@@ -34,5 +34,5 @@ wp-content/themes/twenty*/
 # Ignore all plugins except ours 
 
 wp-content/plugins/*
-!wp-content/plugins/virtual-learning/
+!wp-content/plugins/ghes-vlp/
 

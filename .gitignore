@@ -20,9 +20,6 @@ wp-content/*
 # ignore specific themes
 wp-content/themes/twenty*/
 
-# Dont ignore our vendor folder
-!vendor/
-
 # track this file .gitignore (i.e. do NOT ignore it)
 !.gitignore
 !composer.json

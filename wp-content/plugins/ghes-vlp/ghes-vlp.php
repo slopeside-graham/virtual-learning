@@ -59,8 +59,12 @@ include_once(plugin_dir_path(__FILE__) . '/admin/admin.php');
 include_once(plugin_dir_path(__FILE__) . '/admin/manage-lessons.php');
 include_once(plugin_dir_path(__FILE__) . '/admin/manage-themes.php');
 
+// Include Manage Views
+include_once(plugin_dir_path(__FILE__) . '/views/admin/manage-themes.php');
+include_once(plugin_dir_path(__FILE__) . '/views/admin/manage-lessons.php');
+
 // Register Frontend Scripts and Styles
-function register_vlp_js_scripts_styles()
+function register_vlp_script_style_frontend()
 {
     wp_register_script('wp-api-gameboard', plugins_url('ghes-vlp/js/gameboard.js', dirname(__FILE__)), ['jquery'], scriptver, true);
     wp_localize_script('wp-api-gameboard', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
@@ -71,7 +75,23 @@ function register_vlp_js_scripts_styles()
     wp_register_style('gameboard-1-style', plugins_url('/ghes-vlp/css/gameboard-1.css'), array(), scriptver);
     wp_enqueue_style('gameboard-1-style');
 }
-add_action('wp_enqueue_scripts', 'register_vlp_js_scripts_styles');
+add_action('wp_enqueue_scripts', 'register_vlp_script_style_frontend');
+
+// Register Backend Scripts and Styles
+function register_vlp_script_style_backend()
+{
+  wp_register_script('wp-api-manage-themes', plugins_url('ghes-vlp/js/admin/manage-themes.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-manage-themes', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_register_script('wp-api-manage-lessons', plugins_url('ghes-vlp/js/admin/manage-lessons.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-manage-lessons', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_register_style('manage-themes-style', plugins_url('/ghes-vlp/css/admin/manage-themes.css'), array(), scriptver);
+
+  wp_register_style('manage-lessons-style', plugins_url('/ghes-vlp/css/admin/manage-lessons.css'), array(), scriptver);
+
+}
+add_action('admin_enqueue_scripts', 'register_vlp_script_style_backend');
 
 // Create VLP Admin Pages
 function ghes_vlp_register_menu_pages()

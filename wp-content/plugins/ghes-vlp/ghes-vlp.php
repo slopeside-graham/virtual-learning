@@ -1,6 +1,7 @@
 <?php
 
 use GHES\Utils;
+use GHES\VLP\Utils as VLPUtils;
 
 const vlpscriptver = '1.0.5142020-1';  // Use this in register script calls to bypass cache.
 /**
@@ -16,8 +17,7 @@ const vlpscriptver = '1.0.5142020-1';  // Use this in register script calls to b
  */
 /**
  * Checks if the GHES Registration plugin is activated
- *
-*/
+ */
 // Plugin can only be active if GHES Registration is active
 if (!is_plugin_active('ghes-registration/ghes-registration.php')) {
   deactivate_plugins(plugin_basename(__FILE__));
@@ -44,46 +44,34 @@ function ghes_vlp_activate()
 register_activation_hook(__FILE__, 'ghes_vlp_activate');
 
 // Include shortcodes
-//include_once(plugin_dir_path(__FILE__) . '/shortcodes.php');
-$dbhost = Utils::getunencryptedsetting('vlp-dbhost');
-$dbport = Utils::getunencryptedsetting('vlp-dbport');
-$dbuser = Utils::getunencryptedsetting('vlp-dbuser');
-$dbpassword = Utils::getencryptedsetting('vlp-dbpassword');
-$dbname = Utils::getunencryptedsetting('vlp-dbname');
+include_once(plugin_dir_path(__FILE__) . '/shortcodes.php');
 
+$vlpdbhost = Utils::getunencryptedsetting('vlp-dbhost');
+$vlpdbport = Utils::getunencryptedsetting('vlp-dbport');
+$vlpdbuser = Utils::getunencryptedsetting('vlp-dbuser');
+$vlpdbpassword = Utils::getencryptedsetting('vlp-dbpassword');
+$vlpdbname = Utils::getunencryptedsetting('vlp-dbname');
 
-DB::$host = $dbhost;
-DB::$port = $dbport;
-DB::$user = $dbuser;
-DB::$password = $dbpassword;
-DB::$dbName = $dbname;
-DB::$encoding = 'utf8'; // defaults to latin1 if omitted
-
+VLPUtils::$db = new MeekroDB($vlpdbhost, $vlpdbuser, $vlpdbpassword, $vlpdbname, $vlpdbport);
 
 // Include Setting Pages
 include_once(plugin_dir_path(__FILE__) . '/admin/admin.php');
-include_once(plugin_dir_path(__FILE__) . '/admin/manage.php');
+include_once(plugin_dir_path(__FILE__) . '/admin/manage-lessons.php');
+include_once(plugin_dir_path(__FILE__) . '/admin/manage-themes.php');
 
-// Register Admin Stylesheets and JS
-/*
-function ghes_vlp_admin_scripts_styles()
+// Register Frontend Scripts and Styles
+function register_vlp_js_scripts_styles()
 {
-    // Kendo  styles first
-    wp_register_style('ghes-style-kendo-common', plugins_url('/ghes-registration/styles/kendo.common.min.css', dirname(__FILE__)), array(), vlpscriptver);
-    wp_register_style('ghes-style-kendo-default', plugins_url('/ghes-registration/styles/kendo.silver.min.css', dirname(__FILE__)), array(), vlpscriptver);
-    wp_enqueue_style('ghes-style-kendo-common');
-    wp_enqueue_style('ghes-style-kendo-default');
+    wp_register_script('wp-api-gameboard', plugins_url('ghes-vlp/js/gameboard.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+    wp_localize_script('wp-api-gameboard', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
-    // Kendo Script
-    wp_register_script('ghes-script-kendo-kendo-all', plugins_url('/ghes-registration/kendo/kendo.all.min.js', dirname(__FILE__)), array('jquery'), vlpscriptver, true);
-    wp_enqueue_script('ghes-script-kendo-kendo-all');
+    wp_register_style('gameboard-global-style', plugins_url('/ghes-vlp/css/gameboard-global.css'), array(), scriptver);
+    wp_enqueue_style('gameboard-global-style');
 
-    // Regular Style Sheets
-    wp_register_style('admin-style', plugins_url('/ghes-vlp/css/admin.css'), array(), vlpscriptver);
-    wp_enqueue_style('admin-style');
+    wp_register_style('gameboard-1-style', plugins_url('/ghes-vlp/css/gameboard-1.css'), array(), scriptver);
+    wp_enqueue_style('gameboard-1-style');
 }
-add_action('admin_enqueue_scripts', 'ghes_vlp_admin_scripts_styles');
-*/
+add_action('wp_enqueue_scripts', 'register_vlp_js_scripts_styles');
 
 // Create VLP Admin Pages
 function ghes_vlp_register_menu_pages()
@@ -99,11 +87,19 @@ function ghes_vlp_register_menu_pages()
   );
   add_submenu_page(
     'ghes-vlp/admin/admin.php',
-    'Manage VLP Items',
-    'Manage VLP Items',
+    'Themes',
+    'Themes',
     'vlp_manage_entries',
-    'ghes-vlp/admin/manage.php',
-    'ghes_manage_vlp'
+    'ghes-vlp/admin/manage-themes.php',
+    'vlp_manage_themes'
+  );
+  add_submenu_page(
+    'ghes-vlp/admin/admin.php',
+    'Lesson Plans',
+    'Lesson Plans',
+    'vlp_manage_entries',
+    'ghes-vlp/admin/manage-lessons.php',
+    'vlp_manage_lessons'
   );
 }
 add_action('admin_menu', 'ghes_vlp_register_menu_pages');
@@ -119,7 +115,6 @@ function ghes_vlp_add_custom_roles()
       'vlp_manage_entries' => true,
     )
   );
-
   add_role(
     'VLP Parent',
     'VLP Parent',

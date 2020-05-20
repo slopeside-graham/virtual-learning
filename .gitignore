@@ -25,7 +25,7 @@ wp-content/themes/twenty*/
 !composer.json
 
 # track this file SQl Model.mwb (i.e. do NOT ignore it)
-!SQl Model.mwb
+!SQL Model.mwb
 
 # Include VS Code files, workspace
 !GHES.code-workspace

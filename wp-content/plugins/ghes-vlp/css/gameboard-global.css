@@ -1,0 +1,50 @@
+#gameboard {
+    background-color: #b5cc34;
+    background-image: url("/wp-content/plugins/ghes-vlp/assets/gameboards/gameboard-1.png");
+    height: 500px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+}
+#theme-title {
+    color: #1a71ad;
+    font-size: 1.5em;
+}
+.vlp-intro {
+    color: white;
+    background-color: #1a71ad;
+    text-align: center;
+    font-size: 1.7em;
+    margin-bottom: 20px;
+}
+.gameboard-theme-header {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    margin-bottom: 20px;
+}
+#theme-title {
+    text-align: center;
+}
+.navigation-button {
+    align-self: center;
+}
+.last-week {
+    text-align: left;
+}
+.next-week {
+    text-align: right;
+}
+.lesson-icon-area {
+    position: absolute;
+}
+.lesson-icon-area img {
+    width: 40px;
+}
+span.lesson-icon-area.one-position {
+    left: 240px;
+    bottom: 145px;
+}
+span.lesson-icon-area.two-position {
+    left: 355px;
+    bottom: 210px;
+}

@@ -43,6 +43,11 @@ function ghes_vlp_activate()
 }
 register_activation_hook(__FILE__, 'ghes_vlp_activate');
 
+/*     Include API Routes                                 */
+/*     Routes file will include all API related files     */
+/*     WP routes start:  /wp-json/                        */
+include_once(plugin_dir_path(__FILE__) . '/api/routes.php');
+
 // Include shortcodes
 include_once(plugin_dir_path(__FILE__) . '/shortcodes.php');
 

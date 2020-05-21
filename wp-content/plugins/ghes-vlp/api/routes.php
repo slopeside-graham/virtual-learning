@@ -1,6 +1,4 @@
 <?php
-// Include Enum class
-include_once(plugin_dir_path(__FILE__) . '/../classes/enum.php');  // MyCLabs\Enum class
 
 /*  Include all API files in Routes  */
 include_once(plugin_dir_path(__FILE__) . '/../classes/base.php');  // object base class
@@ -21,7 +19,7 @@ include_once(plugin_dir_path(__FILE__) . '/theme_rest.php');    // Theme REST co
 /**
  * Function to register our new routes from the controller.
  */
-function register_controllers()
+function register_vlp_controllers()
 {
     // Parent Controller
     $controller = new GHES\VLP\Lesson_Rest;
@@ -32,4 +30,4 @@ function register_controllers()
     $controller->register_routes();
 }
 
-add_action('rest_api_init', 'register_controllers');
+add_action('rest_api_init', 'register_vlp_controllers');

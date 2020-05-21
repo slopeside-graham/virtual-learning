@@ -17,6 +17,6 @@ function vlp_view_manage_lessons()
     enqueue_lessons_scripts();
 
     $output = '';
-    $output .= 'Test of the manage lessons view';
+    $output .= '<div id="lesson-grid"><div id="grid"></div>';
     return $output;
 }

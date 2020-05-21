@@ -17,6 +17,6 @@ function vlp_view_manage_themes()
     enqueue_themes_scripts();
 
     $output = '';
-    $output .= 'Test of the manage theme view';
+    $output .= '<div id="theme-grid"><div id="grid"></div>';
     return $output;
 }

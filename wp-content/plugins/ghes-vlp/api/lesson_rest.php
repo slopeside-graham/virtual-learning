@@ -33,7 +33,7 @@ namespace GHES\VLP {
         public function __construct()
         {
 
-            $this->namespace = 'ghes-registration/v1';
+            $this->namespace = 'ghes-vlp/v1';
             $this->rest_base = 'lesson';
         }
 

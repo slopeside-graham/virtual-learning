@@ -2,6 +2,7 @@
 
 namespace GHES\VLP {
 
+    use GHES\VLP\Utils as VLPUtils;
     /**
      * Class Lesson
      */
@@ -144,7 +145,7 @@ namespace GHES\VLP {
 
             try {
 
-                \DB::insert('Lesson', array(
+                VLPUtils::$db->insert('Lesson', array(
                     'Title' => $this->Title,
                     'MainContent' => $this->MainContent,
                     'VideoURL' => $this->VideoURL,
@@ -152,7 +153,7 @@ namespace GHES\VLP {
                     'Theme_id' => $this->Theme_id,
                     'AgeGroup_id' => $this->AgeGroup_id
                 ));
-                $this->id = \DB::insertId();
+                $this->id = VLPUtils::$db->insertId();
 
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Lesson_Create_Error', $e->getMessage());
@@ -168,7 +169,7 @@ namespace GHES\VLP {
 
             try {
 
-                \DB::query(
+                VLPUtils::$db->query(
                     "UPDATE Lesson 
                     SET
                     Title=%s, 
@@ -188,7 +189,7 @@ namespace GHES\VLP {
                     $this->id
                 );
 
-                $counter = \DB::affectedRows();
+                $counter = VLPUtils::$db->affectedRows();
 
                 $lesson = Lesson::Get($this->id);
             } catch (\MeekroDBException $e) {
@@ -205,8 +206,8 @@ namespace GHES\VLP {
 
             try {
 
-                \DB::query("Delete from Lesson WHERE id=%d", $this->id);
-                $counter = \DB::affectedRows();
+                VLPUtils::$db->query("Delete from Lesson WHERE id=%d", $this->id);
+                $counter = VLPUtils::$db->affectedRows();
             } catch (\MeekroDBException $e) {
                 echo $e->getMessage();
                 return new \WP_Error('Lesson_Delete_Error', $e->getMessage());
@@ -221,7 +222,7 @@ namespace GHES\VLP {
 
             try {
 
-                $row = \DB::queryFirstRow("select * from Lesson where id = %i", $thisid);
+                $row = VLPUtils::$db->queryFirstRow("select * from Lesson where id = %i", $thisid);
                 $lesson = Lesson::populatefromRow($row);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Lesson_Get_Error', $e->getMessage());
@@ -238,7 +239,7 @@ namespace GHES\VLP {
             $lessons = new NestedSerializable();
 
             try {
-                    $results = \DB::query("select * from Lesson");
+                    $results = VLPUtils::$db->query("select * from Lesson");
 
                 foreach ($results as $row) {
                     $lesson = Lesson::populatefromRow($row);

@@ -2,6 +2,7 @@
 
 namespace GHES\VLP {
 
+    use GHES\VLP\Utils as VLPUtils;
     /**
      * Class Theme
      */
@@ -118,13 +119,13 @@ namespace GHES\VLP {
 
             try {
 
-                \DB::insert('Theme', array(
+                VLPUtils::$db->insert('Theme', array(
                     'Title' => $this->Title,
                     'StartDate' => $this->StartDate,
                     'EndDate' => $this->EndDate,
                     'Gameboard_id' => $this->Gameboard_id,
                 ));
-                $this->id = \DB::insertId();
+                $this->id = VLPUtils::$db->insertId();
 
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_Create_Error', $e->getMessage());
@@ -140,7 +141,7 @@ namespace GHES\VLP {
 
             try {
 
-                \DB::query(
+                VLPUtils::$db->query(
                     "UPDATE Theme 
                     SET
                     Title=%s, 
@@ -156,7 +157,7 @@ namespace GHES\VLP {
                     $this->id
                 );
 
-                $counter = \DB::affectedRows();
+                $counter = VLPUtils::$db->affectedRows();
 
                 $theme = Theme::Get($this->id);
             } catch (\MeekroDBException $e) {
@@ -173,8 +174,8 @@ namespace GHES\VLP {
 
             try {
 
-                \DB::query("Delete from Theme WHERE id=%d", $this->id);
-                $counter = \DB::affectedRows();
+                VLPUtils::$db->query("Delete from Theme WHERE id=%d", $this->id);
+                $counter = VLPUtils::$db->affectedRows();
             } catch (\MeekroDBException $e) {
                 echo $e->getMessage();
                 return new \WP_Error('Theme_Delete_Error', $e->getMessage());
@@ -189,7 +190,7 @@ namespace GHES\VLP {
 
             try {
 
-                $row = \DB::queryFirstRow("select * from Theme where id = %i", $thisid);
+                $row = VLPUtils::$db->queryFirstRow("select * from Theme where id = %i", $thisid);
                 $theme = Theme::populatefromRow($row);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_Get_Error', $e->getMessage());
@@ -206,8 +207,8 @@ namespace GHES\VLP {
             $themes = new NestedSerializable();
 
             try {
-                    $results = \DB::query("select * from Theme");
-
+                    $results = VLPUtils::$db->query("select * from Theme"); //Need to chage out all database refences to this.
+                    
                 foreach ($results as $row) {
                     $theme = Theme::populatefromRow($row);
                     $themes->add_item($theme);  // Add the theme to the collection

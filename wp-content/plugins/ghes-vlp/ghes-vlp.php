@@ -19,11 +19,15 @@ const vlpscriptver = '1.0.5142020-1';  // Use this in register script calls to b
  * Checks if the GHES Registration plugin is activated
  */
 // Plugin can only be active if GHES Registration is active
-if (!is_plugin_active('ghes-registration/ghes-registration.php')) {
-  deactivate_plugins(plugin_basename(__FILE__));
-  header("Location: /wp-admin/plugins.php");
-  exit;
+function ghesregcheck()
+{
+  if (!is_plugin_active('ghes-registration/ghes-registration.php')) {
+    deactivate_plugins(plugin_basename(__FILE__));
+    header("Location: /wp-admin/plugins.php");
+    exit;
+  }
 }
+add_action('admin_init', 'ghesregcheck');
 
 /* If the GHES Registration plugin is not active, then don't allow the
 * activation of this plugin.
@@ -71,14 +75,14 @@ include_once(plugin_dir_path(__FILE__) . '/views/admin/manage-lessons.php');
 // Register Frontend Scripts and Styles
 function register_vlp_script_style_frontend()
 {
-    wp_register_script('wp-api-gameboard', plugins_url('ghes-vlp/js/gameboard.js', dirname(__FILE__)), ['jquery'], scriptver, true);
-    wp_localize_script('wp-api-gameboard', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+  wp_register_script('wp-api-gameboard', plugins_url('ghes-vlp/js/gameboard.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-gameboard', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
-    wp_register_style('gameboard-global-style', plugins_url('/ghes-vlp/css/gameboard-global.css'), array(), scriptver);
-    wp_enqueue_style('gameboard-global-style');
+  wp_register_style('gameboard-global-style', plugins_url('/ghes-vlp/css/gameboard-global.css'), array(), scriptver);
+  wp_enqueue_style('gameboard-global-style');
 
-    wp_register_style('gameboard-1-style', plugins_url('/ghes-vlp/css/gameboard-1.css'), array(), scriptver);
-    wp_enqueue_style('gameboard-1-style');
+  wp_register_style('gameboard-1-style', plugins_url('/ghes-vlp/css/gameboard-1.css'), array(), scriptver);
+  wp_enqueue_style('gameboard-1-style');
 }
 add_action('wp_enqueue_scripts', 'register_vlp_script_style_frontend');
 
@@ -94,7 +98,6 @@ function register_vlp_script_style_backend()
   wp_register_style('manage-themes-style', plugins_url('/ghes-vlp/css/admin/manage-themes.css'), array(), scriptver);
 
   wp_register_style('manage-lessons-style', plugins_url('/ghes-vlp/css/admin/manage-lessons.css'), array(), scriptver);
-
 }
 add_action('admin_enqueue_scripts', 'register_vlp_script_style_backend');
 

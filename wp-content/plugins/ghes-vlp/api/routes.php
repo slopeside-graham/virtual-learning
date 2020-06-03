@@ -12,6 +12,14 @@ include_once(plugin_dir_path(__FILE__) . '/lesson_rest.php');    // Leeson REST 
 include_once(plugin_dir_path(__FILE__) . '/../classes/theme.php');  // Theme class
 include_once(plugin_dir_path(__FILE__) . '/theme_rest.php');    // Theme REST controller
 
+// Include AgeGroup REST controller and class
+include_once(plugin_dir_path(__FILE__) . '/../classes/agegroup.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/agegroup_rest.php');    // AgeGroup REST controller
+
+// Include Resource REST controller and class
+include_once(plugin_dir_path(__FILE__) . '/../classes/resource.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/resource_rest.php');    // AgeGroup REST controller
+
 /**
  * Register our API routes.
  */
@@ -21,12 +29,20 @@ include_once(plugin_dir_path(__FILE__) . '/theme_rest.php');    // Theme REST co
  */
 function register_vlp_controllers()
 {
-    // Parent Controller
+    // Lesson Controller
     $controller = new GHES\VLP\Lesson_Rest;
     $controller->register_routes();
 
-    // Children Controller
+    // Theme Controller
     $controller = new GHES\VLP\Theme_Rest();
+    $controller->register_routes();
+
+    // AgeGroup Controller
+    $controller = new GHES\VLP\AgeGroup_Rest();
+    $controller->register_routes();
+
+    // Resource Controller
+    $controller = new GHES\VLP\Resource_Rest();
     $controller->register_routes();
 }
 

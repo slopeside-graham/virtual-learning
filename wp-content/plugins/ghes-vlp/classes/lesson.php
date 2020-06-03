@@ -10,6 +10,7 @@ namespace GHES\VLP {
     {
         private $_id;
         private $_Title;
+        private $_Type;
         private $_MainContent;
         private $_VideoURL;
         private $_Image_id;
@@ -41,6 +42,19 @@ namespace GHES\VLP {
                 return $this->_Title;
             }
         }
+
+        protected function Type($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Type = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Type;
+            }
+        }
+
 
         protected function MainContent($value = null)
         {
@@ -127,6 +141,7 @@ namespace GHES\VLP {
             return [
                 'id' => $this->id,
                 'Title' => $this->Title,
+                'Type' => $this->Type,
                 'MainContent' => $this->MainContent,
                 'VideoURL' => $this->VideoURL,
                 'Image_id' => $this->Image_id,
@@ -147,6 +162,7 @@ namespace GHES\VLP {
 
                 VLPUtils::$db->insert('Lesson', array(
                     'Title' => $this->Title,
+                    'Type' => $this->Type,
                     'MainContent' => $this->MainContent,
                     'VideoURL' => $this->VideoURL,
                     'Image_id' => $this->Image_id,
@@ -173,6 +189,7 @@ namespace GHES\VLP {
                     "UPDATE Lesson 
                     SET
                     Title=%s, 
+                    Type=%s, 
                     MainContent=%s, 
                     VideoURL=%s,
                     Image_id=%s,
@@ -181,6 +198,7 @@ namespace GHES\VLP {
                 WHERE 
                     id=%i",
                     $this->Title,
+                    $this->Type,
                     $this->MainContent,
                     $this->VideoURL,
                     $this->Image_id,
@@ -229,6 +247,48 @@ namespace GHES\VLP {
             }
             return $lesson;
         }
+
+        public static function GetAllbyThemeId($themeid)
+        {
+            \DB::$error_handler = false; // since we're catching errors, don't need error handler
+            \DB::$throw_exception_on_error = true;
+
+            $lessons = new NestedSerializable();
+
+            try {
+                    $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i", $themeid);
+
+                foreach ($results as $row) {
+                    $lesson = Lesson::populatefromRow($row);
+                    $lessons->add_item($lesson);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Lesson_GetAll_Error', $e->getMessage());
+            }
+            return $lessons;
+        }
+
+        public static function GetAllbyThemeIdAndAgeGroup($themeid, $agegroupid)
+        {
+            \DB::$error_handler = false; // since we're catching errors, don't need error handler
+            \DB::$throw_exception_on_error = true;
+
+            $lessons = new NestedSerializable();
+
+            try {
+                    $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i and AgeGroup_id = %i", $themeid, $agegroupid);
+
+                foreach ($results as $row) {
+                    $lesson = Lesson::populatefromRow($row);
+                    $lessons->add_item($lesson);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Lesson_GetAll_Error', $e->getMessage());
+            }
+            return $lessons;
+        }
         
 
         public static function GetAll()
@@ -258,6 +318,7 @@ namespace GHES\VLP {
             $lesson = new Lesson();
             $lesson->id = $row['id'];
             $lesson->Title = $row['Title'];
+            $lesson->Type = $row['Type'];
             $lesson->MainContent = $row['MainContent'];
             $lesson->VideoURL = $row['VideoURL'];
             $lesson->Image_id = $row['Image_id'];

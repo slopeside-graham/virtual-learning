@@ -36,15 +36,86 @@
 }
 .lesson-icon-area {
     position: absolute;
+    z-index: 1;
+    width: 45px;
+    height: 45px;
+    display: block;
 }
-.lesson-icon-area img {
-    width: 40px;
+.lesson-icon-area:hover {
+    cursor: pointer;
 }
-span.lesson-icon-area.one-position {
-    left: 240px;
-    bottom: 145px;
+.lesson-icon-area svg {
+    background-color: white;
+    border: 5px solid white;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px black;
 }
-span.lesson-icon-area.two-position {
-    left: 355px;
-    bottom: 210px;
+.lesson-popup {
+    display: none;
+    position:absolute;
+    top:57%;
+    left:50%;
+    width:800px;  /* adjust as per your needs */
+    height:450px;   /* adjust as per your needs */
+    margin-left:-400px;   /* negative half of width above */
+    margin-top:-210px;   /* negative half of height above */
+    padding: 1em;
+    z-index: 2;
+    color: white;
+    background-color: #1375b8;
+    border: 5px solid white;
+    border-radius: 5px;
+}
+.lesson-popup.type-Play {
+    background-color: #f69e33;
+}
+.lesson-popup.type-Learn {
+    background-color: #b5ce33;
+}
+.lesson-popup.type-Art {
+    background-color: #1caa9e;
+}
+.lesson-popup.type-Nurturing {
+    background-color: #1375b8;
+}
+.lesson-content {
+    display: grid;
+    grid-template-columns: 60% 40%;
+    margin-left: 75px;
+}
+.icon-Play {
+    fill: #f69e33;
+}
+.icon-Art {
+    fill: #1caa9e;
+}
+.icon-Learn {
+    fill: #b5ce33;
+}
+.icon-Nurture {
+    fill: #1375b8;
+}
+
+.lesson-popup .close-button {
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    border-radius: 50%;
+    background-color: white;
+    line-height: .7;
+    padding: 5px;
+    border: 2px solid black;
+    color: black;;
+}
+.lesson-popup .close-button:hover {
+    cursor: pointer
+}
+.corner-icon svg {
+    height: 100px;
+    background-color: white;
+    border-radius: 50%;
+    border: 5px solid white;
+    position: absolute;
+    top: -25px;
+    left: -25px;
 }

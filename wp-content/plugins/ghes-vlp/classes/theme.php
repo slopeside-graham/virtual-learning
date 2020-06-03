@@ -3,6 +3,7 @@
 namespace GHES\VLP {
 
     use GHES\VLP\Utils as VLPUtils;
+
     /**
      * Class Theme
      */
@@ -13,6 +14,8 @@ namespace GHES\VLP {
         private $_StartDate;
         private $_EndDate;
         private $_Gameboard_id;
+        private $_Completed;
+        private $_CompletePercent;
         private $_DateCreated;
         private $_DateModified;
 
@@ -74,6 +77,28 @@ namespace GHES\VLP {
                 return $this->_Gameboard_id;
             }
         }
+        protected function Completed($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Completed = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Completed;
+            }
+        }
+        protected function PercentComplete($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_PercentComplete = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_PercentComplete;
+            }
+        }
         protected function DateCreated($value = null)
         {
             // If value was provided, set the value
@@ -96,7 +121,7 @@ namespace GHES\VLP {
                 return $this->_DateModified;
             }
         }
-        
+
 
         public function jsonSerialize()
         {
@@ -106,6 +131,8 @@ namespace GHES\VLP {
                 'StartDate' => $this->StartDate,
                 'EndDate' => $this->EndDate,
                 'Gameboard_id' => $this->Gameboard_id,
+                'Completed' => $this->Completed,
+                'PercentComplete' => $this->PercentComplete,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
@@ -126,7 +153,6 @@ namespace GHES\VLP {
                     'Gameboard_id' => $this->Gameboard_id,
                 ));
                 $this->id = VLPUtils::$db->insertId();
-
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_Create_Error', $e->getMessage());
             }
@@ -197,7 +223,46 @@ namespace GHES\VLP {
             }
             return $theme;
         }
-        
+
+        public static function GetbyDate($date)
+        {
+            \DB::$error_handler = false; // since we're catching errors, don't need error handler
+            \DB::$throw_exception_on_error = true;
+
+            try {
+                if (isset($_COOKIE['VLPSelectedChild'])) {
+                    $child_id = $_COOKIE['VLPSelectedChild'];
+                    $row = VLPUtils::$db->queryFirstRow("select t.*, cts.Completed, cts.PercentComplete from Theme t
+                                                                    Left Join Child_Theme_Status cts on t.id = cts.Theme_id
+                                                                where
+                                                                 %? between t.StartDate and t.EndDate
+                                                                 and (cts.Child_id = %i or isnull(cts.Child_id ))", $date, $child_id);
+                } else {
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %? between StartDate and EndDate", $date);
+                }
+                $theme = Theme::populatefromRow($row);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+            }
+            return $theme;
+        }
+
+
+        public static function GetbyAgeGroup($agegroupid)
+        {
+            \DB::$error_handler = false; // since we're catching errors, don't need error handler
+            \DB::$throw_exception_on_error = true;
+
+            try {
+
+                $row = VLPUtils::$db->queryFirstRow("select * from Theme where AgeGroup_id = %i", $agegroupid);
+                $theme = Theme::populatefromRow($row);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+            }
+            return $theme;
+        }
+
 
         public static function GetAll()
         {
@@ -207,8 +272,8 @@ namespace GHES\VLP {
             $themes = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from Theme"); //Need to chage out all database refences to this.
-                    
+                $results = VLPUtils::$db->query("select * from Theme"); //Need to chage out all database refences to this.
+
                 foreach ($results as $row) {
                     $theme = Theme::populatefromRow($row);
                     $themes->add_item($theme);  // Add the theme to the collection
@@ -229,6 +294,8 @@ namespace GHES\VLP {
             $theme->StartDate = $row['StartDate'];
             $theme->EndDate = $row['EndDate'];
             $theme->Gameboard_id = $row['Gameboard_id'];
+            $theme->Completed = $row['Completed'];
+            $theme->PercentComplete = $row['PercentComplete'];
             return $theme;
         }
     }

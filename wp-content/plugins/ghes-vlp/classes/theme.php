@@ -15,7 +15,7 @@ namespace GHES\VLP {
         private $_EndDate;
         private $_Gameboard_id;
         private $_Completed;
-        private $_CompletePercent;
+        private $_PercentComplete;
         private $_DateCreated;
         private $_DateModified;
 

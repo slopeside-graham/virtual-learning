@@ -137,7 +137,9 @@ function vlp_gameboard($atts, $content = null)
 
                         foreach ($resources->jsonSerialize() as $k => $resource) {
                             $resourcelink = wp_get_attachment_url($resource->Media_id);
-                            $output .= '<a href="' . $resourcelink . '" target="_blank" class="related-materials-item">' . $resource->Title . '</a>';
+                            $percentcomplete = $resource->PercentComplete;
+                            $output .= '<a href="' . $resourcelink . '" target="_blank" class="related-materials-item">' . $resource->Title . '</a><br/>';
+                            $output .= 'Percent Complete: ' . $percentcomplete;
                         }
                         $output .= '</div>';
                     }

@@ -3,6 +3,7 @@
 namespace GHES\VLP {
 
     use GHES\VLP\Utils as VLPUtils;
+
     /**
      * Class Resource
      */
@@ -11,6 +12,8 @@ namespace GHES\VLP {
         private $_id;
         private $_Title;
         private $_Media_id;
+        private $_Completed;
+        private $_PercentComplete;
         private $_DateCreated;
         private $_DateModified;
 
@@ -50,6 +53,28 @@ namespace GHES\VLP {
                 return $this->_Media_id;
             }
         }
+        protected function Completed($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Completed = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Completed;
+            }
+        }
+        protected function PercentComplete($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_PercentComplete = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_PercentComplete;
+            }
+        }
 
         protected function DateCreated($value = null)
         {
@@ -73,7 +98,7 @@ namespace GHES\VLP {
                 return $this->_DateModified;
             }
         }
-        
+
 
         public function jsonSerialize()
         {
@@ -81,6 +106,8 @@ namespace GHES\VLP {
                 'id' => $this->id,
                 'Title' => $this->Title,
                 'Media_id' => $this->Media_id,
+                'Completed' => $this->Completed,
+                'PercentComplete' => $this->PercentComplete,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
@@ -99,7 +126,6 @@ namespace GHES\VLP {
                     'Media_id' => $this->Media_id,
                 ));
                 $this->id = VLPUtils::$db->insertId();
-
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Resource_Create_Error', $e->getMessage());
             }
@@ -166,7 +192,7 @@ namespace GHES\VLP {
             }
             return $resource;
         }
-        
+
 
         public static function GetAll()
         {
@@ -176,7 +202,7 @@ namespace GHES\VLP {
             $resources = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from Resource");
+                $results = VLPUtils::$db->query("select * from Resource");
 
                 foreach ($results as $row) {
                     $resource = Resource::populatefromRow($row);
@@ -197,7 +223,15 @@ namespace GHES\VLP {
             $resources = new NestedSerializable();
 
             try {
+                if (isset($_COOKIE['VLPSelectedChild'])) {
+                    $child_id = $_COOKIE['VLPSelectedChild'];
+                    $results = VLPUtils::$db->query("select r.*, crs.Completed, crs.PercentComplete from Resource r
+                                                    Left Join Child_Resource_Status crs on r.id = crs.Resource_id
+                                                    where Lesson_id = %i
+                                                    and (crs.Child_id = %i or isnull(crs.Child_id ))", $lessonid, $child_id);
+                } else {
                     $results = VLPUtils::$db->query("select * from Resource where Lesson_id = %i", $lessonid);
+                }
 
                 foreach ($results as $row) {
                     $resource = Resource::populatefromRow($row);
@@ -217,6 +251,8 @@ namespace GHES\VLP {
             $resource->id = $row['id'];
             $resource->Title = $row['Title'];
             $resource->Media_id = $row['Media_id'];
+            $resource->Completed = $row['Completed'];
+            $resource->PercentComplete = $row['PercentComplete'];
             return $resource;
         }
     }

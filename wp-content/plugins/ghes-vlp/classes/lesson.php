@@ -16,6 +16,8 @@ namespace GHES\VLP {
         private $_Image_id;
         private $_Theme_id;
         private $_AgeGroup_id;
+        private $_Completed;
+        private $_PercentComplete;
         private $_DateCreated;
         private $_DateModified;
 
@@ -112,6 +114,28 @@ namespace GHES\VLP {
                 return $this->_AgeGroup_id;
             }
         }
+        protected function Completed($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Completed = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Completed;
+            }
+        }
+        protected function PercentComplete($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_PercentComplete = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_PercentComplete;
+            }
+        }
         protected function DateCreated($value = null)
         {
             // If value was provided, set the value
@@ -147,6 +171,8 @@ namespace GHES\VLP {
                 'Image_id' => $this->Image_id,
                 'Theme_id' => $this->Theme_id,
                 'AgeGroup_id' => $this->AgeGroup_id,
+                'Completed' => $this->Completed,
+                'PercentComplete' => $this->PercentComplete,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
@@ -324,6 +350,8 @@ namespace GHES\VLP {
             $lesson->Image_id = $row['Image_id'];
             $lesson->Theme_id = $row['Theme_id'];
             $lesson->AgeGroup_id = $row['AgeGroup_id'];
+            $lesson->Completed = $row['Completed'];
+            $lesson->PercentComplete = $row['PercentComplete'];
             return $lesson;
         }
     }

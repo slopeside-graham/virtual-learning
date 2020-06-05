@@ -34,7 +34,7 @@ function completeResource(clicked_item) {
         transport: {
             create: function (options) {
                 $.ajax({
-                    url: wpApiSettings.root + "ghes-vlp/v1/child-resource-status",
+                    url: wpApiSettings.root + "ghes-vlp/v1/childresourcestatus",
                     method: "POST",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);

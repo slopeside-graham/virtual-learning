@@ -20,6 +20,10 @@ include_once(plugin_dir_path(__FILE__) . '/agegroup_rest.php');    // AgeGroup R
 include_once(plugin_dir_path(__FILE__) . '/../classes/resource.php');  // AgeGroup class
 include_once(plugin_dir_path(__FILE__) . '/resource_rest.php');    // AgeGroup REST controller
 
+// Include Child Resource Status REST controller and class
+include_once(plugin_dir_path(__FILE__) . '/../classes/childresourcestatus.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/childresourcestatus_rest.php');    // AgeGroup REST controller
+
 /**
  * Register our API routes.
  */
@@ -43,6 +47,10 @@ function register_vlp_controllers()
 
     // Resource Controller
     $controller = new GHES\VLP\Resource_Rest();
+    $controller->register_routes();
+
+    // Resource Controller
+    $controller = new GHES\VLP\ChildResourceStatus_Rest();
     $controller->register_routes();
 }
 

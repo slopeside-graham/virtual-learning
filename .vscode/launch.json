@@ -16,7 +16,7 @@
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "url": "http://ghes.test",
+            "url": "http://vlp.test",
             "webRoot": "${workspaceFolder}"
         },
         {

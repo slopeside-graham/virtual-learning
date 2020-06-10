@@ -55,9 +55,9 @@
     position:absolute;
     top:57%;
     left:50%;
-    width:800px;  /* adjust as per your needs */
+    width:900px;  /* adjust as per your needs */
     height:450px;   /* adjust as per your needs */
-    margin-left:-400px;   /* negative half of width above */
+    margin-left:-450px;   /* negative half of width above */
     margin-top:-210px;   /* negative half of height above */
     padding: 1em;
     z-index: 2;
@@ -81,7 +81,11 @@
 .lesson-content {
     display: grid;
     grid-template-columns: 60% 40%;
-    margin-left: 75px;
+    margin-left: 65px;
+    max-height: 410px;
+}
+.first-column {
+    margin-right: 20px;
 }
 .icon-Play {
     fill: #f69e33;
@@ -118,4 +122,54 @@
     position: absolute;
     top: -25px;
     left: -25px;
+}
+.completion-icon svg {
+   width: 12px;
+   position: relative;
+   top: -5px;
+   display: none;
+}
+.lesson-completion-icon svg {
+    display: none;
+    background-color: transparent;
+    border: none;
+    border-radius: none;
+    box-shadow: none;
+    width: 20px;
+    position: absolute;
+    top: 0;
+    right: 0px;
+ }
+.completed .completion-icon svg {
+    display: inline;
+}
+.completed .lesson-completion-icon svg {
+    display: inline;
+}
+.completion-icon svg path, .lesson-completion-icon svg path {
+    fill: greenyellow;
+}
+.resources a {
+    color: white;
+    border-bottom: none !important;
+}
+.type-heading {
+    font-size: 2em;
+    text-transform: uppercase;
+    font-weight: 300;
+}
+.lesson-title {
+    font-size: 1.4em;
+}
+.lesson-main-content {
+    font-size: .8em;
+    max-height: 300px;
+    overflow: auto;
+}
+.related-materials-title {
+    font-style: italic;
+    font-weight: 600;
+}
+.related-materials-list {
+    list-style: none;
 }

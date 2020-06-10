@@ -152,7 +152,7 @@ namespace GHES\VLP {
          */
         public function create_item_permissions_check($request)
         {
-            if (is_user_logged_in() && current_user_can('vlp_manage_entries')) {
+            if (is_user_logged_in()) {
                 return true;
             } else
                 return new \WP_Error('rest_forbidden', esc_html__('You cannot create this child resource status.'), array('status' => $this->authorization_status_code()));
@@ -252,7 +252,9 @@ namespace GHES\VLP {
 
             $childresourcestatus = ChildResourceStatus::populatefromRow($request);
             $success = $childresourcestatus->Create();
-            $childresourcestatus = ChildResourceStatus::Get($childresourcestatus->id);
+            if ($success == true) {
+                $childresourcestatus = ChildResourceStatus::Get($childresourcestatus->id);
+            }
 
             if (!is_wp_error($success))
                 return rest_ensure_response($childresourcestatus);

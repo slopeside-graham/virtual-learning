@@ -63,20 +63,20 @@ function vlp_gameboard($atts, $content = null)
         $themestartdate = $theme->StartDate;
         $themeenddate = $theme->EndDate;
         $themecompleted = $theme->Completed;
-        $themepercentcompleted = $theme->PercentCompleted;
+        $themepercentcompleted = $theme->PercentComplete;
 
         if ($themecompleted) {
             $themeprogress = "completed";
         } else {
             $themeprogress = $themepercentcompleted;
         }
-
+        $output .= '<script>var currentThemeId = '. $themeid . '</script>';
         $output .= '<div class="vlp-intro">Take the journey and see what you can learn with our P.L.A.N.!</div>';
         $output .= '<div class="gameboard-theme-header">';
         if (Theme::GetbyDate($themelastweekdate)) {
             $output .= '<div class="navigation-button last-week"><a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '">Previous Week</a></div>';
         }
-        $output .= '<div id="theme-title" class="'. $themeprogress . '">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
+        $output .= '<div id="theme-title" class="'. $themeprogress . '%-completed">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
         if (Theme::GetbyDate($themenextweekdate)) {
             $output .= '<div class="navigation-button next-week"><a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '">Next Week</a></div>';
         }

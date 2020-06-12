@@ -5,6 +5,7 @@
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
+    position: relative;
 }
 #theme-title {
     color: #1a71ad;
@@ -53,7 +54,7 @@
 .lesson-popup {
     display: none;
     position:absolute;
-    top:57%;
+    top:50%;
     left:50%;
     width:900px;  /* adjust as per your needs */
     height:450px;   /* adjust as per your needs */
@@ -256,20 +257,7 @@
     }
 }
 
-/* Screen Size Max 499px min 425px */
-
-@media screen and (max-width: 499px) and (min-width: 425px) {
-    #gameboard {
-        width: 400px;
-        height: 250px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
-/* Screen Size Max 424px and Under */
-
-@media screen and (max-width: 424px) {
+@media screen and (max-width: 499px) {
     #gameboard {
         height: auto;
         background-image: none;

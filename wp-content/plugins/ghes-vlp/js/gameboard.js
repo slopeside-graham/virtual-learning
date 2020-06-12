@@ -80,6 +80,7 @@ function completeLesson() {
             // notify the data source that the request succeeded
             console.log("Lesson ID: " + currentLessonId + " completed.");
             console.log("Done:" + result);
+            updateThemeStatus();
         },
         error: function (result) {
             if (typeof result.responseJSON !== "undefined") {
@@ -139,7 +140,7 @@ function updateLessonStatus() {
     }
 
 }
-/*
+
 function updateThemeStatus() {
 
     var totalLessons = $(".lesson-icon-area").length;
@@ -150,9 +151,72 @@ function updateThemeStatus() {
     var percentCompleted = (completedLessons / totalLessons) * 100;
     console.log("Percent Completed: " + percentCompleted);
     
-    if (percentCompleted = 100) {
+    if (percentCompleted == 100) {
         $("#theme-title").addClass("completed");
+        completeTheme();
+    } else {
+        $("#theme-title").addClass(percentCompleted + "%-completed");
+        inProgressTheme(percentCompleted);
     }
 
 }
-*/
+
+function completeTheme() {
+    console.log(selectedChild);
+
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/childthemestatus",
+        method: "POST",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        data: {
+            Theme_id: currentThemeId,
+            Child_id: selectedChild,
+            Completed: 1,
+            PercentComplete: 100
+        },
+        success: function (result) {
+            // notify the data source that the request succeeded
+            console.log("Theme ID: " + currentThemeId + " completed.");
+            console.log("Done:" + result);
+            updateThemeStatus();
+        },
+        error: function (result) {
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            }
+            console.log(result.responseText);
+            // notify the data source that the request failed
+        }
+    });
+}
+
+function inProgressTheme(percentCompleted) {
+    console.log(selectedChild);
+
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/childthemestatus",
+        method: "POST",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        data: {
+            Theme_id: currentThemeId,
+            Child_id: selectedChild,
+            PercentComplete: percentCompleted
+        },
+        success: function (result) {
+            // notify the data source that the request succeeded
+            console.log("Theme ID: " + currentThemeId + " " + percentCompleted + "% complete.");
+            console.log("Done:" + result);
+        },
+        error: function (result) {
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            }
+            console.log(result.responseText);
+            // notify the data source that the request failed
+        }
+    });
+}

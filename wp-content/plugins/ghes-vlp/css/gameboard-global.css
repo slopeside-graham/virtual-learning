@@ -129,24 +129,33 @@
    top: -5px;
    display: none;
 }
-.lesson-completion-icon svg {
+.lesson-completion-icon svg, .theme-completion-icon svg {
     display: none;
     background-color: transparent;
     border: none;
     border-radius: none;
     box-shadow: none;
     width: 20px;
-    position: absolute;
-    top: 0;
-    right: 0px;
  }
 .completed .completion-icon svg {
     display: inline;
 }
 .completed .lesson-completion-icon svg {
     display: inline;
+    position: absolute;
+    top: 0;
+    right: 0px;
 }
-.completion-icon svg path, .lesson-completion-icon svg path {
+.completed .theme-completion-icon svg {
+    display: inline;
+    position: relative;
+    top: -10px;
+    left: -5px;
+}
+.completed .theme-completion-icon svg {
+    display: inline;
+}
+.completion-icon svg path, .lesson-completion-icon svg path, .completed .theme-completion-icon svg path {
     fill: greenyellow;
 }
 .resources a {

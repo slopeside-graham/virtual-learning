@@ -65,12 +65,18 @@ function vlp_gameboard($atts, $content = null)
         $themecompleted = $theme->Completed;
         $themepercentcompleted = $theme->PercentCompleted;
 
+        if ($themecompleted) {
+            $themeprogress = "completed";
+        } else {
+            $themeprogress = $themepercentcompleted;
+        }
+
         $output .= '<div class="vlp-intro">Take the journey and see what you can learn with our P.L.A.N.!</div>';
         $output .= '<div class="gameboard-theme-header">';
         if (Theme::GetbyDate($themelastweekdate)) {
             $output .= '<div class="navigation-button last-week"><a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '">Previous Week</a></div>';
         }
-        $output .= '<div id="theme-title">This weeks theme: <strong>' . $theme->Title . '</strong></div>';
+        $output .= '<div id="theme-title" class="'. $themeprogress . '">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
         if (Theme::GetbyDate($themenextweekdate)) {
             $output .= '<div class="navigation-button next-week"><a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '">Next Week</a></div>';
         }
@@ -105,6 +111,14 @@ function vlp_gameboard($atts, $content = null)
                 foreach ($lessons->jsonSerialize() as $k => $lesson) {
                     $lessonid = $lesson->id;
                     $lessonNumber = $lessonnumber++;
+                    $completed = $lesson->Completed;
+                    $percentcomplete = $lesson->PercentComplete;
+
+                    if ($completed) {
+                        $lessonprogress = "completed";
+                    } else {
+                        $lessonprogress = $percentcomplete;
+                    }
 
                     if ($lesson->Type == 'Play') {
                         $lessonicon = file_get_contents("wp-content/plugins/ghes-vlp/assets/icons/play.svg");
@@ -118,7 +132,7 @@ function vlp_gameboard($atts, $content = null)
                         $lessonicon = "No Icon Found";
                     }
 
-                    $output .= ' <span id="lesson-icon-'. $lessonNumber .'" class="lesson-icon-area L-' . $lessonNumber . '-position icon-' . $lesson->Type . '" onclick="openLessonPopup(this)" data-lesson-number="' . $lessonNumber . '" data-lesson-id="' . $lessonid . '">' . $lessonicon . '<span class="lesson-completion-icon">' . $completionIcon . '</span><span class="lesson-icon-title">' . $lesson->Title . '</span></span>';
+                    $output .= ' <span id="lesson-icon-'. $lessonNumber .'" class="lesson-icon-area L-' . $lessonNumber . '-position icon-' . $lesson->Type . ' ' . $lessonprogress . '" onclick="openLessonPopup(this)" data-lesson-number="' . $lessonNumber . '" data-lesson-id="' . $lessonid . '">' . $lessonicon . '<span class="lesson-completion-icon">' . $completionIcon . '</span><span class="lesson-icon-title">' . $lesson->Title . '</span></span>';
                     $output .= '<div class="lesson-popup type-' . $lesson->Type . '" id="lesson-' . $lessonNumber . '">';
                     $output .= '<span class="close-button">&times;</span>';
                     $output .= '<span class="corner-icon icon-' . $lesson->Type . '">' . $lessonicon . '</span>';

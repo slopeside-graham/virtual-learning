@@ -282,7 +282,16 @@ namespace GHES\VLP {
             $lessons = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i", $themeid);
+
+                    if (isset($_COOKIE['VLPSelectedChild'])) {
+                        $child_id = $_COOKIE['VLPSelectedChild'];
+                        $results = VLPUtils::$db->query("select l.*, cls.Completed, cls.PercentComplete from Lesson l
+                                                        Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id
+                                                        where Theme_id = %i
+                                                        and (cls.Child_id = %i or isnull(cls.Child_id ))", $themeid, $child_id);
+                    } else {
+                        $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i", $themeid);
+                    }
 
                 foreach ($results as $row) {
                     $lesson = Lesson::populatefromRow($row);
@@ -303,7 +312,15 @@ namespace GHES\VLP {
             $lessons = new NestedSerializable();
 
             try {
+                if (isset($_COOKIE['VLPSelectedChild'])) {
+                    $child_id = $_COOKIE['VLPSelectedChild'];
+                    $results = VLPUtils::$db->query("select l.*, cls.Completed, cls.PercentComplete from Lesson l
+                                                    Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id
+                                                    where Theme_id = %i and AgeGroup_id = %i
+                                                    and (cls.Child_id = %i or isnull(cls.Child_id ))", $themeid, $agegroupid, $child_id);
+                } else {
                     $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i and AgeGroup_id = %i", $themeid, $agegroupid);
+                }
 
                 foreach ($results as $row) {
                     $lesson = Lesson::populatefromRow($row);

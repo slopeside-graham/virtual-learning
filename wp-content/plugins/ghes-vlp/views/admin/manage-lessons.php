@@ -17,6 +17,8 @@ function vlp_view_manage_lessons()
     enqueue_lessons_scripts();
 
     $output = '';
+    $lessonTemplate = file_get_contents(plugin_dir_path(__FILE__).'templates/lesson-editor.html');
+    $output .= $lessonTemplate;
     $output .= '<div id="lesson-grid"><div id="grid"></div>';
     return $output;
 }

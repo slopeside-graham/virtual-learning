@@ -1,3 +1,5 @@
+// TODO: On load run a check status function.
+
 $ = jQuery;
 var currentLessonId;
 var currentLessonNumber;
@@ -180,7 +182,6 @@ function completeTheme() {
             // notify the data source that the request succeeded
             console.log("Theme ID: " + currentThemeId + " completed.");
             console.log("Done:" + result);
-            updateThemeStatus();
         },
         error: function (result) {
             if (typeof result.responseJSON !== "undefined") {

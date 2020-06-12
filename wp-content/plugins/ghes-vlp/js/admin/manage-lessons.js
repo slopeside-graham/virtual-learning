@@ -128,7 +128,10 @@ $(function () {
                 buttonCount: 5
             },
             toolbar: ["create"],
-            editable: "inline",
+            editable: {
+                mode: "popup",
+                template: kendo.template($("#lesson-editor").html())
+            },
             dataBound: onDataBound,
             change: onChange,
             columns: [

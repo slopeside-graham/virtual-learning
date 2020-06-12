@@ -144,7 +144,7 @@ namespace GHES\VLP {
 
             } catch (\MeekroDBException $e) {
                 if ($e->getCode() == '1062')  { // Ignore this duplicate entry error and continue
-                    return false;
+                    $this->Update();
                 } else {
                     return new \WP_Error('Child_Theme_Status_Create_Error', $e->getMessage());
                 }
@@ -168,12 +168,13 @@ namespace GHES\VLP {
                     Completed=%i,
                     PercentComplete=%i
                 WHERE 
-                    id=%i",
+                    Theme_id=%i and Child_id=%i",
                     $this->Theme_id,
                     $this->Child_id,
                     $this->Completed,
                     $this->PercentComplete,
-                    $this->id
+                    $this->Theme_id,
+                    $this->Child_id
                 );
 
                 $counter = VLPUtils::$db->affectedRows();

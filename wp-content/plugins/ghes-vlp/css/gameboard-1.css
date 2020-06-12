@@ -1,3 +1,5 @@
+/* Responsive Sizing for Gameboard */
+
 /* Largest size 1200px and up */
 
 @media screen and (min-width: 1200px) {
@@ -70,29 +72,180 @@
 /* Screen Size Max 1199px min 991px */
 
 @media screen and (max-width: 1199px) and (min-width: 992px) {
-
+    .lesson-icon-area {
+        width: 35px;
+        height: 35px;
+    }
+    .lesson-icon-area svg {
+        border-width: 3px;
+        box-shadow: 0px 0px 8px black;
+    }
+    .L-1-position {
+        left: 188px;
+        bottom: 134px;
+    }
+    .L-2-position {
+        left: 314px;
+        bottom: 183px;
+    }
+    .L-3-position {
+        left: 293px;
+        bottom: 291px;
+    }
+    .L-4-position {
+        left: 208px;
+        bottom: 200px;
+    }
+    .L-5-position {
+        left: 369px;
+        bottom: 129px;
+    }
+    .L-6-position {
+        left: 552px;
+        bottom: 133px;
+    }
+    .L-7-position {
+        left: 619px;
+        bottom: 252px;
+    }
+    .L-8-position {
+        left: 488px;
+        bottom: 302px;
+    }
+    .L-9-position {
+        left: 454px;
+        bottom: 163px;
+    }
+    .L-10-position {
+        left: 648px;
+        bottom: 142px;
+        ;
+    }
+    .L-11-position {
+        left: 662px;
+        bottom: 279px;
+        ;
+    }
+    .L-12-position {
+        left: 599px;
+        bottom: 355px;
+        ;
+    }
+    .L-13-position {
+        left: 475px;
+        bottom: 347px;
+        ;
+    }
+    .L-14-position {
+        left: 343px;
+        bottom: 407px;
+        ;
+    }
+    .L-15-position {
+        left: 467px;
+        bottom: 445px;
+    }
+    .L-16-position {
+        left: 586px;
+        bottom: 408px;
+    }
 }
 
 /* Screen Size Max 991px min 768px */
 
-@media screen and (max-width: 991px) and (min-width: 768px) {
-
-}
+@media screen and (max-width: 991px) and (min-width: 768px) {}
 
 /* Screen Size Max 767px min 600px */
 
 @media screen and (max-width: 767px) and (min-width: 600px) {
-
+    .lesson-icon-area {
+        width: 20px;
+        height: 20px;
+    }
+    .lesson-icon-area svg {
+        border-width: 2px;
+        box-shadow: 0px 0px 3px black;
+    }
+    .L-1-position {
+        left: 183px;
+        bottom: 90px;
+        ;
+    }
+    .L-2-position {
+        left: 245px;
+        bottom: 125px;
+    }
+    .L-3-position {
+        left: 239px;
+        bottom: 194px;
+    }
+    .L-4-position {
+        left: 185px;
+        bottom: 133px;
+    }
+    .L-5-position {
+        left: 285px;
+        bottom: 98px;
+    }
+    .L-6-position {
+        left: 387px;
+        bottom: 99px;
+    }
+    .L-7-position {
+        left: 435px;
+        bottom: 160px;
+    }
+    .L-8-position {
+        left: 352px;
+        bottom: 201px;
+        ;
+    }
+    .L-9-position {
+        left: 332px;
+        bottom: 116px;
+        ;
+    }
+    .L-10-position {
+        left: 452px;
+        bottom: 98px;
+        ;
+    }
+    .L-11-position {
+        left: 468px;
+        bottom: 178px;
+        ;
+    }
+    .L-12-position {
+        left: 421px;
+        bottom: 228px;
+        ;
+    }
+    .L-13-position {
+        left: 312px;
+        bottom: 207px;
+        ;
+    }
+    .L-14-position {
+        left: 268px;
+        bottom: 253px;
+        ;
+    }
+    .L-15-position {
+        left: 334px;
+        bottom: 287px;
+        ;
+    }
+    .L-16-position {
+        left: 408px;
+        bottom: 263px;
+        ;
+    }
 }
 
 /* Screen Size Max 599px min 500px */
 
-@media screen and (max-width: 599px) and (min-width: 500px) {
-
-}
+@media screen and (max-width: 599px) and (min-width: 500px) {}
 
 /* Screen Size Max 499px min 425px */
 
-@media screen and (max-width: 499px) and (min-width: 425px) {
-
-}
+@media screen and (max-width: 499px) and (min-width: 425px) {}

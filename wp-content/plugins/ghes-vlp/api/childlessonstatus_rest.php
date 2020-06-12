@@ -6,12 +6,12 @@ namespace GHES\VLP {
      * Add rest api endpoint for resources
      */
 
-    use GHES\VLP\ChildThemeStatus;
+    use GHES\VLP\ChildLessonStatus;
 
     /**
-     * Class ChildThemeStatus_Rest
+     * Class ChildLessonStatus_Rest
      */
-    class ChildThemeStatus_Rest extends \WP_REST_Controller
+    class ChildLessonStatus_Rest extends \WP_REST_Controller
     {
         /**
          * The namespace.
@@ -28,13 +28,13 @@ namespace GHES\VLP {
         protected $rest_base;
 
         /**
-         * ChildThemeStatus_Rest constructor.
+         * ChildLessonStatus_Rest constructor.
          */
         public function __construct()
         {
 
             $this->namespace = 'ghes-vlp/v1';
-            $this->rest_base = 'childresourcestatus';
+            $this->rest_base = 'childlessonstatus';
         }
 
         /**
@@ -87,24 +87,24 @@ namespace GHES\VLP {
             register_rest_route($this->namespace, '/' . $this->rest_base, array(
 
                 array(
-                    'methods'             => ChildThemeStatus_Rest::READABLE,
+                    'methods'             => ChildLessonStatus_Rest::READABLE,
                     'callback'            => array($this, 'get_item'),
                     'permission_callback' => array($this, 'get_item_permissions_check'),
                 ),
                 array(
-                    'methods'         => ChildThemeStatus_Rest::EDITABLE,
+                    'methods'         => ChildLessonStatus_Rest::EDITABLE,
                     'callback'        => array($this, 'update_item'),
                     'permission_callback' => array($this, 'update_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(false),
                 ),
                 array(
-                    'methods'         => ChildThemeStatus_Rest::CREATABLE,
+                    'methods'         => ChildLessonStatus_Rest::CREATABLE,
                     'callback'        => array($this, 'create_item'),
                     'permission_callback' => array($this, 'create_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(true),
                 ),
                 array(
-                    'methods'         => ChildThemeStatus_Rest::DELETABLE,
+                    'methods'         => ChildLessonStatus_Rest::DELETABLE,
                     'callback'        => array($this, 'delete_item'),
                     'permission_callback' => array($this, 'delete_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(true),
@@ -184,22 +184,22 @@ namespace GHES\VLP {
         {
             if ($request['id'] != '') {
                 // Call static function Get (use :: to reference static function)
-                $themeresourcestatus = ChildThemeStatus::Get($request['id']);
+                $childlessonstatus = ChildLessonStatus::Get($request['id']);
             } else {
                 // Call static function Get (use :: to reference static function)
-                $themeresourcestatus = ChildThemeStatus::GetAll();
+                $childlessonstatus = ChildLessonStatus::GetAll();
             }
 
-            if (!is_wp_error($themeresourcestatus))
-                return rest_ensure_response($themeresourcestatus);
+            if (!is_wp_error($childlessonstatus))
+                return rest_ensure_response($childlessonstatus);
             else {
-                $error_string = $themeresourcestatus->get_error_message();
-                return new \WP_Error('ChildThemeStatus_Get_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                $error_string = $childlessonstatus->get_error_message();
+                return new \WP_Error('ChildLessonStatus_Get_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
         /**
-         * Update ChildThemeStatus
+         * Update ChildLessonStatus
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -207,16 +207,16 @@ namespace GHES\VLP {
          */
         public function update_item($request)
         {
-            $themeresourcestatus = ChildThemeStatus::populatefromRow($request);
-            $success = $themeresourcestatus->Update();
+            $childlessonstatus = ChildLessonStatus::populatefromRow($request);
+            $success = $childlessonstatus->Update();
 
-            $themeresourcestatus = ChildThemeStatus::Get($themeresourcestatus->id);
+            $childlessonstatus = ChildLessonStatus::Get($childlessonstatus->id);
 
             if (!is_wp_error($success))
-                return rest_ensure_response($themeresourcestatus);
+                return rest_ensure_response($childlessonstatus);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('ChildThemeStatus_Update_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('ChildLessonStatus_Update_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
@@ -229,19 +229,19 @@ namespace GHES\VLP {
          */
         public function delete_item($request)
         {
-            $themeresourcestatus = ChildThemeStatus::Get($request['id']);
-            $success = $themeresourcestatus->Delete();
+            $childlessonstatus = ChildLessonStatus::Get($request['id']);
+            $success = $childlessonstatus->Delete();
 
             if (!is_wp_error($success))
-                return rest_ensure_response($themeresourcestatus);
+                return rest_ensure_response($childlessonstatus);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('ChildThemeStatus_Delete_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('ChildLessonStatus_Delete_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
         /**
-         * Create ChildThemeStatus
+         * Create ChildLessonStatus
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -250,17 +250,17 @@ namespace GHES\VLP {
         public function create_item($request)
         {
 
-            $themeresourcestatus = ChildThemeStatus::populatefromRow($request);
-            $success = $themeresourcestatus->Create();
+            $childlessonstatus = ChildLessonStatus::populatefromRow($request);
+            $success = $childlessonstatus->Create();
             if ($success == true) {
-                $themeresourcestatus = ChildThemeStatus::Get($themeresourcestatus->id);
+                $childlessonstatus = ChildLessonStatus::Get($childlessonstatus->id);
             }
 
             if (!is_wp_error($success))
-                return rest_ensure_response($themeresourcestatus);
+                return rest_ensure_response($childlessonstatus);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('ChildThemeStatus_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('ChildLessonStatus_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 

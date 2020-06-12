@@ -8,14 +8,13 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome",
-            "url": "http://ghes.test",
+            "url": "http://vlp.test",
             "webRoot": "${workspaceFolder}"
         },
         {
             "name": "Launch Firefox",
             "type": "firefox",
             "request": "launch",
-            "reAttach": true,
             "url": "http://vlp.test",
             "webRoot": "${workspaceFolder}"
         },

@@ -25,12 +25,12 @@ include_once(plugin_dir_path(__FILE__) . '/../classes/childresourcestatus.php');
 include_once(plugin_dir_path(__FILE__) . '/childresourcestatus_rest.php');    // AgeGroup REST controller
 
 // Include Lesson Resource Status REST controller and class
-include_once(plugin_dir_path(__FILE__) . '/../classes/lessonresourcestatus.php');  // AgeGroup class
-include_once(plugin_dir_path(__FILE__) . '/lessonresourcestatus_rest.php');    // AgeGroup REST controller
+include_once(plugin_dir_path(__FILE__) . '/../classes/childlessonstatus.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/childlessonstatus_rest.php');    // AgeGroup REST controller
 
 // Include Theme Resource Status REST controller and class
-include_once(plugin_dir_path(__FILE__) . '/../classes/themeresourcestatus.php');  // AgeGroup class
-include_once(plugin_dir_path(__FILE__) . '/themeresourcestatus_rest.php');    // AgeGroup REST controller
+include_once(plugin_dir_path(__FILE__) . '/../classes/childthemestatus.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/childthemestatus_rest.php');    // AgeGroup REST controller
 
 /**
  * Register our API routes.

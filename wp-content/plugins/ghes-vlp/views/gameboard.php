@@ -118,7 +118,7 @@ function vlp_gameboard($atts, $content = null)
                         $lessonicon = "No Icon Found";
                     }
 
-                    $output .= ' <span id="lesson-icon-'. $lessonNumber .'" class="lesson-icon-area L-' . $lessonNumber . '-position icon-' . $lesson->Type . '" onclick="openLessonPopup(this)" data-lesson-number="' . $lessonNumber . '" data-lesson-id="' . $lessonid . '">' . $lessonicon . '<span class="lesson-completion-icon">' . $completionIcon . '</span></span>';
+                    $output .= ' <span id="lesson-icon-'. $lessonNumber .'" class="lesson-icon-area L-' . $lessonNumber . '-position icon-' . $lesson->Type . '" onclick="openLessonPopup(this)" data-lesson-number="' . $lessonNumber . '" data-lesson-id="' . $lessonid . '">' . $lessonicon . '<span class="lesson-completion-icon">' . $completionIcon . '</span><span class="lesson-icon-title">' . $lesson->Title . '</span></span>';
                     $output .= '<div class="lesson-popup type-' . $lesson->Type . '" id="lesson-' . $lessonNumber . '">';
                     $output .= '<span class="close-button">&times;</span>';
                     $output .= '<span class="corner-icon icon-' . $lesson->Type . '">' . $lessonicon . '</span>';

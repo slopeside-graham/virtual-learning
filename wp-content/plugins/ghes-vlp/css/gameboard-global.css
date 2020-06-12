@@ -173,3 +173,115 @@
 .related-materials-list {
     list-style: none;
 }
+.lesson-icon-title {
+    display: none;
+}
+
+/* Responsive sizes for gameboard */
+/* Screen Size Max 1199px min 991px */
+
+@media screen and (max-width: 1199px) and (min-width: 992px) {
+    #gameboard {
+        width: 940px;
+        height: 500;
+    }
+}
+
+/* Screen Size Max 991px min 768px */
+
+@media screen and (max-width: 991px) and (min-width: 768px) {
+    #gameboard {
+        width: 720px;
+        height: 400px;
+    }
+    .lesson-popup {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .lesson-popup {
+        width: 90%;
+        margin-left: -45%;
+        height: auto;
+        top: 50%;
+        position: fixed;
+    }
+    .lesson-content {
+        display: block;
+        height: 330px;
+        max-height: none;
+        margin-left: 0px;
+        margin-top: 60px;
+        overflow: scroll;
+        padding-bottom: 20px;
+    }
+    .lesson-main-content {
+        max-height: none;
+    }
+    .first-column {
+        margin-right: none;
+        margin-bottom: 20px;
+    }
+}
+
+/* Screen Size Max 767px min 600px */
+
+@media screen and (max-width: 767px) and (min-width: 600px) {
+    #gameboard {
+        width: 570px;
+        height: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Screen Size Max 599px min 500px */
+
+@media screen and (max-width: 599px) and (min-width: 500px) {
+    #gameboard {
+        width: 475px;
+        height: 250px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Screen Size Max 499px min 425px */
+
+@media screen and (max-width: 499px) and (min-width: 425px) {
+    #gameboard {
+        width: 400px;
+        height: 250px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+/* Screen Size Max 424px and Under */
+
+@media screen and (max-width: 424px) {
+    #gameboard {
+        height: auto;
+        background-image: none;
+        padding: 20px;
+    }
+    .lesson-icon-area {
+        position: relative;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .lesson-icon-area svg {
+        width: 45px;
+    }
+    .lesson-icon-title {
+        display: inline-block;
+        color: white;
+        font-weight: 600;
+        top: 5px;
+        height: 100%;
+        position: absolute;
+        margin-left: 10px;
+        font-size: 1.2em;
+    }
+}

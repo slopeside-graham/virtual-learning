@@ -7,10 +7,12 @@
     background-size: contain;
     position: relative;
 }
+
 #theme-title {
     color: #1a71ad;
     font-size: 1.5em;
 }
+
 .vlp-intro {
     color: white;
     background-color: #1a71ad;
@@ -18,23 +20,29 @@
     font-size: 1.7em;
     margin-bottom: 20px;
 }
+
 .gameboard-theme-header {
     display: grid;
     grid-template-columns: auto auto auto;
     margin-bottom: 20px;
 }
+
 #theme-title {
     text-align: center;
 }
+
 .navigation-button {
     align-self: center;
 }
+
 .last-week {
     text-align: left;
 }
+
 .next-week {
     text-align: right;
 }
+
 .lesson-icon-area {
     position: absolute;
     z-index: 1;
@@ -42,24 +50,31 @@
     height: 45px;
     display: block;
 }
+
 .lesson-icon-area:hover {
     cursor: pointer;
 }
+
 .lesson-icon-area svg {
     background-color: white;
     border: 5px solid white;
     border-radius: 50%;
     box-shadow: 0px 0px 10px black;
 }
+
 .lesson-popup {
     display: none;
-    position:absolute;
-    top:50%;
-    left:50%;
-    width:900px;  /* adjust as per your needs */
-    height:450px;   /* adjust as per your needs */
-    margin-left:-450px;   /* negative half of width above */
-    margin-top:-210px;   /* negative half of height above */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 90%;
+    /* adjust as per your needs */
+    height: 90%;
+    /* adjust as per your needs */
+    margin-left: -45%;
+    /* negative half of width above */
+    margin-top: -215px;
+    /* negative half of height above */
     padding: 1em;
     z-index: 2;
     color: white;
@@ -67,36 +82,46 @@
     border: 5px solid white;
     border-radius: 5px;
 }
+
 .lesson-popup.type-Play {
     background-color: #f69e33;
 }
+
 .lesson-popup.type-Learn {
     background-color: #b5ce33;
 }
+
 .lesson-popup.type-Art {
     background-color: #1caa9e;
 }
+
 .lesson-popup.type-Nurturing {
     background-color: #1375b8;
 }
+
 .lesson-content {
     display: grid;
     grid-template-columns: 60% 40%;
     margin-left: 65px;
     max-height: 410px;
 }
+
 .first-column {
     margin-right: 20px;
 }
+
 .icon-Play {
     fill: #f69e33;
 }
+
 .icon-Art {
     fill: #1caa9e;
 }
+
 .icon-Learn {
     fill: #b5ce33;
 }
+
 .icon-Nurture {
     fill: #1375b8;
 }
@@ -110,11 +135,14 @@
     line-height: .7;
     padding: 5px;
     border: 2px solid black;
-    color: black;;
+    color: black;
+    ;
 }
+
 .lesson-popup .close-button:hover {
     cursor: pointer
 }
+
 .corner-icon svg {
     height: 100px;
     background-color: white;
@@ -124,12 +152,14 @@
     top: -25px;
     left: -25px;
 }
+
 .completion-icon svg {
-   width: 12px;
-   position: relative;
-   top: -5px;
-   display: none;
+    width: 12px;
+    position: relative;
+    top: -5px;
+    display: none;
 }
+
 .lesson-completion-icon svg, .theme-completion-icon svg {
     display: none;
     background-color: transparent;
@@ -137,57 +167,70 @@
     border-radius: none;
     box-shadow: none;
     width: 20px;
- }
+}
+
 .completed .completion-icon svg {
     display: inline;
 }
+
 .completed .lesson-completion-icon svg {
     display: inline;
     position: absolute;
     top: 0;
     right: 0px;
 }
+
 .completed .theme-completion-icon svg {
     display: inline;
     position: relative;
     top: -10px;
     left: -5px;
 }
+
 .completed .theme-completion-icon svg {
     display: inline;
 }
+
 .completion-icon svg path, .lesson-completion-icon svg path, .completed .theme-completion-icon svg path {
     fill: greenyellow;
 }
+
 .resources a {
     color: white;
     border-bottom: none !important;
 }
+
 .type-heading {
     font-size: 2em;
     text-transform: uppercase;
     font-weight: 300;
 }
+
 .lesson-title {
     font-size: 1.4em;
 }
+
 .lesson-main-content {
     font-size: .8em;
     max-height: 300px;
     overflow: auto;
 }
+
 .related-materials-title {
     font-style: italic;
     font-weight: 600;
 }
+
 .related-materials-list {
     list-style: none;
 }
+
 .lesson-icon-title {
     display: none;
 }
 
 /* Responsive sizes for gameboard */
+
 /* Screen Size Max 1199px min 991px */
 
 @media screen and (max-width: 1199px) and (min-width: 992px) {

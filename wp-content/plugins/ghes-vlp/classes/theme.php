@@ -141,8 +141,8 @@ namespace GHES\VLP {
         public function Create()
         {
 
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
@@ -162,8 +162,8 @@ namespace GHES\VLP {
         public function Update()
         {
 
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
@@ -195,8 +195,8 @@ namespace GHES\VLP {
         public function Delete()
         {
 
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
@@ -211,8 +211,8 @@ namespace GHES\VLP {
 
         public static function Get($thisid)
         {
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
@@ -226,8 +226,8 @@ namespace GHES\VLP {
 
         public static function GetbyDate($date)
         {
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
                 if (isset($_COOKIE['VLPSelectedChild'])) {
@@ -250,8 +250,8 @@ namespace GHES\VLP {
 
         public static function GetbyAgeGroup($agegroupid)
         {
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
@@ -266,8 +266,8 @@ namespace GHES\VLP {
 
         public static function GetAll()
         {
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             $themes = new NestedSerializable();
 

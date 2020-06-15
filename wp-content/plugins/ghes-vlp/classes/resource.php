@@ -12,6 +12,7 @@ namespace GHES\VLP {
         private $_id;
         private $_Title;
         private $_Media_id;
+        private $_Lesson_id;
         private $_Completed;
         private $_PercentComplete;
         private $_DateCreated;
@@ -51,6 +52,17 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_Media_id;
+            }
+        }
+        protected function Lesson_id($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Lesson_id = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Lesson_id;
             }
         }
         protected function Completed($value = null)
@@ -106,6 +118,7 @@ namespace GHES\VLP {
                 'id' => $this->id,
                 'Title' => $this->Title,
                 'Media_id' => $this->Media_id,
+                'Lesson_id' => $this->Lesson_id,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,
                 'DateCreated' => $this->DateCreated,
@@ -116,14 +129,15 @@ namespace GHES\VLP {
         public function Create()
         {
 
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
                 VLPUtils::$db->insert('Resource', array(
                     'Title' => $this->Title,
                     'Media_id' => $this->Media_id,
+                    'Lesson_id' => $this->Lesson_id,
                 ));
                 $this->id = VLPUtils::$db->insertId();
             } catch (\MeekroDBException $e) {
@@ -135,8 +149,8 @@ namespace GHES\VLP {
         public function Update()
         {
 
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
@@ -144,11 +158,13 @@ namespace GHES\VLP {
                     "UPDATE Resource 
                     SET
                     Title=%s, 
-                    Media_id=%s, 
+                    Media_id=%s,
+                    Lesson_id=%i
                 WHERE 
                     id=%i",
                     $this->Title,
                     $this->Media_id,
+                    $this->Lesson_id,
                     $this->id
                 );
 
@@ -164,24 +180,27 @@ namespace GHES\VLP {
         public function Delete()
         {
 
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
                 VLPUtils::$db->query("Delete from Resource WHERE id=%d", $this->id);
                 $counter = VLPUtils::$db->affectedRows();
             } catch (\MeekroDBException $e) {
-                echo $e->getMessage();
-                return new \WP_Error('Resource_Delete_Error', $e->getMessage());
+                if ($e->getCode() == '1451') {
+                    return new \WP_Error('Resource_Delete_Error', "You Cannot delete this resource, it is in use with current lessons.");
+                } else {
+                    return new \WP_Error('Resource_Delete_Error', $e->getMessage());
+                }
             }
             return true;
         }
 
         public static function Get($thisid)
         {
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
@@ -196,8 +215,8 @@ namespace GHES\VLP {
 
         public static function GetAll()
         {
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             $resources = new NestedSerializable();
 
@@ -217,8 +236,8 @@ namespace GHES\VLP {
 
         public static function GetAllbyLessonId($lessonid)
         {
-            \DB::$error_handler = false; // since we're catching errors, don't need error handler
-            \DB::$throw_exception_on_error = true;
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
             $resources = new NestedSerializable();
 
@@ -251,6 +270,7 @@ namespace GHES\VLP {
             $resource->id = $row['id'];
             $resource->Title = $row['Title'];
             $resource->Media_id = $row['Media_id'];
+            $resource->Lesson_id = $row['Lesson_id'];
             $resource->Completed = $row['Completed'];
             $resource->PercentComplete = $row['PercentComplete'];
             return $resource;

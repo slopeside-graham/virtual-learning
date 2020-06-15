@@ -73,30 +73,22 @@ function vlp_gameboard($atts, $content = null)
         $output .= '<script>var currentThemeId = '. $themeid . '</script>';
         $output .= '<div class="vlp-intro">Take the journey and see what you can learn with our P.L.A.N.!</div>';
         $output .= '<div class="gameboard-theme-header">';
-        if (Theme::GetbyDate($themelastweekdate)) {
-            $output .= '<div class="navigation-button last-week"><a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '">Previous Week</a></div>';
-        }
-        $output .= '<div id="theme-title" class="'. $themeprogress . '%-completed">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
-        if (Theme::GetbyDate($themenextweekdate)) {
-            $output .= '<div class="navigation-button next-week"><a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '">Next Week</a></div>';
+
+        $output .= '<div class="navigation-button last-week">';
+        if (is_null(Theme::GetbyDate($themelastweekdate))) {
+            $output .= '<a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '">Previous Week</a>';
         }
         $output .= '</div>';
 
+        $output .= '<div id="theme-title" class="'. $themeprogress . '%-completed">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
+        
+        $output .= '<div class="navigation-button next-week">';
+        if (is_null(Theme::GetbyDate($themenextweekdate))) {
+            $output .= '<a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '">Next Week</a>';
+        }
+        $output .= '</div>';
 
-
-        //Get All Age Group Items - id, Name, AgeStart, AgeEnd
-
-        //Get all Vatogy Items - id, Name
-
-        // Get all Lesson Status - id, Child_id, Lesson_id, Status
-
-        // Get all Resource Status - id, Child_id, Resources_id, Status
-
-        // Get all Theme Status - id, Child_id, Theme_id, Status
-
-        // Get all Gameboard Items - Title, Version
-
-        // Get all Lesson itesm - Title, Type, MainContent, Video URL, Image_id, Theme_id, AgeGroud_id
+        $output .= '</div>';
 
         if (isset($agegroupid)) {
 
@@ -136,11 +128,6 @@ function vlp_gameboard($atts, $content = null)
                     $output .= '<div class="lesson-popup type-' . $lesson->Type . '" id="lesson-' . $lessonNumber . '">';
                     $output .= '<span class="close-button">&times;</span>';
                     $output .= '<span class="corner-icon icon-' . $lesson->Type . '">' . $lessonicon . '</span>';
-                    //$output .= '<h3>Lesson #' . $lessonnumber++ . '</h3>';
-                    //$output .= '<p>ID: ' . $lesson->id . '</p>';
-                    //$output .= '<p>Type: ' . $lesson->Type . '</p>';
-                    //$output .= '<p>Theme ID: ' . $lesson->Theme_id . '</p>';
-                    //$output .= '<p>Age Group ID: ' . $lesson->AgeGroup_id . '</p>';
                     $output .= '<div class="lesson-content">';
                     $output .= '<div class="first-column">';
                     $output .= '<span class="type-heading">' . $lesson->Type . ' Activity</span><br/>';

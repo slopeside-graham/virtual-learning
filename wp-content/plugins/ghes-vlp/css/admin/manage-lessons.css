@@ -1,0 +1,44 @@
+.edit-lesson-popup {
+    padding: 10px;
+}
+.edit-lesson-popup label {
+    display: block;
+    margin-bottom: 10px;
+}
+.lessonInformation {
+    display: flex;
+}
+.lessonInformation label {
+    margin-right: 20px;
+}
+.edit-lesson {
+    display: grid;
+    grid-template-columns: 60% 40%;
+}
+.edit-lesson .first-column {
+    margin-right: 20px;
+}
+#LessonRelatedMaterials {
+    min-height: 50px;
+}
+div.k-edit-form-container {
+    width: auto;
+    height: auto;
+}
+
+/* Loading Window CSS */
+
+.loading-window {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: 0;
+    left: 0;
+    display: none;
+    z-index: 10005;
+}
+
+div.k-loading-mask {
+    z-index: 9999;
+    /* must be larger than the z-index:2 of #container */
+}

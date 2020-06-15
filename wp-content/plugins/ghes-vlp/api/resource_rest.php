@@ -182,7 +182,11 @@ namespace GHES\VLP {
          */
         public function get_item($request)
         {
-            if ($request['id'] != '') {
+            if ($request['lesson_id'] != '') {
+                // Call static function Get (use :: to reference static function)
+                $resource = Resource::GetAllbyLessonId($request['lesson_id']);
+            } 
+            else if ($request['id'] != '') {
                 // Call static function Get (use :: to reference static function)
                 $resource = Resource::Get($request['id']);
             } else {

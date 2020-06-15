@@ -16,9 +16,19 @@ function vlp_view_manage_lessons()
 
     enqueue_lessons_scripts();
 
+    $lessonTemplate = file_get_contents(plugin_dir_path(__FILE__) . 'templates/lesson-editor.html');
+    $relatedItemsTemplate = file_get_contents(plugin_dir_path(__FILE__) . 'templates/related-items-editor.html');
+
     $output = '';
-    $lessonTemplate = file_get_contents(plugin_dir_path(__FILE__).'templates/lesson-editor.html');
+
+    $output .= '<script type="text/x-kendo-template" id="RelatedMaterialstemplate">';
+    $output .= $relatedItemsTemplate;
+    $output .= '</script>';
+    $output .= '<script id="lesson-editor" type="text/x-kendo-template">';
     $output .= $lessonTemplate;
-    $output .= '<div id="lesson-grid"><div id="grid"></div>';
+    $output .= '</script>';
+    $output .= '<div id="lesson-grid"><div id="grid">';
+    $output .= '<div class="lesson-loading-window"></div>';
+    $output .= '</div>';
     return $output;
 }

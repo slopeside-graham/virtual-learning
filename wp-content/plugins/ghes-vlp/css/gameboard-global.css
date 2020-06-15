@@ -167,6 +167,7 @@
     border-radius: none;
     box-shadow: none;
     width: 20px;
+    box-shadow: none !important;
 }
 
 .completed .completion-icon svg {
@@ -238,6 +239,17 @@
         width: 940px;
         height: 500;
     }
+    .lesson-icon-area {
+        width: 35px;
+        height: 35px;
+    }
+    .lesson-icon-area svg {
+        border-width: 3px;
+        box-shadow: 0px 0px 8px black;
+    }
+    .completed .lesson-completion-icon svg {
+        right: -7px;
+    }
 }
 
 /* Screen Size Max 991px min 768px */
@@ -249,6 +261,19 @@
     }
     .lesson-popup {
         width: 100%;
+    }
+    .lesson-icon-area {
+        width: 25px;
+        height: 25px;
+    }
+    .lesson-icon-area svg {
+        border-width: 2px;
+        box-shadow: 0px 0px 3px black;
+    }
+    .completed .lesson-completion-icon svg {
+        top: -3px;
+        right: -1px;
+        width: 15px;
     }
 }
 
@@ -287,6 +312,19 @@
         margin-left: auto;
         margin-right: auto;
     }
+    .lesson-icon-area {
+        width: 20px;
+        height: 20px;
+    }
+    .lesson-icon-area svg {
+        border-width: 2px;
+        box-shadow: 0px 0px 3px black;
+    }
+    .completed .lesson-completion-icon svg {
+        top: 0px;
+        right: -2px;
+        width: 12px;
+    }
 }
 
 /* Screen Size Max 599px min 500px */
@@ -297,6 +335,19 @@
         height: 250px;
         margin-left: auto;
         margin-right: auto;
+    }
+    .lesson-icon-area {
+        width: 17px;
+        height: 17px;
+    }
+    .lesson-icon-area svg {
+        border-width: 1px;
+        box-shadow: 0px 0px 3px black;
+    }
+    .completed .lesson-completion-icon svg {
+        top: 3px;
+        right: -2px;
+        width: 12px;
     }
 }
 
@@ -323,5 +374,11 @@
         position: absolute;
         margin-left: 10px;
         font-size: 1.2em;
+    }
+    .completed .lesson-completion-icon svg {
+        top: -3px;
+        right: unset;
+        width: 24px;
+        left: 27px;
     }
 }

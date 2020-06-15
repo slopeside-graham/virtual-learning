@@ -69,24 +69,16 @@
     }
 }
 
-/* Screen Size Max 1199px min 991px */
+/* Screen Size Max 1199px min 992px */
 
 @media screen and (max-width: 1199px) and (min-width: 992px) {
-    .lesson-icon-area {
-        width: 35px;
-        height: 35px;
-    }
-    .lesson-icon-area svg {
-        border-width: 3px;
-        box-shadow: 0px 0px 8px black;
-    }
     .L-1-position {
         left: 168px;
         bottom: 94px;
     }
     .L-2-position {
         left: 294px;
-        bottom: 143px;
+        bottom: 153px;
     }
     .L-3-position {
         left: 273px;
@@ -97,32 +89,32 @@
         bottom: 160px;
     }
     .L-5-position {
-        left: 349px;
-        bottom: 89px;
-    }
-    .L-6-position {
-        left: 532px;
+        left: 293px;
         bottom: 93px;
     }
+    .L-6-position {
+        left: 416px;
+        bottom: 102px;
+    }
     .L-7-position {
-        left: 599px;
-        bottom: 212px;
+        left: 503px;
+        bottom: 103px;
     }
     .L-8-position {
-        left: 468px;
-        bottom: 262px;
+        left: 569px;
+        bottom: 140px;
     }
     .L-9-position {
-        left: 434px;
-        bottom: 123px;
+        left: 627px;
+        bottom: 216px;
     }
     .L-10-position {
-        left: 628px;
-        bottom: 102px;
+        left: 524px;
+        bottom: 283px;
         ;
     }
     .L-11-position {
-        left: 642px;
+        left: 419px;
         bottom: 239px;
         ;
     }
@@ -154,238 +146,215 @@
 /* Screen Size Max 991px min 768px */
 
 @media screen and (max-width: 991px) and (min-width: 768px) {
-    .lesson-icon-area {
-        width: 25px;
-        height: 25px;
-    }
-    .lesson-icon-area svg {
-        border-width: 2px;
-        box-shadow: 0px 0px 3px black;
-    }
     .L-1-position {
-        left: 153px;
-        bottom: 120px;
+        left: 134px;
+        bottom: 88px;
     }
     .L-2-position {
-        left: 245px;
-        bottom: 155px;
+        left: 221px;
+        bottom: 127px;
         ;
     }
     .L-3-position {
-        left: 277px;
-        bottom: 238px;
+        left: 241px;
+        bottom: 198px;
         ;
     }
     .L-4-position {
-        left: 165px;
-        bottom: 193px;
+        left: 130px;
+        bottom: 158px;
     }
     .L-5-position {
-        left: 295px;
-        bottom: 118px;
+        left: 221px;
+        bottom: 82px;
         ;
     }
     .L-6-position {
-        left: 417px;
-        bottom: 119px;
+        left: 319px;
+        bottom: 88px;
         ;
     }
     .L-7-position {
-        left: 475px;
-        bottom: 170px;
+        left: 388px;
+        bottom: 87px;
     }
     .L-8-position {
-        left: 380px;
-        bottom: 251px;
+        left: 446px;
+        bottom: 114px;
     }
     .L-9-position {
-        left: 356px;
-        bottom: 145px;
+        left: 478px;
+        bottom: 177px;
     }
     .L-10-position {
-        left: 502px;
-        bottom: 138px;
+        left: 403px;
+        bottom: 230px;
     }
     .L-11-position {
-        left: 498px;
-        bottom: 268px;
+        left: 326px;
+        bottom: 191px;
     }
     .L-12-position {
-        left: 421px;
-        bottom: 298px;
+        left: 450px;
+        bottom: 249px;
     }
     .L-13-position {
-        left: 322px;
-        bottom: 267px;
+        left: 316px;
+        bottom: 242px;
     }
     .L-14-position {
-        left: 268px;
-        bottom: 323px;
+        left: 252px;
+        bottom: 289px;
     }
     .L-15-position {
-        left: 354px;
-        bottom: 357px;
+        left: 337px;
+        bottom: 321px;
     }
     .L-16-position {
-        left: 458px;
-        bottom: 333px;
+        left: 395px;
+        bottom: 311px;
     }
 }
 
 /* Screen Size Max 767px min 600px */
 
 @media screen and (max-width: 767px) and (min-width: 600px) {
-    .lesson-icon-area {
-        width: 20px;
-        height: 20px;
-    }
-    .lesson-icon-area svg {
-        border-width: 2px;
-        box-shadow: 0px 0px 3px black;
-    }
+
     .L-1-position {
-        left: 183px;
-        bottom: 90px;
+        left: 121px;
+        bottom: 63px;
     }
     .L-2-position {
-        left: 245px;
-        bottom: 125px;
+        left: 175px;
+        bottom: 97px;
     }
     .L-3-position {
-        left: 239px;
-        bottom: 194px;
+        left: 201px;
+        bottom: 162px;
     }
     .L-4-position {
-        left: 185px;
-        bottom: 133px;
+        left: 107px;
+        bottom: 123px;
     }
     .L-5-position {
-        left: 285px;
-        bottom: 98px;
+        left: 177px;
+        bottom: 60px;
     }
     .L-6-position {
-        left: 387px;
-        bottom: 99px;
+        left: 254px;
+        bottom: 64px;
     }
     .L-7-position {
-        left: 435px;
-        bottom: 160px;
+        left: 305px;
+        bottom: 63px;
     }
     .L-8-position {
-        left: 352px;
-        bottom: 201px;
+        left: 346px;
+        bottom: 82px;
     }
     .L-9-position {
-        left: 332px;
-        bottom: 116px;
+        left: 384px;
+        bottom: 133px;
     }
     .L-10-position {
-        left: 452px;
-        bottom: 98px;
+        left: 324px;
+        bottom: 177px;
     }
     .L-11-position {
-        left: 468px;
-        bottom: 178px;
+        left: 257px;
+        bottom: 143px;
     }
     .L-12-position {
-        left: 421px;
-        bottom: 228px;
+        left: 354px;
+        bottom: 194px;
     }
     .L-13-position {
-        left: 312px;
-        bottom: 207px;
+        left: 251px;
+        bottom: 186px;
     }
     .L-14-position {
-        left: 268px;
-        bottom: 253px;
+        left: 202px;
+        bottom: 225px;
     }
     .L-15-position {
-        left: 334px;
-        bottom: 287px;
+        left: 263px;
+        bottom: 257px;
     }
     .L-16-position {
-        left: 408px;
-        bottom: 263px;
+        left: 315px;
+        bottom: 237px;
     }
 }
 
 /* Screen Size Max 599px min 500px */
 
 @media screen and (max-width: 599px) and (min-width: 500px) {
-    .lesson-icon-area {
-        width: 17px;
-        height: 17px;
-    }
-    .lesson-icon-area svg {
-        border-width: 1px;
-        box-shadow: 0px 0px 3px black;
-    }
     .L-1-position {
-        left: 125px;
-        bottom: 90px;
+        left: 97px;
+        bottom: 49px;
     }
     .L-2-position {
-        left: 185px;
-        bottom: 115px;
+        left: 144px;
+        bottom: 82px;
     }
     .L-3-position {
-        left: 205px;
-        bottom: 164px;
+        left: 168px;
+        bottom: 131px;
     }
     .L-4-position {
-        left: 132px;
-        bottom: 136px;
+        left: 86px;
+        bottom: 103px;
     }
     .L-5-position {
-        left: 245px;
-        bottom: 83px;
+        left: 148px;
+        bottom: 51px;
     }
     .L-6-position {
-        left: 328px;
-        bottom: 99px;
+        left: 210px;
+        bottom: 57px;
     }
     .L-7-position {
-        left: 345px;
-        bottom: 148px;
+        left: 256px;
+        bottom: 45px;
     }
     .L-8-position {
-        left: 302px;
-        bottom: 181px;
+        left: 287px;
+        bottom: 73px;
     }
     .L-9-position {
-        left: 252px;
-        bottom: 126px;
+        left: 317px;
+        bottom: 113px;
     }
     .L-10-position {
-        left: 362px;
-        bottom: 98px;
+        left: 265px;
+        bottom: 149px;
     }
     .L-11-position {
-        left: 358px;
-        bottom: 187px;
+        left: 213px;
+        bottom: 125px;
     }
     .L-12-position {
-        left: 301px;
-        bottom: 205px;
+        left: 298px;
+        bottom: 163px;
     }
     .L-13-position {
-        left: 242px;
-        bottom: 187px;
+        left: 213px;
+        bottom: 159px;
     }
     .L-14-position {
-        left: 218px;
-        bottom: 223px;
+        left: 166px;
+        bottom: 190px;
     }
     .L-15-position {
-        left: 264px;
-        bottom: 247px;
+        left: 225px;
+        bottom: 216px;
     }
     .L-16-position {
-        left: 328px;
-        bottom: 228px;
+        left: 271px;
+        bottom: 199px;
     }
 }
 
 /* Screen Size Max 499px min 425px */
 
-@media screen and (max-width: 499px) and (min-width: 425px) {}
+/* @media screen and (max-width: 499px) and (min-width: 425px) {} */

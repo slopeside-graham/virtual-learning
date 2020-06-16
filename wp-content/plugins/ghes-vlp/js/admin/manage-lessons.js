@@ -1,6 +1,7 @@
 $ = jQuery;
 var relatedMaterialsData;
 var currentLessonID;
+var customMediaLibrary;
 
 function displayLoading(target) {
     var element = $(target);
@@ -15,6 +16,27 @@ $(function () {
 
     $(document).ready(function () {
 
+        customMediaLibrary = getcustomMediaLibrary();
+
+        customMediaLibrary.on('select', function () {
+            // write your handling code here.
+            var selectedMedia = customMediaLibrary.state().get('selection');
+            var selectedMediaID = '';
+            var selectedMediaURL = '';
+            var selectedMediaTitle = '';
+
+            selectedMedia.each(function (attachment) {
+                selectedMediaID = attachment['id'];
+                selectedMediaURL = attachment.attributes['url'];
+                selectedMediaTitle = attachment.attributes['title'];
+            });
+            $("#newResourceId").val(selectedMediaID).change();
+            $("#newResourceURL").text(selectedMediaTitle);
+            $("#newResourceURL").attr("href", selectedMediaURL);
+            $("#newResourceURL").show();
+            $("#newResourceButton").text("Change Media");
+
+        });
 
         displayLoading("#lesson-grid");
 
@@ -124,9 +146,9 @@ $(function () {
                         VideoURL: { validation: { required: false } },
                         Image_id: { editable: true, validation: { required: false } },
                         Theme_id: { editable: true, validation: { required: true } },
+                        ThemeTitle: { editable: true, validation: { required: true } },
                         AgeGroup_id: { editable: true, validation: { required: true } },
-                        DateCreated: { editable: false, validation: { required: true } },
-                        DateModified: { editable: false, validation: { required: true } },
+                        AgeGroupName: { editable: true, validation: { required: true } },
                     }
                 }
             }
@@ -159,10 +181,8 @@ $(function () {
                 { field: "MainContent", title: "Main Content", encoded: false },
                 { field: "VideoURL", title: "Video URL" },
                 { field: "Image_id", title: "Image ID" },
-                { field: "Theme_id", title: "Theme ID" },
-                { field: "AgeGroup_id", title: "AgeGroup ID" },
-                { field: "DateCreated", title: "Date Created" },
-                { field: "DateModified", title: "Date Modified" },
+                { field: "ThemeTitle", title: "Theme Title" },
+                { field: "AgeGroupName", title: "Age Group" },
                 { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
             ],
         });
@@ -178,8 +198,13 @@ $(function () {
 
             currentLessonID = e.model.id;
 
+            // Open the media uploader.
+            $('#newResourceButton').on('click', function (e) {
+                e.preventDefault();
+                customMediaLibrary.open();
+            });
+
             $('#LessonTheme')
-                .appendTo('#LessonTheme')
                 .kendoDropDownList({
                     dataTextField: "Title",
                     dataValueField: "id",
@@ -188,7 +213,6 @@ $(function () {
                 });
 
             $('#LessonAgeGroup')
-                .appendTo('#LessonAgeGroup')
                 .kendoDropDownList({
                     dataTextField: "Name",
                     dataValueField: "id",
@@ -197,7 +221,6 @@ $(function () {
                 });
 
             $('#LessonType')
-                .appendTo('#LessonType')
                 .kendoDropDownList({
                     dataTextField: "text",
                     dataValueField: "value",
@@ -205,31 +228,24 @@ $(function () {
                     index: 0,
                 })
             $('#LessonTitle')
-                .appendTo('#LessonTitle')
+                .kendoTextBox({
+
+                });
+            $('#newResourceTitle')
                 .kendoTextBox({
 
                 });
             $('#LessonMainContent')
-                .appendTo('#LessonMainContent')
-                .kendoEditor({
-                    tools: [
-                        "bold",
-                        "italic",
-                        "underline",
-                        "justifyLeft",
-                        "justifyCenter",
-                        "justifyRight",
-                        "insertUnorderedList",
-                        "createLink",
-                        "unlink",
-                        "insertImage",
-                        "formatting",
-                        "fontSize",
-                    ]
-                });
+                .kendoEditor(
+                    {
+                        resizable: true,
+                        pasteCleanup: {
+                          all: true
+                        }
+                      }
+                );
 
             $('#LessonVideo')
-                .appendTo('#LessonVideo')
                 .kendoTextBox({
                 });
 
@@ -379,7 +395,7 @@ $(function () {
 
 function AddNewResource() {
     displayLoading("#LessonRelatedMaterials");
-    if ($("#resourceTitle").val() != "" && $("#resourceMediaId").val() != "") {
+    if ($("#newResourceTitle").val() != "" && $("#newResourceId").val() != "") {
         $.ajax({
             url: wpApiSettings.root + "ghes-vlp/v1/resource",
             method: "POST",
@@ -387,15 +403,18 @@ function AddNewResource() {
                 xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
             },
             data: {
-                Title: $("#resourceTitle").val(),
-                Media_id: $("#resourceMediaId").val(),
+                Title: $("#newResourceTitle").val(),
+                Media_id: $("#newResourceId").val(),
                 Lesson_id: currentLessonID
             },
             success: function (result) {
                 hideLoading("#LessonRelatedMaterials");
                 console.log("Done:" + result);
-                $("#resourceTitle").val('');
-                $("#resourceMediaId").val('');
+                $("#newResourceTitle").val('');
+                $("#newResourceId").val('');
+                $("#newResourceURL").hide();
+                $("#newResourceButton").text("Add Media");
+                $("#addResource").addClass("k-state-disabled");
                 var listView = $("#LessonRelatedMaterials").data("kendoListView");
                 // refreshes the ListView
                 listView.dataSource.read();
@@ -424,7 +443,7 @@ function DeleteResource(e) {
             id: $("#LessonRelatedMaterials").data("kendoListView").dataItem($(e).closest("div").parent("div"))['id']
         },
         success: function (result) {
-            
+
             console.log("Done:" + result);
             var listView = $("#LessonRelatedMaterials").data("kendoListView");
             // refreshes the ListView
@@ -440,4 +459,17 @@ function DeleteResource(e) {
             // notify the data source that the request failed
         }
     });
+}
+
+function UpdateVideo(video) {
+    var videourl = $(video).val();
+    console.log(videourl);
+
+    $("#LessonVideoiFrame").attr("src", videourl);
+
+}
+function ResourceRequired() {
+    if( ($("#newResourceTitle").val() != "") && ($("#newResourceId").val() != "") ) {
+        $("#addResource").removeClass("k-state-disabled");
+    } 
 }

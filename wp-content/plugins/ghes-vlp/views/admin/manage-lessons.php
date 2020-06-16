@@ -6,6 +6,7 @@
 
 function enqueue_lessons_scripts()
 {
+    wp_enqueue_script('wp-api-utils');
     wp_enqueue_script('wp-api-manage-lessons');
     wp_enqueue_style('manage-lessons-style');
 }

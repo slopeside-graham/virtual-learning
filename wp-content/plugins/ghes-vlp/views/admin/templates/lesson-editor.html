@@ -3,6 +3,7 @@
         <label>Lesson Theme: <input id="LessonTheme" data-bind="value:Theme_id" name="Theme_id"></label>
         <label>Lesson Age Group: <input id="LessonAgeGroup" data-bind="value:AgeGroup_id" name="AgeGroup_id"></label>
     </div>
+    <hr>
     <div class="edit-lesson">
         <div class="first-column">
             <label>Lesson Type: <input id="LessonType" name="Type" /></label>
@@ -11,14 +12,23 @@
                     style="width:100%;height:100px;"></textarea></label>
         </div>
         <div class="second-column">
-            <label>Lesson Video: <input id="LessonVideo" name="VideoURL" /></label>
+            <label>Lesson Video: <input id="LessonVideo" name="VideoURL" onblur="UpdateVideo(this)" /></label>
+            <iframe id="LessonVideoiFrame" width="320" height="180" name="VideoURL" src="#= VideoURL #"></iframe>
+            <hr>
             <div class="related-materials">
-                <span>Related Materials</span>
+                <label>Related Materials:</label>
                 <div id="LessonRelatedMaterials"></div>
             </div>
-            <input id="resourceTitle" />
-            <input id="resourceMediaId" />
-            <span class="k-button k-button-icontext k-add-button" onClick="AddNewResource()"><span class="k-icon k-i-add"></span>Add new record</span>
+            <div class="resources">
+                <br/>
+                <label>Add Related Materials:</label>
+                <input id="newResourceTitle" placeholder="Item Title..." onblur="ResourceRequired()"/>
+                <a hidden id="newResourceURL" src="" target="_blank">NewResourceTitle</a>
+                <input hidden id="newResourceId" onchange="ResourceRequired()" />
+                <span class="k-button" id="newResourceButton" >Add Media</span>
+                <span class="k-button k-button-icontext k-add-button k-state-disabled" id="addResource" onClick="AddNewResource()"><span
+                        class="k-icon k-i-add"></span>Add</span>
+            </div>
         </div>
     </div>
 </div>

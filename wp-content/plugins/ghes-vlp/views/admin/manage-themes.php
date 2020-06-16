@@ -6,6 +6,7 @@
 
 function enqueue_themes_scripts()
 {
+    wp_enqueue_script('wp-api-utils');
     wp_enqueue_script('wp-api-manage-themes');
     wp_enqueue_style('manage-themes-style');
 }

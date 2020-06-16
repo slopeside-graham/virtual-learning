@@ -3,6 +3,7 @@
 namespace GHES\VLP {
 
     use GHES\VLP\Utils as VLPUtils;
+
     /**
      * Class Lesson
      */
@@ -15,11 +16,11 @@ namespace GHES\VLP {
         private $_VideoURL;
         private $_Image_id;
         private $_Theme_id;
+        private $_ThemeTitle; // Not in the DB, queries will build it
         private $_AgeGroup_id;
+        private $_AgeGroupName; // Not in the DB, queries will build it
         private $_Completed;
         private $_PercentComplete;
-        private $_DateCreated;
-        private $_DateModified;
 
         protected function id($value = null)
         {
@@ -103,6 +104,17 @@ namespace GHES\VLP {
                 return $this->_Theme_id;
             }
         }
+        protected function ThemeTitle($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_ThemeTitle = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_ThemeTitle;
+            }
+        }
         protected function AgeGroup_id($value = null)
         {
             // If value was provided, set the value
@@ -112,6 +124,17 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_AgeGroup_id;
+            }
+        }
+        protected function AgeGroupName($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_AgeGroupName = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_AgeGroupName;
             }
         }
         protected function Completed($value = null)
@@ -136,29 +159,8 @@ namespace GHES\VLP {
                 return $this->_PercentComplete;
             }
         }
-        protected function DateCreated($value = null)
-        {
-            // If value was provided, set the value
-            if ($value) {
-                $this->_DateCreated = $value;
-            }
-            // If no value was provided return the existing value
-            else {
-                return $this->_DateCreated;
-            }
-        }
-        protected function DateModified($value = null)
-        {
-            // If value was provided, set the value
-            if ($value) {
-                $this->_DateModified = $value;
-            }
-            // If no value was provided return the existing value
-            else {
-                return $this->_DateModified;
-            }
-        }
-        
+
+
 
         public function jsonSerialize()
         {
@@ -170,11 +172,11 @@ namespace GHES\VLP {
                 'VideoURL' => $this->VideoURL,
                 'Image_id' => $this->Image_id,
                 'Theme_id' => $this->Theme_id,
+                'ThemeTitle' => $this->ThemeTitle,
                 'AgeGroup_id' => $this->AgeGroup_id,
+                'AgeGroupName' => $this->AgeGroupName,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,
-                'DateCreated' => $this->DateCreated,
-                'DateModified' => $this->DateModified,
             ];
         }
 
@@ -196,7 +198,6 @@ namespace GHES\VLP {
                     'AgeGroup_id' => $this->AgeGroup_id
                 ));
                 $this->id = VLPUtils::$db->insertId();
-
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Lesson_Create_Error', $e->getMessage());
             }
@@ -266,7 +267,15 @@ namespace GHES\VLP {
 
             try {
 
-                $row = VLPUtils::$db->queryFirstRow("select * from Lesson where id = %i", $thisid);
+                $row = VLPUtils::$db->queryFirstRow("
+                select l.*, 
+                        t.Title as ThemeTitle, 
+                        ag.Name as AgeGroupName 
+                    from Lesson l
+                        Inner Join Theme t on l.Theme_id = t.id
+                        Inner Join AgeGroup ag on l.AgeGroup_id = ag.id 
+                where l.id = %i", $thisid);
+
                 $lesson = Lesson::populatefromRow($row);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Lesson_Get_Error', $e->getMessage());
@@ -283,15 +292,15 @@ namespace GHES\VLP {
 
             try {
 
-                    if (isset($_COOKIE['VLPSelectedChild'])) {
-                        $child_id = $_COOKIE['VLPSelectedChild'];
-                        $results = VLPUtils::$db->query("select l.*, cls.Completed, cls.PercentComplete from Lesson l
+                if (isset($_COOKIE['VLPSelectedChild'])) {
+                    $child_id = $_COOKIE['VLPSelectedChild'];
+                    $results = VLPUtils::$db->query("select l.*, cls.Completed, cls.PercentComplete from Lesson l
                                                         Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id
                                                         where Theme_id = %i
                                                         and (cls.Child_id = %i or isnull(cls.Child_id ))", $themeid, $child_id);
-                    } else {
-                        $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i", $themeid);
-                    }
+                } else {
+                    $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i", $themeid);
+                }
 
                 foreach ($results as $row) {
                     $lesson = Lesson::populatefromRow($row);
@@ -332,7 +341,7 @@ namespace GHES\VLP {
             }
             return $lessons;
         }
-        
+
 
         public static function GetAll()
         {
@@ -342,7 +351,10 @@ namespace GHES\VLP {
             $lessons = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from Lesson");
+                $results = VLPUtils::$db->query("
+                    select l.*, t.Title as ThemeTitle, ag.Name as AgeGroupName from Lesson l
+                    Inner Join Theme t on l.Theme_id = t.id
+                    Inner Join AgeGroup ag on l.AgeGroup_id = ag.id");
 
                 foreach ($results as $row) {
                     $lesson = Lesson::populatefromRow($row);
@@ -366,9 +378,15 @@ namespace GHES\VLP {
             $lesson->VideoURL = $row['VideoURL'];
             $lesson->Image_id = $row['Image_id'];
             $lesson->Theme_id = $row['Theme_id'];
+            $lesson->ThemeTitle = $row['ThemeTitle'];
             $lesson->AgeGroup_id = $row['AgeGroup_id'];
+            $lesson->AgeGroupName = $row['AgeGroupName'];
             $lesson->Completed = $row['Completed'];
             $lesson->PercentComplete = $row['PercentComplete'];
+            $lesson->DateCreated = $row['DateCreated'];
+            if (isset($row['DateModified'])) {
+                $lesson->DateModified = $row['DateModified'];
+            }
             return $lesson;
         }
     }

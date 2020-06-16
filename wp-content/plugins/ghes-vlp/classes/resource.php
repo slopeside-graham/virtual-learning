@@ -12,6 +12,7 @@ namespace GHES\VLP {
         private $_id;
         private $_Title;
         private $_Media_id;
+        private $_MediaURL;
         private $_Lesson_id;
         private $_Completed;
         private $_PercentComplete;
@@ -52,6 +53,15 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_Media_id;
+            }
+        }
+
+        protected function MediaURL($value = null)
+        {
+            if (isset($this->_Media_id)) {
+                return wp_get_attachment_url($this->_Media_id);
+            } else {
+                return "";
             }
         }
         protected function Lesson_id($value = null)
@@ -118,6 +128,7 @@ namespace GHES\VLP {
                 'id' => $this->id,
                 'Title' => $this->Title,
                 'Media_id' => $this->Media_id,
+                'MediaURL' => $this->MediaURL,
                 'Lesson_id' => $this->Lesson_id,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,

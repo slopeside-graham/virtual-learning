@@ -25,6 +25,19 @@ div.k-edit-form-container {
     width: auto;
     height: auto;
 }
+.related-item {
+    display: grid;
+    grid-template-columns: auto auto;
+}
+.related-item .edit-buttons {
+    text-align: right;
+}
+.related-item .edit-buttons .k-i-delete:hover {
+    cursor: pointer;
+}
+#LessonRelatedMaterials {
+    padding: 5px;
+}
 
 /* Loading Window CSS */
 
@@ -41,4 +54,22 @@ div.k-edit-form-container {
 div.k-loading-mask {
     z-index: 9999;
     /* must be larger than the z-index:2 of #container */
+}
+
+.k-editor span[title="Format"] {
+    display: none;
+}
+
+.k-editor button[title="Insert image"] {
+    display: none;
+}
+
+.k-editor button[title="Create a table"] {
+    display: none;
+}
+.k-editor button[title="Insert hyperlink"] {
+    display: none;
+}
+.k-editor button[title="Remove hyperlink"] {
+    display: none;
 }

@@ -95,9 +95,15 @@ function register_vlp_script_style_backend()
   wp_register_script('wp-api-manage-lessons', plugins_url('ghes-vlp/js/admin/manage-lessons.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-manage-lessons', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
+  wp_register_script('wp-api-utils', plugins_url('ghes-vlp/js/admin/utils.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-utils', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
   wp_register_style('manage-themes-style', plugins_url('/ghes-vlp/css/admin/manage-themes.css'), array(), scriptver);
 
   wp_register_style('manage-lessons-style', plugins_url('/ghes-vlp/css/admin/manage-lessons.css'), array(), scriptver);
+
+  // Enqueue WP Media Scripts
+  wp_enqueue_media();
 }
 add_action('admin_enqueue_scripts', 'register_vlp_script_style_backend');
 

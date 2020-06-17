@@ -139,8 +139,6 @@ namespace GHES\VLP {
                     'PercentComplete' => $this->PercentComplete,
                 ));
                 $this->id = VLPUtils::$db->insertId();
-                // Get a reference to Lesson, update LessonStats
-                //TODO Update Lesson Status from Resource Stats: ChildLessonStatus::UpdateStatusbyResourceid($this->Lesson_id, $this->Child_id);
 
             } catch (\MeekroDBException $e) {
                 if ($e->getCode() == '1062')  { // Ignore this duplicate entry error and continue

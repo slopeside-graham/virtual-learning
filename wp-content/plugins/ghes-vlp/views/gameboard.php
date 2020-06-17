@@ -60,6 +60,8 @@ function vlp_gameboard($atts, $content = null)
         $themeenddate = $theme->EndDate;
         $themecompleted = $theme->Completed;
         $themepercentcompleted = $theme->PercentComplete;
+        $lastweekstheme = Theme::GetbyDateandAgeGroup($themelastweekdate, $agegroupid);
+        $nextweekstheme = Theme::GetbyDateandAgeGroup($themenextweekdate, $agegroupid);
 
         if ($themecompleted) {
             $themeprogress = "completed";
@@ -71,7 +73,8 @@ function vlp_gameboard($atts, $content = null)
         $output .= '<div class="gameboard-theme-header">';
 
         $output .= '<div class="navigation-button last-week">';
-        if (is_null(Theme::GetbyDateandAgeGroup($themelastweekdate, $agegroupid))) {
+        
+        if (!is_null($lastweekstheme)) {
             $output .= '<a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '">Previous Week</a>';
         }
         $output .= '</div>';
@@ -79,7 +82,7 @@ function vlp_gameboard($atts, $content = null)
         $output .= '<div id="theme-title" class="'. $themeprogress . '%-completed">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
         
         $output .= '<div class="navigation-button next-week">';
-        if (is_null(Theme::GetbyDateandAgeGroup($themenextweekdate, $agegroupid))) {
+        if (!is_null($nextweekstheme)) {
             $output .= '<a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '">Next Week</a>';
         }
         $output .= '</div>';

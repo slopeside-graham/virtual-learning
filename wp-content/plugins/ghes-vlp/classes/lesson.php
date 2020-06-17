@@ -240,7 +240,7 @@ namespace GHES\VLP {
 
                 $row = VLPUtils::$db->queryFirstRow("
                 select l.*, 
-                        t.Title as ThemeTitle, 
+                        t.Title as ThemeTitle 
                     from Lesson l
                         Inner Join Theme t on l.Theme_id = t.id
                 where l.id = %i", $thisid);

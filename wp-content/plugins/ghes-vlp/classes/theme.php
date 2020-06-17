@@ -199,9 +199,12 @@ namespace GHES\VLP {
                     'StartDate' => $this->StartDate,
                     'EndDate' => $this->EndDate,
                     'Gameboard_id' => $this->Gameboard_id,
+                    'AgeGroup_id' => $this->AgeGroup_id
                 ));
                 $this->id = VLPUtils::$db->insertId();
             } catch (\MeekroDBException $e) {
+                return new \WP_Error('Theme_Create_DatabaseError', $e->getMessage());
+            } catch (Exception $e) {
                 return new \WP_Error('Theme_Create_Error', $e->getMessage());
             }
             return true;
@@ -238,6 +241,8 @@ namespace GHES\VLP {
                 $theme = Theme::Get($this->id);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_Update_Error', $e->getMessage());
+            } catch (Exception $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
             }
             return $theme;
         }
@@ -255,6 +260,8 @@ namespace GHES\VLP {
             } catch (\MeekroDBException $e) {
                 echo $e->getMessage();
                 return new \WP_Error('Theme_Delete_Error', $e->getMessage());
+            } catch (Exception $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
             }
             return true;
         }
@@ -276,6 +283,8 @@ namespace GHES\VLP {
 
                 $theme = Theme::populatefromRow($row);
             } catch (\MeekroDBException $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+            } catch (Exception $e) {
                 return new \WP_Error('Theme_Get_Error', $e->getMessage());
             }
             return $theme;
@@ -352,6 +361,8 @@ namespace GHES\VLP {
                 $theme = Theme::populatefromRow($row);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_Get_Error', $e->getMessage());
+            } catch (Exception $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
             }
             return $theme;
         }
@@ -381,6 +392,8 @@ namespace GHES\VLP {
                 return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
             } catch (Exception $e) {
                 return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
+            } catch (Exception $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
             }
             return $themes;
         }

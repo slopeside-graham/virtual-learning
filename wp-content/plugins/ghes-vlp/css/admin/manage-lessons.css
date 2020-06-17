@@ -73,3 +73,6 @@ div.k-loading-mask {
 .k-editor button[title="Remove hyperlink"] {
     display: none;
 }
+.k-grid tbody tr{
+    height: 50px;
+}

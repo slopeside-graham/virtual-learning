@@ -129,8 +129,6 @@ $(function () {
                     });
                 }
             },
-            batch: true,
-            pageSize: 10,
             sort: {
                 field: "Title",
                 dir: "asc"
@@ -160,7 +158,13 @@ $(function () {
                 pageSizes: true,
                 buttonCount: 5
             },
-            toolbar: ["create"],
+            filterable: true,
+            sortable: true,
+            groupable: true,
+            toolbar: [
+               { name: "create" },
+               { name: "search"}
+            ],
             editable: {
                 mode: "popup",
                 template: kendo.template($("#lesson-editor").html()),
@@ -173,14 +177,14 @@ $(function () {
             dataBound: onDataBound,
             change: onChange,
             columns: [
-                { field: "id", title: "ID", width: "100px" },
-                { field: "Title", title: "Title" },
-                { field: "Type", title: "Type" },
+                { field: "id", title: "ID", width: "60px" },
+                { field: "Title", title: "Title", width: "100px" },
+                { field: "ThemeTitle", title: "Theme", width: "100px" },
+                { field: "Type", title: "Type", width: "100px" },
                 { field: "MainContent", title: "Main Content", encoded: false },
-                { field: "VideoURL", title: "Video URL" },
-                { field: "Image_id", title: "Image ID" },
-                { field: "ThemeTitle", title: "Theme Title" },
-                { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                { field: "VideoURL", title: "Video URL", width: "100px" },
+                //{ field: "Image_id", title: "Image ID", width: "100px" },
+                { command: ["edit", "destroy"], title: "&nbsp;", width: "180px" }
             ],
         });
         function onDataBound() {

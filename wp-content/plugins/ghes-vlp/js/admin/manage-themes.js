@@ -109,7 +109,9 @@ $(function () {
                             StartDate: { validation: { required: false }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
                             EndDate: { validation: { required: false }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
                             Gameboard_id: { validation: { required: true } },
-                            AgeGroup_id: { validation: { required: true } }
+                            GameboardTitle: { validation: { required: true } },
+                            AgeGroup_id: { validation: { required: true } },
+                            AgeGroupTitle: { validation: { required: true } }
                         }
                     }
                 }

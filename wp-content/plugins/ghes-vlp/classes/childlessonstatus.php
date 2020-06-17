@@ -163,8 +163,8 @@ namespace GHES\VLP {
                 VLPUtils::$db->query(
                     "UPDATE Child_Lesson_Status
                     SET
-                    Lesson_id=%s, 
-                    Child_id=%s, 
+                    Lesson_id=%i, 
+                    Child_id=%i, 
                     Completed=%i,
                     PercentComplete=%i
                 WHERE 

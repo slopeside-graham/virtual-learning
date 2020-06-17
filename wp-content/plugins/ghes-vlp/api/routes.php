@@ -32,6 +32,10 @@ include_once(plugin_dir_path(__FILE__) . '/childlessonstatus_rest.php');    // A
 include_once(plugin_dir_path(__FILE__) . '/../classes/childthemestatus.php');  // AgeGroup class
 include_once(plugin_dir_path(__FILE__) . '/childthemestatus_rest.php');    // AgeGroup REST controller
 
+// Include Theme Resource Status REST controller and class
+include_once(plugin_dir_path(__FILE__) . '/../classes/gameboard.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/gameboard_rest.php');    // AgeGroup REST controller
+
 /**
  * Register our API routes.
  */
@@ -61,13 +65,17 @@ function register_vlp_controllers()
     $controller = new GHES\VLP\ChildResourceStatus_Rest();
     $controller->register_routes();
 
-        // Resource Controller
-        $controller = new GHES\VLP\ChildLessonStatus_Rest();
-        $controller->register_routes();
+    // Resource Controller
+    $controller = new GHES\VLP\ChildLessonStatus_Rest();
+    $controller->register_routes();
 
-                // Resource Controller
-                $controller = new GHES\VLP\ChildThemeStatus_Rest();
-                $controller->register_routes();
+    // Resource Controller
+    $controller = new GHES\VLP\ChildThemeStatus_Rest();
+    $controller->register_routes();
+
+    // Resource Controller
+    $controller = new GHES\VLP\Gameboard_Rest();
+    $controller->register_routes();
 }
 
 add_action('rest_api_init', 'register_vlp_controllers');

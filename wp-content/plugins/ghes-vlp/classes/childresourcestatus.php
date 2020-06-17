@@ -149,8 +149,8 @@ namespace GHES\VLP {
                 VLPUtils::$db->query(
                     "UPDATE Child_Resource_Status
                     SET
-                    Resource_id=%s, 
-                    Child_id=%s, 
+                    Resource_id=%i, 
+                    Child_id=%i, 
                     Completed=%i
                 WHERE 
                     id=%i",

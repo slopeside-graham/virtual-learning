@@ -147,8 +147,6 @@ $(function () {
                         Image_id: { editable: true, validation: { required: false } },
                         Theme_id: { editable: true, validation: { required: true } },
                         ThemeTitle: { editable: true, validation: { required: true } },
-                        AgeGroup_id: { editable: true, validation: { required: true } },
-                        AgeGroupName: { editable: true, validation: { required: true } },
                     }
                 }
             }
@@ -182,7 +180,6 @@ $(function () {
                 { field: "VideoURL", title: "Video URL" },
                 { field: "Image_id", title: "Image ID" },
                 { field: "ThemeTitle", title: "Theme Title" },
-                { field: "AgeGroupName", title: "Age Group" },
                 { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
             ],
         });
@@ -210,14 +207,6 @@ $(function () {
                     dataValueField: "id",
                     value: e.model.Theme_id,
                     dataSource: ThemeData
-                });
-
-            $('#LessonAgeGroup')
-                .kendoDropDownList({
-                    dataTextField: "Name",
-                    dataValueField: "id",
-                    dataSource: AgeGroupData,
-                    value: e.model.AgeGroup_id,
                 });
 
             $('#LessonType')
@@ -354,27 +343,6 @@ $(function () {
             read: function (options) {
                 $.ajax({
                     url: wpApiSettings.root + "ghes-vlp/v1/theme",
-                    dataType: "json",
-                    method: "GET",
-                    data: options.data,
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
-                    },
-                    success: function (result) {
-                        options.success(result);
-                    },
-                    error: function (result) {
-                        options.error(result);
-                    }
-                });
-            }
-        }
-    }
-    var AgeGroupData = {
-        transport: {
-            read: function (options) {
-                $.ajax({
-                    url: wpApiSettings.root + "ghes-vlp/v1/agegroup",
                     dataType: "json",
                     method: "GET",
                     data: options.data,

@@ -2,19 +2,18 @@
 
 namespace GHES\VLP {
 
+    use Exception;
     use GHES\VLP\Utils as VLPUtils;
+
     /**
-     * Class AgeGroup
+     * Class Gameboard
      */
-    class AgeGroup extends ghes_vlp_base implements \JsonSerializable
+    class Gameboard extends ghes_vlp_base implements \JsonSerializable
     {
         private $_id;
-        private $_Name;
-        private $_AgeStart;
-        private $_AgeEnd;
+        private $_Title;
         private $_DateCreated;
         private $_DateModified;
-
 
         protected function id($value = null)
         {
@@ -28,40 +27,15 @@ namespace GHES\VLP {
             }
         }
 
-        protected function Name($value = null)
+        protected function Title($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_Name = $value;
+                $this->_Title = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_Name;
-            }
-        }
-
-        protected function AgeStart($value = null)
-        {
-            // If value was provided, set the value
-            if ($value) {
-                $this->_AgeStart = $value;
-            }
-            // If no value was provided return the existing value
-            else {
-                return $this->_AgeStart;
-            }
-        }
-
-
-        protected function AgeEnd($value = null)
-        {
-            // If value was provided, set the value
-            if ($value) {
-                $this->_AgeEnd = $value;
-            }
-            // If no value was provided return the existing value
-            else {
-                return $this->_AgeEnd;
+                return $this->_Title;
             }
         }
         protected function DateCreated($value = null)
@@ -86,15 +60,13 @@ namespace GHES\VLP {
                 return $this->_DateModified;
             }
         }
-        
+
 
         public function jsonSerialize()
         {
             return [
                 'id' => $this->id,
-                'Name' => $this->Name,
-                'AgeStart' => $this->AgeStart,
-                'AgeEnd' => $this->AgeEnd,
+                'Title' => $this->Title,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
@@ -108,15 +80,12 @@ namespace GHES\VLP {
 
             try {
 
-                VLPUtils::$db->insert('AgeGroup', array(
-                    'Name' => $this->Name,
-                    'AgeStart' => $this->AgeStart,
-                    'AgeEnd' => $this->AgeEnd,
+                VLPUtils::$db->insert('Gameboard', array(
+                    'Title' => $this->Title
                 ));
                 $this->id = VLPUtils::$db->insertId();
-
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('AgeGroup_Create_Error', $e->getMessage());
+                return new \WP_Error('Gameboard_Create_Error', $e->getMessage());
             }
             return true;
         }
@@ -130,26 +99,22 @@ namespace GHES\VLP {
             try {
 
                 VLPUtils::$db->query(
-                    "UPDATE AgeGroup 
+                    "UPDATE Gameboard 
                     SET
-                    Name=%s, 
-                    AgeStart=%i, 
-                    AgeEnd=%i
+                    Title=%s
                 WHERE 
                     id=%i",
-                    $this->Name,
-                    $this->AgeStart,
-                    $this->AgeEnd,
+                    $this->Title,
                     $this->id
                 );
 
                 $counter = VLPUtils::$db->affectedRows();
 
-                $ageGroup = AgeGroup::Get($this->id);
+                $gameboard = Gameboard::Get($this->id);
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('AgeGroup_Update_Error', $e->getMessage());
+                return new \WP_Error('Gameboard_Update_Error', $e->getMessage());
             }
-            return $ageGroup;
+            return $gameboard;
         }
 
         public function Delete()
@@ -160,11 +125,11 @@ namespace GHES\VLP {
 
             try {
 
-                VLPUtils::$db->query("Delete from AgeGroup WHERE id=%d", $this->id);
+                VLPUtils::$db->query("Delete from Gameboard WHERE id=%d", $this->id);
                 $counter = VLPUtils::$db->affectedRows();
             } catch (\MeekroDBException $e) {
                 echo $e->getMessage();
-                return new \WP_Error('AgeGroup_Delete_Error', $e->getMessage());
+                return new \WP_Error('Gameboard_Delete_Error', $e->getMessage());
             }
             return true;
         }
@@ -176,62 +141,45 @@ namespace GHES\VLP {
 
             try {
 
-                $row = VLPUtils::$db->queryFirstRow("select * from AgeGroup where id = %i", $thisid);
-                $ageGroup = AgeGroup::populatefromRow($row);
+                $row = VLPUtils::$db->queryFirstRow("select * from Gameboard where id = %i", $thisid);
+
+                $gameboard = Gameboard::populatefromRow($row);
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('AgeGroup_Get_Error', $e->getMessage());
+                return new \WP_Error('Gameboard_Get_Error', $e->getMessage());
             }
-            return $ageGroup;
+            return $gameboard;
         }
-
-        public static function GetByAgeMonths($agemonths)
-        {
-            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
-            VLPUtils::$db->throw_exception_on_error = true;
-
-            try {
-
-                $row = VLPUtils::$db->queryFirstRow("select * from AgeGroup where %i between AgeStart and AgeEnd", $agemonths);
-                $ageGroup = AgeGroup::populatefromRow($row);
-
-            } catch (\MeekroDBException $e) {
-                return new \WP_Error('AgeGroup_Get_Error', $e->getMessage());
-            }
-            return $ageGroup;
-        }
-        
-        
 
         public static function GetAll()
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
-            $ageGroups = new NestedSerializable();
+            $gameboards = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from AgeGroup");
+                $results = VLPUtils::$db->query("select * from Gameboard");
 
                 foreach ($results as $row) {
-                    $ageGroup = AgeGroup::populatefromRow($row);
-                    $ageGroups->add_item($ageGroup);  // Add the lesson to the collection
+                    $gameboard = Gameboard::populatefromRow($row);
+                    $gameboards->add_item($gameboard);  // Add the theme to the collection
 
                 }
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('AgeGroup_GetAll_Error', $e->getMessage());
+                return new \WP_Error('Gameboard_GetAll_Error', $e->getMessage());
+            } catch (Exception $e) {
+                return new \WP_Error('Gameboard_GetAll_Error', $e->getMessage());
             }
-            return $ageGroups;
+            return $gameboards;
         }
 
-        // Helper function to populate a lesson from a MeekroDB Row
-        public static function populatefromRow($row): AgeGroup
+        // Helper function to populate a theme from a MeekroDB Row
+        public static function populatefromRow($row): Gameboard
         {
-            $ageGroup = new AgeGroup();
-            $ageGroup->id = $row['id'];
-            $ageGroup->Name = $row['Name'];
-            $ageGroup->AgeStart = $row['AgeStart'];
-            $ageGroup->AgeEnd = $row['AgeEnd'];
-            return $ageGroup;
+            $gameboard = new Gameboard();
+            $gameboard->id = $row['id'];
+            $gameboard->Title = $row['Title'];
+            return $gameboard;
         }
     }
 }

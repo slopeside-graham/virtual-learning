@@ -259,9 +259,6 @@
         width: 720px;
         height: 400px;
     }
-    .lesson-popup {
-        width: 100%;
-    }
     .lesson-icon-area {
         width: 25px;
         height: 25px;
@@ -274,34 +271,6 @@
         top: -3px;
         right: -1px;
         width: 15px;
-    }
-}
-
-@media screen and (max-width: 991px) {
-    .lesson-popup {
-        width: 90%;
-        margin-left: -45%;
-        height: auto;
-        top: 0;
-        position: fixed;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    .lesson-content {
-        display: block;
-        height: auto;
-        max-height: none;
-        margin-left: 0px;
-        padding-top: 60px;
-        overflow: scroll;
-        padding-bottom: 20px;
-    }
-    .lesson-main-content {
-        max-height: none;
-    }
-    .first-column {
-        margin-right: none;
-        margin-bottom: 20px;
     }
 }
 

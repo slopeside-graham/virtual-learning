@@ -3,7 +3,7 @@
 use GHES\Utils;
 use GHES\VLP\Utils as VLPUtils;
 
-const vlpscriptver = '1.0.6152020-1';  // Use this in register script calls to bypass cache.
+const vlpscriptver = '1.0.6172020-1';  // Use this in register script calls to bypass cache.
 /**
  * Plugin Name: GHES Virtual Learning Platform
  * Version: 0.1

@@ -282,15 +282,17 @@
         width: 90%;
         margin-left: -45%;
         height: auto;
-        top: 50%;
+        top: 0;
         position: fixed;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
     .lesson-content {
         display: block;
-        height: 330px;
+        height: auto;
         max-height: none;
         margin-left: 0px;
-        margin-top: 60px;
+        padding-top: 60px;
         overflow: scroll;
         padding-bottom: 20px;
     }

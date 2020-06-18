@@ -1,4 +1,5 @@
 <?php
+
 namespace GHES\VLP {
 
     /**
@@ -184,6 +185,8 @@ namespace GHES\VLP {
             if ($request['id'] != '') {
                 // Call static function Get (use :: to reference static function)
                 $theme = Theme::Get($request['id']);
+            } else if ($request['ageGroupid'] != '') {
+                $theme = Theme::GetAllbyAgeGroup($request['ageGroupid']);
             } else {
                 // Call static function Get (use :: to reference static function)
                 $theme = Theme::GetAll();

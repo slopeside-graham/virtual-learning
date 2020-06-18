@@ -1,0 +1,35 @@
+#themes-listView {
+    min-height: 200px;
+}
+
+#themes-listView .k-listview-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    text-align: center;
+    color: white;
+}
+.theme-title {
+    color: white;
+    padding: 10px;
+}
+.themeaccess {
+    color: white;
+    background-color: #f69e33;
+    padding: 5px;
+}
+
+.theme {
+    padding: 20px;
+}
+.theme:nth-child(3n-2) {
+    background-color: #1fa99d;
+}
+.theme:nth-child(3n-1) {
+    background-color: #b5cc34;
+}
+
+.theme:nth-child(3n) {
+    background-color: #1a71ad;
+}

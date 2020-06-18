@@ -367,6 +367,37 @@ namespace GHES\VLP {
             return $theme;
         }
 
+        public static function GetAllbyAgeGroup($agegroupid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $themes = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("
+                select t.*, 
+                    gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
+                from Theme t
+                    Inner Join Gameboard gb on t.Gameboard_id = gb.id
+                    Inner Join AgeGroup ag on t.Agegroup_id = ag.id
+                    Where AgeGroup_id = %i", $agegroupid);
+
+                foreach ($results as $row) {
+                    $theme = Theme::populatefromRow($row);
+                    $themes->add_item($theme);  // Add the theme to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
+            } catch (Exception $e) {
+                return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
+            } catch (Exception $e) {
+                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+            }
+            return $themes;
+        }
+
 
         public static function GetAll()
         {

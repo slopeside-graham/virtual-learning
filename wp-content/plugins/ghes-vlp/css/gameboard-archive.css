@@ -1,0 +1,14 @@
+.vlp-lesson-items {
+    display: none;
+    list-style: none;
+}
+.Theme-Title:hover {
+    cursor: pointer;
+}
+.archive-lesson-title:hover {
+    cursor: pointer;
+}
+.archive-lesson-content {
+    display: none;
+    margin-left: 25px;
+}

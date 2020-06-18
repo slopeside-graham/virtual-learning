@@ -83,6 +83,23 @@ function register_vlp_script_style_frontend()
 
   wp_register_style('gameboard-1-style', plugins_url('/ghes-vlp/css/gameboard-1.css'), array(), scriptver);
   wp_enqueue_style('gameboard-1-style');
+
+  wp_register_style('gameboard-archive-style', plugins_url('/ghes-vlp/css/gameboard-archive.css'), array(), scriptver);
+  wp_enqueue_style('gameboard-archive-style');
+
+  wp_register_script('wp-api-gameboard-archive', plugins_url('ghes-vlp/js/gameboard-archive.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-gameboard-archive', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_register_style('browse-themes-style', plugins_url('/ghes-vlp/css/browse-themes.css'), array(), scriptver);
+  wp_enqueue_style('browse-themes-style');
+
+  wp_register_script('wp-api-browse-themes', plugins_url('ghes-vlp/js/browse-themes.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-browse-themes', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_register_script('wp-api-frontend-utils', plugins_url('ghes-vlp/js/utils.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-frontend-utils', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_enqueue_script('wp-api-frontend-utils');
 }
 add_action('wp_enqueue_scripts', 'register_vlp_script_style_frontend');
 

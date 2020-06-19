@@ -49,7 +49,7 @@ function vlp_browse_themes($atts, $content = null)
 
 
     $BrowseThemeTemplate = file_get_contents(plugin_dir_path(__FILE__) . 'templates/browse-theme.html');
-    $output .= '<div>' . $agegroupname . ' / Weekly Themes</div>';
+    $output .= '<div class="browse-themes-header"><span class="browse-themes-age">' . $agegroupname . ' / </span><span class="weely-theme">Weekly Themes</span></div>';
     $output .= $BrowseThemeTemplate;
 
     return $output;

@@ -66,11 +66,12 @@ $(function () {
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
                         },
-                        data: options.data.models[0],
+                        data: options.data,
                         success: function (result) {
                             // notify the data source that the request succeeded
                             console.log("Done:" + result);
                             options.success(result);
+                            newLessonid = result.id;
                         },
                         error: function (result) {
                             if (typeof result.responseJSON !== "undefined") {
@@ -89,7 +90,7 @@ $(function () {
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
                         },
-                        data: options.data.models[0],
+                        data: options.data,
                         success: function (result) {
                             // notify the data source that the request succeeded
                             console.log("Done:" + result);
@@ -112,7 +113,7 @@ $(function () {
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
                         },
-                        data: options.data.models[0],
+                        data: options.data,
                         success: function (result) {
                             // notify the data source that the request succeeded
                             console.log("Done:" + result);
@@ -372,6 +373,7 @@ function AddNewResource() {
             url: wpApiSettings.root + "ghes-vlp/v1/resource",
             method: "POST",
             beforeSend: function (xhr) {
+                // lessondataSource.sync(); //TODO: SAve the lesoon, then save the resource, then dont close the popup window
                 xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
             },
             data: {

@@ -23,6 +23,7 @@ function vlp_gameboard($atts, $content = null)
     enqueue_gameboard_scripts();
 
     $completionIcon = file_get_contents("wp-content/plugins/ghes-vlp/assets/check-solid.svg");
+    $completionIcon = file_get_contents(plugin_dir_path(__FILE__) . 'templates/lesson-editor.html');
 
     $childid = $_COOKIE['VLPSelectedChild'];
     $child = Children::Get($childid);

@@ -2,9 +2,9 @@ $ = jQuery;
 $(function () {
     $(document).ready(function () {
         kendo.ui.progress($(".loading-window"), true);
-        $(".loading-window").show();
 
-        var crudServiceBaseUrl = wpApiSettings.root + "ghes-vlp/v1",
+        displayLoading("#theme-grid");
+
             dataSource = new kendo.data.DataSource({
                 transport: {
                     read: function (options) {
@@ -215,10 +215,11 @@ $(function () {
 
         function onDataBound() {
             console.log("Theme ListView data bound");
-            $('.loading-window').hide();
+            hideLoading("#theme-grid");
         }
 
         function onChange(e) {
+            
         }
     })
 });

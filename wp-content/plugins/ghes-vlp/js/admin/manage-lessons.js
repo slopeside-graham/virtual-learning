@@ -3,15 +3,6 @@ var relatedMaterialsData;
 var currentLessonID;
 var customMediaLibrary;
 
-function displayLoading(target) {
-    var element = $(target);
-    kendo.ui.progress(element, true);
-}
-function hideLoading(target) {
-    var element = $(target);
-    kendo.ui.progress(element, false);
-}
-
 $(function () {
 
     $(document).ready(function () {
@@ -140,7 +131,7 @@ $(function () {
                     fields: {
                         id: { editable: false, nullable: true },
                         Title: { validation: { required: true } },
-                        Type: { validation: { required: false } },
+                        Type: { validation: { required: true } },
                         MainContent: { validation: { required: false } },
                         VideoURL: { validation: { required: false } },
                         Image_id: { editable: true, validation: { required: false } },
@@ -179,9 +170,9 @@ $(function () {
             change: onChange,
             columns: [
                 { field: "id", title: "ID", width: "60px" },
-                { field: "Title", title: "Title", width: "100px" },
-                { field: "ThemeTitle", title: "Theme", width: "100px" },
-                { field: "Type", title: "Type", width: "100px" },
+                { field: "Title", title: "Title", width: "100px", required: true },
+                { field: "ThemeTitle", title: "Theme", width: "100px", required: true },
+                { field: "Type", title: "Type", width: "100px", required: true },
                 { field: "MainContent", title: "Main Content", encoded: false },
                 { field: "VideoURL", title: "Video URL", width: "100px" },
                 //{ field: "Image_id", title: "Image ID", width: "100px" },
@@ -217,9 +208,9 @@ $(function () {
             $('#LessonType')
                 .kendoDropDownList({
                     dataTextField: "text",
-                    dataValueField: "value",
+                    dataValueField: "text",
                     dataSource: activityData,
-                    index: 0,
+                    valuePrimitive: true
                 })
             $('#LessonTitle')
                 .kendoTextBox({
@@ -337,10 +328,10 @@ $(function () {
         }
     })
     var activityData = [
-        { text: "Play", value: "Play" },
-        { text: "Learn", value: "Learn" },
-        { text: "Art", value: "Art" },
-        { text: "Nurture", value: "Nurture" }
+        { text: "Play" },
+        { text: "Learn" },
+        { text: "Art" },
+        { text: "Nurture" }
     ];
 
     var ThemeData = {
@@ -373,7 +364,7 @@ function AddNewResource() {
             url: wpApiSettings.root + "ghes-vlp/v1/resource",
             method: "POST",
             beforeSend: function (xhr) {
-                // lessondataSource.sync(); //TODO: SAve the lesoon, then save the resource, then dont close the popup window
+                // lessondataSource.sync(); //TODO: Save the lesoon, then save the resource, then dont close the popup window
                 xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
             },
             data: {

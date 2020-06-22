@@ -35,7 +35,13 @@
 .navigation-button {
     align-self: center;
 }
-
+img.nav-btn-img {
+    max-width: 200px !important;
+}
+.view-all-weeks-btn {
+    margin-top: 20px;
+    display: block;
+}
 .last-week {
     text-align: left;
 }

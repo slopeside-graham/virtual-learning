@@ -22,8 +22,10 @@ function vlp_gameboard($atts, $content = null)
 {
     enqueue_gameboard_scripts();
 
-    $completionIcon = file_get_contents("wp-content/plugins/ghes-vlp/assets/check-solid.svg");
-    $completionIcon = file_get_contents(plugin_dir_path(__FILE__) . 'templates/lesson-editor.html');
+    $completionIcon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . 'assets/check-solid.svg');
+    $nextWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Next Week Button.png';
+    $previousWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Last Week Button.png';
+    $viewAllWeeksButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/View All Weeks Button.png';
 
     $childid = $_COOKIE['VLPSelectedChild'];
     $child = Children::Get($childid);
@@ -69,22 +71,22 @@ function vlp_gameboard($atts, $content = null)
         } else {
             $themeprogress = $themepercentcompleted;
         }
-        $output .= '<script>var currentThemeId = '. $themeid . '</script>';
+        $output .= '<script>var currentThemeId = ' . $themeid . '</script>';
         $output .= '<div class="vlp-intro">Take the journey and see what you can learn with our P.L.A.N.!</div>';
         $output .= '<div class="gameboard-theme-header">';
 
         $output .= '<div class="navigation-button last-week">';
-        
+
         if (!is_null($lastweekstheme)) {
-            $output .= '<a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '">Previous Week</a>';
+            $output .= '<a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $previousWeekButton . '" /></a>';
         }
         $output .= '</div>';
 
-        $output .= '<div id="theme-title" class="'. $themeprogress . '%-completed">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
-        
+        $output .= '<div id="theme-title" class="' . $themeprogress . '%-completed">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon">' . $completionIcon . '</span></div>';
+
         $output .= '<div class="navigation-button next-week">';
         if (!is_null($nextweekstheme)) {
-            $output .= '<a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '">Next Week</a>';
+            $output .= '<a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $nextWeekButton . '" /></a>';
         }
         $output .= '</div>';
 
@@ -113,18 +115,18 @@ function vlp_gameboard($atts, $content = null)
                     }
 
                     if ($lesson->Type == 'Play') {
-                        $lessonicon = file_get_contents("wp-content/plugins/ghes-vlp/assets/icons/play.svg");
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/play.svg');
                     } else if ($lesson->Type == 'Art') {
-                        $lessonicon = file_get_contents("wp-content/plugins/ghes-vlp/assets/icons/art.svg");
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/art.svg');
                     } else if ($lesson->Type == 'Learn') {
-                        $lessonicon = file_get_contents("wp-content/plugins/ghes-vlp/assets/icons/learn.svg");
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/learn.svg');
                     } else if ($lesson->Type == 'Nurture') {
-                        $lessonicon = file_get_contents("wp-content/plugins/ghes-vlp/assets/icons/nurture.svg");
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/nurture.svg');
                     } else {
                         $lessonicon = "No Icon Found";
                     }
 
-                    $output .= ' <span id="lesson-icon-'. $lessonNumber .'" class="lesson-icon-area L-' . $lessonNumber . '-position icon-' . $lesson->Type . ' ' . $lessonprogress . '" onclick="openLessonPopup(this)" data-lesson-number="' . $lessonNumber . '" data-lesson-id="' . $lessonid . '">' . $lessonicon . '<span class="lesson-completion-icon">' . $completionIcon . '</span><span class="lesson-icon-title">' . $lesson->Title . '</span></span>';
+                    $output .= ' <span id="lesson-icon-' . $lessonNumber . '" class="lesson-icon-area L-' . $lessonNumber . '-position icon-' . $lesson->Type . ' ' . $lessonprogress . '" onclick="openLessonPopup(this)" data-lesson-number="' . $lessonNumber . '" data-lesson-id="' . $lessonid . '">' . $lessonicon . '<span class="lesson-completion-icon">' . $completionIcon . '</span><span class="lesson-icon-title">' . $lesson->Title . '</span></span>';
                     $output .= '<div class="lesson-popup type-' . $lesson->Type . '" id="lesson-' . $lessonNumber . '">';
                     $output .= '<span class="close-button">&times;</span>';
                     $output .= '<span class="corner-icon icon-' . $lesson->Type . '">' . $lessonicon . '</span>';
@@ -135,7 +137,7 @@ function vlp_gameboard($atts, $content = null)
                     $output .= '<p class="lesson-main-content">' . $lesson->MainContent . '</p>';
                     $output .= '</div>';
                     $output .= '<div class="second-column">';
-                    $output .= '<span class="lesson-video">' . wp_oembed_get($lesson->VideoURL, array( 'height' => 180)) . '</span>';
+                    $output .= '<span class="lesson-video">' . wp_oembed_get($lesson->VideoURL, array('height' => 180)) . '</span>';
                     //$output .= '<p>Image ID: ' . $lesson->Image_id . '</p>';
 
                     $resources = Resource::GetAllbyLessonId($lessonid);
@@ -145,11 +147,15 @@ function vlp_gameboard($atts, $content = null)
                         $output .= '<ul class="related-materials-list">';
 
                         foreach ($resources->jsonSerialize() as $k => $resource) {
-                            $resourcelink = wp_get_attachment_url($resource->Media_id);
+                            if ($resource->Media_id != "") {
+                                $resourcelink = wp_get_attachment_url($resource->Media_id);
+                            } else if ($resource->Link != "") {
+                                $resourcelink = $resource->Link;
+                            }
                             $resourceid = $resource->id;
                             $percentcomplete = $resource->PercentComplete;
                             $completed = $resource->Completed;
-                            
+
                             if ($completed) {
                                 $resourceprogress = "completed";
                             } else {
@@ -159,7 +165,7 @@ function vlp_gameboard($atts, $content = null)
                         }
                         $output .= '</ul></div>';
                     }
-                    
+
                     $output .= '</div>';
                     $output .= '</div>';
                     $output .= '</div>';
@@ -175,7 +181,8 @@ function vlp_gameboard($atts, $content = null)
 
         //Get All Resources - id, Media_id, Lesson_id
 
-        $output .= ' </div>';
+        $output .= ' </div> <!-- End of Gameboard -->';
+        $output .= '<a href="/browse-themes" class="view-all-weeks-btn"><img class="nav-btn-img" src="' . $viewAllWeeksButton . '" /></a>'; //TODO Set a page for the Themes
     } else {
         $output .= '<h2>Sorry, no theme found for that week.</h2>';
     }

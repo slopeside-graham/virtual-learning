@@ -21,10 +21,12 @@
             <div class="resources">
                 <br/>
                 <label>Add Related Materials:</label>
-                <input id="newResourceTitle" placeholder="Item Title..." onblur="ResourceRequired()"/>
+                <input id="newResourceTitle" placeholder="Item Title..." onblur="ResourceRequired()" onkeypress="ResourceRequired()"/>
+                <input hidden id="newResourceLink" placeholder="https://example.com/" onblur="ResourceRequired()" onkeypress="ResourceRequired()"/>
                 <a hidden id="newResourceURL" src="" target="_blank">NewResourceTitle</a>
                 <input hidden id="newResourceId" onchange="ResourceRequired()" />
-                <span class="k-button" id="newResourceButton" >Add Media</span>
+                <span class="k-button" id="newResourceMediaButton" >Add Media</span>
+                <span class="k-button" id="newResourceLinkButton" onClick="AddNewResourceLink()">Add Link</span>
                 <span class="k-button k-button-icontext k-add-button k-state-disabled" id="addResource" onClick="AddNewResource()"><span
                         class="k-icon k-i-add"></span>Add</span>
             </div>

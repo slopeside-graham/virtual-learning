@@ -25,7 +25,7 @@ $(function () {
             $("#newResourceURL").text(selectedMediaTitle);
             $("#newResourceURL").attr("href", selectedMediaURL);
             $("#newResourceURL").show();
-            $("#newResourceButton").text("Change Media");
+            $("#newResourceMediaButton").text("Change Media");
 
         });
 
@@ -192,7 +192,8 @@ $(function () {
             currentLessonID = e.model.id;
 
             // Open the media uploader.
-            $('#newResourceButton').on('click', function (e) {
+            $('#newResourceMediaButton').on('click', function (e) {
+                $("#newResourceLinkButton").hide();
                 e.preventDefault();
                 customMediaLibrary.open();
             });
@@ -357,9 +358,15 @@ $(function () {
     }
 });
 
+function AddNewResourceLink() {
+    $("#newResourceLink").show();
+    $("#newResourceLinkButton").hide();
+    $("#newResourceMediaButton").hide()
+}
+
 function AddNewResource() {
     displayLoading("#LessonRelatedMaterials");
-    if ($("#newResourceTitle").val() != "" && $("#newResourceId").val() != "") {
+    if ($("#newResourceTitle").val() != "" && ($("#newResourceId").val() != "") || $("#newResourceLink").val() != "") {
         $.ajax({
             url: wpApiSettings.root + "ghes-vlp/v1/resource",
             method: "POST",
@@ -370,6 +377,7 @@ function AddNewResource() {
             data: {
                 Title: $("#newResourceTitle").val(),
                 Media_id: $("#newResourceId").val(),
+                Link: $("#newResourceLink").val(),
                 Lesson_id: currentLessonID
             },
             success: function (result) {
@@ -378,7 +386,11 @@ function AddNewResource() {
                 $("#newResourceTitle").val('');
                 $("#newResourceId").val('');
                 $("#newResourceURL").hide();
-                $("#newResourceButton").text("Add Media");
+                $("#newResourceLink").val('');
+                $("#newResourceLink").hide();
+                $("#newResourceMediaButton").text("Add Media");
+                $("#newResourceMediaButton").show();
+                $("#newResourceLinkButton").show();
                 $("#addResource").addClass("k-state-disabled");
                 var listView = $("#LessonRelatedMaterials").data("kendoListView");
                 // refreshes the ListView
@@ -434,7 +446,9 @@ function UpdateVideo(video) {
 
 }
 function ResourceRequired() {
-    if( ($("#newResourceTitle").val() != "") && ($("#newResourceId").val() != "") ) {
+    if( ($("#newResourceTitle").val() != "") && ($("#newResourceId").val() != "") || $("#newResourceLink").val() != "") {
         $("#addResource").removeClass("k-state-disabled");
-    } 
+    } else if ($("#newResourceTitle").val() == "") {
+        $("#addResource").addClass("k-state-disabled");
+    }
 }

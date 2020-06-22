@@ -13,6 +13,8 @@ namespace GHES\VLP {
         private $_Title;
         private $_Media_id;
         private $_MediaURL;
+        private $_ResourceLink;
+        private $_Link;
         private $_Lesson_id;
         private $_Completed;
         private $_PercentComplete;
@@ -64,6 +66,17 @@ namespace GHES\VLP {
                 return "";
             }
         }
+
+        protected function ResourceLink($value = null)
+        {
+            if (isset($this->_Media_id)) {
+                return wp_get_attachment_url($this->_Media_id);
+            } else if (isset($this->_Link)) {
+                return $this->_Link;
+            } else {
+                return "";
+            }
+        }
         protected function Lesson_id($value = null)
         {
             // If value was provided, set the value
@@ -73,6 +86,17 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_Lesson_id;
+            }
+        }
+        protected function Link($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Link = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Link;
             }
         }
         protected function Completed($value = null)
@@ -129,7 +153,9 @@ namespace GHES\VLP {
                 'Title' => $this->Title,
                 'Media_id' => $this->Media_id,
                 'MediaURL' => $this->MediaURL,
+                'ResourceLink' => $this->ResourceLink,
                 'Lesson_id' => $this->Lesson_id,
+                'Link' => $this->Link,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,
                 'DateCreated' => $this->DateCreated,
@@ -149,6 +175,7 @@ namespace GHES\VLP {
                     'Title' => $this->Title,
                     'Media_id' => $this->Media_id,
                     'Lesson_id' => $this->Lesson_id,
+                    'Link' => $this->Link,
                 ));
                 $this->id = VLPUtils::$db->insertId();
             } catch (\MeekroDBException $e) {
@@ -170,12 +197,14 @@ namespace GHES\VLP {
                     SET
                     Title=%s, 
                     Media_id=%s,
-                    Lesson_id=%i
+                    Lesson_id=%i,
+                    Link=%i
                 WHERE 
                     id=%i",
                     $this->Title,
                     $this->Media_id,
                     $this->Lesson_id,
+                    $this->Link,
                     $this->id
                 );
 
@@ -282,6 +311,7 @@ namespace GHES\VLP {
             $resource->Title = $row['Title'];
             $resource->Media_id = $row['Media_id'];
             $resource->Lesson_id = $row['Lesson_id'];
+            $resource->Link = $row['Link'];
             $resource->Completed = $row['Completed'];
             $resource->PercentComplete = $row['PercentComplete'];
             return $resource;

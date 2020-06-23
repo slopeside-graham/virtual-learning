@@ -41,7 +41,7 @@ function vlp_gameboard($atts, $content = null)
 
         $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
         $agegroupid = $agegroup->id;
-        
+
         setcookie('VLPAgeGroupId', $agegroupid);
 
     } else if (isset($_COOKIE['VLPAgeGroupId'])) {
@@ -150,7 +150,7 @@ function vlp_gameboard($atts, $content = null)
                     $output .= '<p class="lesson-main-content">' . $lesson->MainContent . '</p>';
                     $output .= '</div>';
                     $output .= '<div class="second-column">';
-                    $output .= '<span class="lesson-video">' . wp_oembed_get($lesson->VideoURL, array('height' => 180)) . '</span>';
+                    $output .= '<span class="lesson-video">' . wp_oembed_get($lesson->VideoURL) . '</span>';
                     //$output .= '<p>Image ID: ' . $lesson->Image_id . '</p>';
 
                     $resources = Resource::GetAllbyLessonId($lessonid);

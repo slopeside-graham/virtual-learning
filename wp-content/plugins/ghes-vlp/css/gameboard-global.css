@@ -22,6 +22,24 @@
     font-weight: 300;
 }
 
+.lesson-video {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%;
+    /* 16:9 Aspect Ratio */
+    display: block;
+}
+
+.lesson-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .gameboard-theme-header {
     display: grid;
     grid-template-columns: auto auto auto;
@@ -35,13 +53,16 @@
 .navigation-button {
     align-self: center;
 }
+
 img.nav-btn-img {
     max-width: 200px !important;
 }
+
 .view-all-weeks-btn {
     margin-top: 20px;
     display: block;
 }
+
 .last-week {
     text-align: left;
 }
@@ -71,17 +92,12 @@ img.nav-btn-img {
 
 .lesson-popup {
     display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 90%;
-    /* adjust as per your needs */
+    position: relative;
+    top: 5%;
+    left: 0;
+    margin-left: 5%;
+    margin-right: 5%;
     height: 90%;
-    /* adjust as per your needs */
-    margin-left: -45%;
-    /* negative half of width above */
-    margin-top: -215px;
-    /* negative half of height above */
     padding: 1em;
     z-index: 2;
     color: white;
@@ -110,7 +126,8 @@ img.nav-btn-img {
     display: grid;
     grid-template-columns: 60% 40%;
     margin-left: 65px;
-    max-height: 410px;
+    max-height: 100%;
+    overflow: auto;
 }
 
 .first-column {
@@ -220,7 +237,6 @@ img.nav-btn-img {
 
 .lesson-main-content {
     font-size: .8em;
-    max-height: 300px;
     overflow: auto;
 }
 
@@ -358,5 +374,31 @@ img.nav-btn-img {
         right: unset;
         width: 24px;
         left: 27px;
+    }
+    .lesson-popup {
+        margin-left: auto;
+        margin-right: auto;
+        top: 0;
+    }
+    .corner-icon svg {
+        height: 65px;
+    }
+    .lesson-content {
+        display: block;
+        margin-left: auto;
+        margin-top: 25px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .gameboard-theme-header {
+        grid-template-columns: auto auto;
+    }
+    .gameboard-theme-header #theme-title {
+        grid-row-start: 1;
+        grid-column: 1 / span 2;
+    }
+    .nav-btn-img {
+        width: 140px;
     }
 }

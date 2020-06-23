@@ -41,6 +41,8 @@ function vlp_gameboard($atts, $content = null)
 
         $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
         $agegroupid = $agegroup->id;
+        
+        setcookie('VLPAgeGroupId', $agegroupid);
 
     } else if (isset($_COOKIE['VLPAgeGroupId'])) {
         $agegroupid = $_COOKIE['VLPAgeGroupId'];

@@ -333,6 +333,9 @@ namespace GHES\VLP {
                                                                  %t between t.StartDate and t.EndDate
                                                                  and (cts.Child_id = %i or isnull(cts.Child_id ))
                                                                  and t.AgeGroup_id = %i", $date, $child_id, $agegroupid);
+                } else if (isset($_COOKIE['VLPAgeGroupId']) && !isset($_COOKIE['VLPSelectedChild'])) {
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate
+                    and AgeGroup_id = %i", $date, $agegroupid);
                 } else {
                     $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate", $date);
                 }

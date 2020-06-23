@@ -11,3 +11,6 @@ add_shortcode( 'vlp_gameboard_archive', 'vlp_gameboard_archive' );
 
 include_once(plugin_dir_path( __FILE__ ) . 'views/browse-themes.php'); 
 add_shortcode( 'vlp_browse_themes', 'vlp_browse_themes' );
+
+include_once(plugin_dir_path( __FILE__ ) . 'views/agetree.php'); 
+add_shortcode( 'vlp_agetree', 'vlp_agetree' );

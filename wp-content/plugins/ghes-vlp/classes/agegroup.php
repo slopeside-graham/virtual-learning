@@ -12,6 +12,8 @@ namespace GHES\VLP {
         private $_Name;
         private $_AgeStart;
         private $_AgeEnd;
+        private $_Image_id;
+        private $_Position;
         private $_DateCreated;
         private $_DateModified;
 
@@ -64,6 +66,28 @@ namespace GHES\VLP {
                 return $this->_AgeEnd;
             }
         }
+        protected function Image_id($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Image_id = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Image_id;
+            }
+        }
+        protected function Position($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Position = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Position;
+            }
+        }
         protected function DateCreated($value = null)
         {
             // If value was provided, set the value
@@ -95,6 +119,8 @@ namespace GHES\VLP {
                 'Name' => $this->Name,
                 'AgeStart' => $this->AgeStart,
                 'AgeEnd' => $this->AgeEnd,
+                'Image_id' => $this->Image_id,
+                'Position' => $this->Position,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
@@ -112,6 +138,8 @@ namespace GHES\VLP {
                     'Name' => $this->Name,
                     'AgeStart' => $this->AgeStart,
                     'AgeEnd' => $this->AgeEnd,
+                    'Image_id' => $this->Image_id,
+                    'Position' => $this->Position
                 ));
                 $this->id = VLPUtils::$db->insertId();
 
@@ -134,12 +162,16 @@ namespace GHES\VLP {
                     SET
                     Name=%s, 
                     AgeStart=%i, 
-                    AgeEnd=%i
+                    AgeEnd=%i,
+                    Image_id=%i,
+                    Position=%i
                 WHERE 
                     id=%i",
                     $this->Name,
                     $this->AgeStart,
                     $this->AgeEnd,
+                    $this->Image_id,
+                    $this->Position,
                     $this->id
                 );
 
@@ -231,6 +263,8 @@ namespace GHES\VLP {
             $ageGroup->Name = $row['Name'];
             $ageGroup->AgeStart = $row['AgeStart'];
             $ageGroup->AgeEnd = $row['AgeEnd'];
+            $ageGroup->Image_id = $row['Image_id'];
+            $ageGroup->Position = $row['Position'];
             return $ageGroup;
         }
     }

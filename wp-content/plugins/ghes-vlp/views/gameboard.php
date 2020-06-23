@@ -22,25 +22,36 @@ function vlp_gameboard($atts, $content = null)
 {
     enqueue_gameboard_scripts();
 
-    $completionIcon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . 'assets/check-solid.svg');
+    $completionIcon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . 'assets/star-solid.svg');
     $nextWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Next Week Button.png';
     $previousWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Last Week Button.png';
     $viewAllWeeksButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/View All Weeks Button.png';
 
-    $childid = $_COOKIE['VLPSelectedChild'];
-    $child = Children::Get($childid);
-    $todaysdate = new DateTime(date("Y-m-d"));
-    $childdob = $child->DOB;
-    $interval = $todaysdate->diff($childdob);
-    $years = $interval->format('%y');
-    $months = $interval->format('%m');
-    $childagemonths = ($years * 12) + $months;
+    $output = '';
 
-    $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
-    $agegroupid = $agegroup->id;
+    if (isset($_COOKIE['VLPSelectedChild'])) {
+        $childid = $_COOKIE['VLPSelectedChild'];
+        $child = Children::Get($childid);
+        $todaysdate = new DateTime(date("Y-m-d"));
+        $childdob = $child->DOB;
+        $interval = $todaysdate->diff($childdob);
+        $years = $interval->format('%y');
+        $months = $interval->format('%m');
+        $childagemonths = ($years * 12) + $months;
+
+        $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
+        $agegroupid = $agegroup->id;
+
+    } else if (isset($_COOKIE['VLPAgeGroupId'])) {
+        $agegroupid = $_COOKIE['VLPAgeGroupId'];
+    } else {
+        $output .= 'No Chid or Age group Selected';
+        return $output;
+    }
+
     $themedate = $_GET['theme-date'];
 
-    $output = '';
+
 
     if (isset($_GET['theme-date'])) {
         $themedate = $_GET['theme-date'];

@@ -67,10 +67,12 @@ VLPUtils::$db = new MeekroDB($vlpdbhost, $vlpdbuser, $vlpdbpassword, $vlpdbname,
 include_once(plugin_dir_path(__FILE__) . '/admin/admin.php');
 include_once(plugin_dir_path(__FILE__) . '/admin/manage-lessons.php');
 include_once(plugin_dir_path(__FILE__) . '/admin/manage-themes.php');
+include_once(plugin_dir_path(__FILE__) . '/admin/manage-agegroups.php');
 
 // Include Manage Views
 include_once(plugin_dir_path(__FILE__) . '/views/admin/manage-themes.php');
 include_once(plugin_dir_path(__FILE__) . '/views/admin/manage-lessons.php');
+include_once(plugin_dir_path(__FILE__) . '/views/admin/manage-agegroups.php');
 
 // Register Frontend Scripts and Styles
 function register_vlp_script_style_frontend()
@@ -118,10 +120,15 @@ function register_vlp_script_style_backend()
   wp_register_script('wp-api-manage-lessons', plugins_url('ghes-vlp/js/admin/manage-lessons.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-manage-lessons', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
+  wp_register_script('wp-api-manage-agegroups', plugins_url('ghes-vlp/js/admin/manage-agegroups.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-manage-agegroups', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
   wp_register_script('wp-api-utils', plugins_url('ghes-vlp/js/admin/utils.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-utils', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
   wp_register_style('manage-themes-style', plugins_url('/ghes-vlp/css/admin/manage-themes.css'), array(), scriptver);
+
+  wp_register_style('manage-agegroups-style', plugins_url('/ghes-vlp/css/admin/manage-agegroups.css'), array(), scriptver);
 
   wp_register_style('manage-lessons-style', plugins_url('/ghes-vlp/css/admin/manage-lessons.css'), array(), scriptver);
 
@@ -157,6 +164,14 @@ function ghes_vlp_register_menu_pages()
     'vlp_manage_entries',
     'ghes-vlp/admin/manage-lessons.php',
     'vlp_manage_lessons'
+  );
+  add_submenu_page(
+    'ghes-vlp/admin/admin.php',
+    'Age Groups',
+    'Age Groups',
+    'vlp_manage_entries',
+    'ghes-vlp/admin/manage-agegroups.php',
+    'vlp_manage_agegroups'
   );
 }
 add_action('admin_menu', 'ghes_vlp_register_menu_pages');

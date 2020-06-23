@@ -13,6 +13,7 @@ namespace GHES\VLP {
         private $_AgeStart;
         private $_AgeEnd;
         private $_Image_id;
+        private $_Image_url;
         private $_Position;
         private $_DateCreated;
         private $_DateModified;
@@ -77,6 +78,17 @@ namespace GHES\VLP {
                 return $this->_Image_id;
             }
         }
+        protected function Image_url($value = null)
+        {
+            // If value was provided, set the value
+            if (isset($this->_Image_id)) {
+                return wp_get_attachment_url($this->Image_id);
+            }
+            // If no value was provided return the existing value
+            else {
+                return "";
+            }
+        }
         protected function Position($value = null)
         {
             // If value was provided, set the value
@@ -120,6 +132,7 @@ namespace GHES\VLP {
                 'AgeStart' => $this->AgeStart,
                 'AgeEnd' => $this->AgeEnd,
                 'Image_id' => $this->Image_id,
+                'Image_url' => $this->Image_url,
                 'Position' => $this->Position,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
@@ -264,6 +277,7 @@ namespace GHES\VLP {
             $ageGroup->AgeStart = $row['AgeStart'];
             $ageGroup->AgeEnd = $row['AgeEnd'];
             $ageGroup->Image_id = $row['Image_id'];
+            $ageGroup->Image_url = $row['Image_url'];
             $ageGroup->Position = $row['Position'];
             return $ageGroup;
         }

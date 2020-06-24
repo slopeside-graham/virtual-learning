@@ -137,10 +137,21 @@ $(function () {
                         Image_id: { editable: true, validation: { required: false } },
                         Theme_id: { editable: true, validation: { required: true } },
                         ThemeTitle: { editable: true, validation: { required: true } },
+                        ThemeAgeGroupName: { editable: true, validation: { required: true } },
+                        ThemeStartDate: { editable: true, validation: { required: true }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
+                        ThemeEndDate: { editable: true, validation: { required: true }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate }
                     }
                 }
             }
         });
+
+        function parseDate(data) {
+            if (data.date) {
+                return kendo.parseDate(data.date, "yyyy-MM-dd");
+            } else {
+                return data;
+            }
+        }
 
         $("#lesson-grid").kendoGrid({
             dataSource: lessondataSource,
@@ -152,10 +163,11 @@ $(function () {
             },
             filterable: true,
             sortable: true,
+            resizable: true,
             groupable: true,
             toolbar: [
-               { name: "create" },
-               { name: "search"}
+                { name: "create" },
+                { name: "search" }
             ],
             editable: {
                 mode: "popup",
@@ -169,19 +181,25 @@ $(function () {
             dataBound: onDataBound,
             change: onChange,
             columns: [
-                { field: "id", title: "ID", width: "60px" },
-                { field: "Title", title: "Title", width: "100px", required: true },
-                { field: "ThemeTitle", title: "Theme", width: "100px", required: true },
-                { field: "Type", title: "Type", width: "100px", required: true },
-                { field: "MainContent", title: "Main Content", encoded: false },
-                { field: "VideoURL", title: "Video URL", width: "100px" },
+                { field: "id", title: "ID", editable: false },
+                { field: "Title", title: "Title", required: true },
+                { field: "ThemeTitle", title: "Theme", editable: false, template: '#: ThemeTitle #: #: kendo.format("{0:MM/dd/yyyy}", ThemeStartDate)# - #: kendo.format("{0:MM/dd/yyyy}", ThemeEndDate)#' },
+                { field: "ThemeAgeGroupName", title: "Age Group", editable: false },
+                { field: "Type", title: "Type", required: true },
+                { field: "MainContent", title: "Main Content", width: "400px", encoded: false },
+                { field: "VideoURL", title: "Video URL" },
                 //{ field: "Image_id", title: "Image ID", width: "100px" },
-                { command: ["edit", "destroy"], title: "&nbsp;", width: "180px" }
+                { command: ["edit", "destroy"], title: "&nbsp;" }
             ],
         });
+        var grid = $("#lesson-grid").data("kendoGrid");
+        grid.autoFitColumn("id");
+        grid.autoFitColumn("Type");
+
         function onDataBound() {
             console.log("Lesson ListView data bound");
             hideLoading("#lesson-grid");
+
         }
 
         function onChange(e) {
@@ -202,6 +220,8 @@ $(function () {
                 .kendoDropDownList({
                     dataTextField: "Title",
                     dataValueField: "id",
+                    template: '#: Title #: #: kendo.format("{0:MM/dd/yyyy}", StartDate)# - #: kendo.format("{0:MM/dd/yyyy}", EndDate)# - #: AgeGroupTitle #',
+                    valueTemplate: '#: Title #: #: kendo.format("{0:MM/dd/yyyy}", StartDate)# - #: kendo.format("{0:MM/dd/yyyy}", EndDate)# - #: AgeGroupTitle #',
                     value: e.model.Theme_id,
                     dataSource: ThemeData
                 });
@@ -226,9 +246,9 @@ $(function () {
                     {
                         resizable: true,
                         pasteCleanup: {
-                          all: true
+                            all: true
                         }
-                      }
+                    }
                 );
 
             $('#LessonVideo')
@@ -354,6 +374,28 @@ $(function () {
                     }
                 });
             }
+        },
+        schema: {
+            model: {
+                id: "id",
+                fields: {
+                    id: { editable: false, nullable: true },
+                    Title: { validation: { required: true } },
+                    StartDate: { validation: { required: false }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
+                    EndDate: { validation: { required: false }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
+                    Gameboard_id: { validation: { required: true } },
+                    GameboardTitle: { validation: { required: true } },
+                    AgeGroup_id: { validation: { required: true } },
+                    AgeGroupTitle: { validation: { required: true } }
+                }
+            }
+        }
+    }
+    function parseDate(data) {
+        if (data.date) {
+            return kendo.parseDate(data.date, "yyyy-MM-dd");
+        } else {
+            return data;
         }
     }
 });
@@ -446,7 +488,7 @@ function UpdateVideo(video) {
 
 }
 function ResourceRequired() {
-    if( ($("#newResourceTitle").val() != "") && ($("#newResourceId").val() != "") || $("#newResourceLink").val() != "") {
+    if (($("#newResourceTitle").val() != "") && ($("#newResourceId").val() != "") || $("#newResourceLink").val() != "") {
         $("#addResource").removeClass("k-state-disabled");
     } else if ($("#newResourceTitle").val() == "") {
         $("#addResource").addClass("k-state-disabled");

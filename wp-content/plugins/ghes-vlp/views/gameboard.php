@@ -27,6 +27,8 @@ function vlp_gameboard($atts, $content = null)
     $previousWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Last Week Button.png';
     $viewAllWeeksButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/View All Weeks Button.png';
 
+    $browsethemeslink = get_permalink(get_option('vlp-themes'));
+
     $output = '';
 
     if (isset($_COOKIE['VLPSelectedChild'])) {
@@ -195,7 +197,7 @@ function vlp_gameboard($atts, $content = null)
         //Get All Resources - id, Media_id, Lesson_id
 
         $output .= ' </div> <!-- End of Gameboard -->';
-        $output .= '<a href="/browse-themes" class="view-all-weeks-btn"><img class="nav-btn-img" src="' . $viewAllWeeksButton . '" /></a>'; //TODO Set a page for the Themes
+        $output .= '<a href="' . $browsethemeslink . '" class="view-all-weeks-btn"><img class="nav-btn-img" src="' . $viewAllWeeksButton . '" /></a>'; //TODO Set a page for the Themes
     } else {
         $output .= '<h2>Sorry, no theme found for that week.</h2>';
     }

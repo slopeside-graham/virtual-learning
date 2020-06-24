@@ -32,16 +32,11 @@ $(function () {
             sort: {
                 field: "Title",
                 dir: "asc"
-            },
-            pageSize: 10
+            }
         });
 
         $(function() {
             var dataSource = themedataSource
-            $("#pager").kendoPager({
-                dataSource: dataSource
-            });
-
             $("#themes-listView").kendoListView({
                 dataSource: dataSource,
                 template: kendo.template($("#template").html())

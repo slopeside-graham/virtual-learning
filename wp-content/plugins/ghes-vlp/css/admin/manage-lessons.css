@@ -1,78 +1,104 @@
-.edit-lesson-popup {
-    padding: 10px;
-}
-.edit-lesson-popup label {
-    display: block;
-    margin-bottom: 10px;
-}
-.lessonInformation {
-    display: flex;
-}
-.lessonInformation label {
-    margin-right: 20px;
-}
-.edit-lesson {
-    display: grid;
-    grid-template-columns: 60% 40%;
-}
-.edit-lesson .first-column {
-    margin-right: 20px;
-}
-#LessonRelatedMaterials {
-    min-height: 50px;
-}
-div.k-edit-form-container {
-    width: auto;
-    height: auto;
-}
-.related-item {
-    display: grid;
-    grid-template-columns: auto auto;
-}
-.related-item .edit-buttons {
-    text-align: right;
-}
-.related-item .edit-buttons .k-i-delete:hover {
-    cursor: pointer;
-}
-#LessonRelatedMaterials {
-    padding: 5px;
-}
+    #lesson-grid>table {
+        table-layout: fixed;
+    }
+    #lesson-grid td {
+        white-space: nowrap;
+    }
 
-/* Loading Window CSS */
+    .edit-lesson-popup {
+        padding: 10px;
+    }
 
-.loading-window {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    top: 0;
-    left: 0;
-    display: none;
-    z-index: 10005;
-}
+    .edit-lesson-popup label {
+        display: block;
+        margin-bottom: 10px;
+    }
 
-div.k-loading-mask {
-    z-index: 9999;
-    /* must be larger than the z-index:2 of #container */
-}
+    .lessonInformation {
+        display: flex;
+    }
 
-.k-editor span[title="Format"] {
-    display: none;
-}
+    .lessonInformation label {
+        margin-right: 20px;
+        width: 100%;
+    }
 
-.k-editor button[title="Insert image"] {
-    display: none;
-}
+    .lessonInformation label .k-dropdown {
+        width: auto;
+    }
 
-.k-editor button[title="Create a table"] {
-    display: none;
-}
-.k-editor button[title="Insert hyperlink"] {
-    display: none;
-}
-.k-editor button[title="Remove hyperlink"] {
-    display: none;
-}
-.k-grid tbody tr{
-    height: 50px;
-}
+    .edit-lesson {
+        display: grid;
+        grid-template-columns: 60% 40%;
+    }
+
+    .edit-lesson .first-column {
+        margin-right: 20px;
+    }
+
+    #LessonRelatedMaterials {
+        min-height: 50px;
+    }
+
+    div.k-edit-form-container {
+        width: auto;
+        height: auto;
+    }
+
+    .related-item {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+
+    .related-item .edit-buttons {
+        text-align: right;
+    }
+
+    .related-item .edit-buttons .k-i-delete:hover {
+        cursor: pointer;
+    }
+
+    #LessonRelatedMaterials {
+        padding: 5px;
+    }
+
+    /* Loading Window CSS */
+
+    .loading-window {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        top: 0;
+        left: 0;
+        display: none;
+        z-index: 10005;
+    }
+
+    div.k-loading-mask {
+        z-index: 9999;
+        /* must be larger than the z-index:2 of #container */
+    }
+
+    .k-editor span[title="Format"] {
+        display: none;
+    }
+
+    .k-editor button[title="Insert image"] {
+        display: none;
+    }
+
+    .k-editor button[title="Create a table"] {
+        display: none;
+    }
+
+    .k-editor button[title="Insert hyperlink"] {
+        display: none;
+    }
+
+    .k-editor button[title="Remove hyperlink"] {
+        display: none;
+    }
+
+    .k-grid tbody tr {
+        height: 50px;
+    }

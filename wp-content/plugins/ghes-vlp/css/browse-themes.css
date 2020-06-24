@@ -11,13 +11,14 @@
 }
 #themes-listView {
     min-height: 200px;
+    border: none;
 }
 
 #themes-listView .k-listview-content {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-column-gap: 20px;
-    grid-row-gap: 20px;
+    grid-column-gap: 10px;
+    grid-row-gap: 15px;
     text-align: center;
     color: white;
 }

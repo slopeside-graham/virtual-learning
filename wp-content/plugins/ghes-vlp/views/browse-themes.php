@@ -24,7 +24,11 @@ function vlp_browse_themes($atts, $content = null)
 
     $output = '';
 
-    if (isset($_COOKIE['VLPSelectedChild'])) {
+    if (isset($_COOKIE['VLPAgeGroupId'])) {
+        $agegroupid = $_COOKIE['VLPAgeGroupId'];
+        $agegroupname = AgeGroup::Get($agegroupid)->name;
+        
+    } else if (isset($_COOKIE['VLPSelectedChild'])) {
         $childid = $_COOKIE['VLPSelectedChild'];
         $child = Children::Get($childid);
         $todaysdate = new DateTime(date("Y-m-d"));

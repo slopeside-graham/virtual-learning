@@ -17,6 +17,10 @@ namespace GHES\VLP {
         private $_Image_id;
         private $_Theme_id;
         private $_ThemeTitle; // Not in the DB, queries will build it
+        private $_ThemeAgeGroup; // Not in the DB, queries will build it
+        private $_ThemeAgeGroupName; // Not in the DB, queries will build it
+        private $_ThemeStartDate; // Not in the DB, queries will build it
+        private $_ThemeEndDate; // Not in the DB, queries will build it
         private $_Completed;
         private $_PercentComplete;
 
@@ -113,6 +117,42 @@ namespace GHES\VLP {
                 return $this->_ThemeTitle;
             }
         }
+        protected function ThemeAgeGroup($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_ThemeAgeGroup = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_ThemeAgeGroup;
+            }
+        }
+        protected function ThemeAgeGroupName($value = null)
+        {
+            if ($this->_ThemeAgeGroup) {
+                return AgeGroup::Get($this->_ThemeAgeGroup)->Name;
+            } else {
+                return "";
+            }
+        }
+        protected function ThemeStartDate($value = null)
+        {
+            if ($this->_Theme_id) {
+                return Theme::Get($this->_Theme_id)->StartDate;
+            } else {
+                return "";
+            }
+        }
+
+        protected function ThemeEndDate($value = null)
+        {
+            if ($this->_Theme_id) {
+                return Theme::Get($this->_Theme_id)->EndDate;
+            } else {
+                return "";
+            }
+        }
         protected function Completed($value = null)
         {
             // If value was provided, set the value
@@ -149,6 +189,10 @@ namespace GHES\VLP {
                 'Image_id' => $this->Image_id,
                 'Theme_id' => $this->Theme_id,
                 'ThemeTitle' => $this->ThemeTitle,
+                'ThemeAgeGroup' => $this->ThemeAgeGroup,
+                'ThemeAgeGroupName' => $this->ThemeAgeGroupName,
+                'ThemeStartDate' => $this->ThemeStartDate,
+                'ThemeEndDate' => $this->ThemeEndDate,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,
             ];
@@ -292,7 +336,7 @@ namespace GHES\VLP {
 
             try {
                 $results = VLPUtils::$db->query("
-                    select l.*, t.Title as ThemeTitle from Lesson l
+                    select l.*, t.Title as ThemeTitle, t.AgeGroup_id as ThemeAgeGroup from Lesson l
                     Inner Join Theme t on l.Theme_id = t.id");
 
                 foreach ($results as $row) {
@@ -318,6 +362,10 @@ namespace GHES\VLP {
             $lesson->Image_id = $row['Image_id'];
             $lesson->Theme_id = $row['Theme_id'];
             $lesson->ThemeTitle = $row['ThemeTitle'];
+            $lesson->ThemeAgeGroup = $row['ThemeAgeGroup'];
+            $lesson->ThemeAgeGroupName = $row['ThemeAgeGroupName'];
+            $lesson->ThemeStartDate = $row['ThemeStartDate'];
+            $lesson->ThemeEndDate = $row['ThemeEndDate'];
             $lesson->Completed = $row['Completed'];
             $lesson->PercentComplete = $row['PercentComplete'];
             $lesson->DateCreated = $row['DateCreated'];

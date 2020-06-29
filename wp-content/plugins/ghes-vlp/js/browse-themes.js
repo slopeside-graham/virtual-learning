@@ -1,6 +1,12 @@
 $ = jQuery;
 
+function SetTheme(clicked_item) {
+        setCookie("VLPThemeId", clicked_item.dataset.themeId);
+}
+
 $(function () {
+
+
 
     $(document).ready(function () {
         ageGroupid = getCookie("AgeGroupid");

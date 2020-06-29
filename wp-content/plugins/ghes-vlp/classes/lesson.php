@@ -130,27 +130,44 @@ namespace GHES\VLP {
         }
         protected function ThemeAgeGroupName($value = null)
         {
-            if ($this->_ThemeAgeGroup) {
-                return AgeGroup::Get($this->_ThemeAgeGroup)->Name;
-            } else {
-                return "";
+            // If value was provided, set the value
+            if ($value) {
+                $this->_ThemeAgeGroupName = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_ThemeAgeGroupName;
             }
         }
-        protected function ThemeStartDate($value = null)
+        protected function ThemeStartDate($value = null): \DateTime
         {
-            if ($this->_Theme_id) {
-                return Theme::Get($this->_Theme_id)->StartDate;
-            } else {
-                return "";
+            // If value was provided, set the value
+            if ($value) {
+                if (strlen($value) > 10)
+                    $this->_ThemeStartDate = \DateTime::createFromFormat('D M d Y H:i:s e+', $value);
+                else
+                    $this->_ThemeStartDate = \DateTime::createFromFormat('Y-m-d', $value);
+                return $this->_ThemeStartDate;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_ThemeStartDate;
             }
         }
 
-        protected function ThemeEndDate($value = null)
+        protected function ThemeEndDate($value = null): \DateTime
         {
-            if ($this->_Theme_id) {
-                return Theme::Get($this->_Theme_id)->EndDate;
-            } else {
-                return "";
+            // If value was provided, set the value
+            if ($value) {
+                if (strlen($value) > 10)
+                    $this->_ThemeEndDate = \DateTime::createFromFormat('D M d Y H:i:s e+', $value);
+                else
+                    $this->_ThemeEndDate = \DateTime::createFromFormat('Y-m-d', $value);
+                return $this->_ThemeEndDate;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_ThemeEndDate;
             }
         }
         protected function Completed($value = null)
@@ -284,9 +301,14 @@ namespace GHES\VLP {
 
                 $row = VLPUtils::$db->queryFirstRow("
                 select l.*, 
-                        t.Title as ThemeTitle 
-                    from Lesson l
-                        Inner Join Theme t on l.Theme_id = t.id
+                    t.Title as ThemeTitle, 
+                    t.AgeGroup_id as ThemeAgeGroup, 
+                    ag.Name as ThemeAgeGroupName, 
+                    t.StartDate as ThemeStartDate, 
+                    t.EndDate as ThemeEndDate 
+                from Lesson l
+                    Inner Join Theme t on l.Theme_id = t.id
+                    Inner Join AgeGroup ag on ag.id = t.AgeGroup_id
                 where l.id = %i", $thisid);
 
                 $lesson = Lesson::populatefromRow($row);
@@ -307,12 +329,31 @@ namespace GHES\VLP {
 
                 if (isset($_COOKIE['VLPSelectedChild'])) {
                     $child_id = $_COOKIE['VLPSelectedChild'];
-                    $results = VLPUtils::$db->query("select l.*, cls.Completed, cls.PercentComplete from Lesson l
-                                                        Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id
-                                                        where Theme_id = %i
-                                                        and (cls.Child_id = %i or isnull(cls.Child_id ))", $themeid, $child_id);
+                    $results = VLPUtils::$db->query("
+                    select l.*,
+                        cls.Completed, cls.PercentComplete,
+                        t.Title as ThemeTitle, 
+                        t.AgeGroup_id as ThemeAgeGroup, 
+                        ag.Name as ThemeAgeGroupName, 
+                        t.StartDate as ThemeStartDate, 
+                        t.EndDate as ThemeEndDate  
+                    from Lesson l
+                        Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id
+                        Inner Join Theme t on l.Theme_id = t.id
+                        Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
+                    where Theme_id = %i and (cls.Child_id = %i or isnull(cls.Child_id ))", $themeid, $child_id);
                 } else {
-                    $results = VLPUtils::$db->query("select * from Lesson where Theme_id = %i", $themeid);
+                    $results = VLPUtils::$db->query("                
+                    select l.*, 
+                        t.Title as ThemeTitle, 
+                        t.AgeGroup_id as ThemeAgeGroup, 
+                        ag.Name as ThemeAgeGroupName, 
+                        t.StartDate as ThemeStartDate, 
+                        t.EndDate as ThemeEndDate 
+                    from Lesson l
+                        Inner Join Theme t on l.Theme_id = t.id
+                        Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
+                    where Theme_id = %i", $themeid);
                 }
 
                 foreach ($results as $row) {
@@ -336,8 +377,15 @@ namespace GHES\VLP {
 
             try {
                 $results = VLPUtils::$db->query("
-                    select l.*, t.Title as ThemeTitle, t.AgeGroup_id as ThemeAgeGroup from Lesson l
-                    Inner Join Theme t on l.Theme_id = t.id");
+                    select l.*, 
+                        t.Title as ThemeTitle, 
+                        t.AgeGroup_id as ThemeAgeGroup, 
+                        ag.Name as ThemeAgeGroupName, 
+                        t.StartDate as ThemeStartDate, 
+                        t.EndDate as ThemeEndDate 
+                    from Lesson l
+                        Inner Join Theme t on l.Theme_id = t.id
+                        Inner Join AgeGroup ag on ag.id = t.AgeGroup_id");
 
                 foreach ($results as $row) {
                     $lesson = Lesson::populatefromRow($row);

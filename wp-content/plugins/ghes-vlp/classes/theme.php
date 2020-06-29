@@ -359,9 +359,8 @@ namespace GHES\VLP {
             VLPUtils::$db->throw_exception_on_error = true;
 
             try {
-
-                $row = VLPUtils::$db->queryFirstRow("select * from Theme where AgeGroup_id = %i", $agegroupid);
-                $theme = Theme::populatefromRow($row);
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where AgeGroup_id = %i", $agegroupid);
+                    $theme = Theme::populatefromRow($row);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_Get_Error', $e->getMessage());
             } catch (Exception $e) {

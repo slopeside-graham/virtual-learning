@@ -52,9 +52,19 @@ function vlp_browse_themes($atts, $content = null)
 
 
 
-    $BrowseThemeTemplate = file_get_contents(plugin_dir_path(__FILE__) . 'templates/browse-theme.html');
+    //$BrowseThemeTemplate = file_get_contents(plugin_dir_path(__FILE__) . 'templates/browse-theme.html');
     $output .= '<div class="browse-themes-header"><span class="browse-themes-age">' . $agegroupname . ' / </span><span class="weely-theme">Weekly Themes</span></div>';
-    $output .= $BrowseThemeTemplate;
+    //$output .= $BrowseThemeTemplate;
+    $output .= '<div class="k-content wide">';
+    $output .= '<div id="themes-listView"></div>';
+    $output .= '</div>';
+
+    $output .= '<script type="text/x-kendo-template" id="template">';
+    $output .= '<div class="theme">';
+    $output .= '    <div class="theme-title">#:Title#</div>';
+    $output .= '<a class="themeaccess" href="' . get_permalink(get_option("vlp-lessons")) . '" data-theme-id="#:id#" onClick="SetTheme(this)">Access Content</a>';
+    $output .= ' </div>';
+    $output .= '</script>';
 
     return $output;
 }

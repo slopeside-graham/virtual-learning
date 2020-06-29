@@ -1,0 +1,77 @@
+#lessons-listView {
+    border: none;
+}
+.browse-lessons-header {
+    background-color: #1a71ad;
+    color: white;
+    padding: 5px 20px 5px 20px;
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 300;
+}
+#lessons-listView .browse-lessons {
+    display: grid;
+    grid-template-columns: 50px 20px 3fr 5px 2fr 100px 10px 70px;
+    align-items: end;
+}
+.browse-lesson-icon svg {
+    border-radius: 50%;
+    width: 45px;
+}
+.browse-lesson-go-icon img {
+    width: 45px;
+}
+
+.browse-lesson-icon.Play-icon path {
+    fill: #f69e33;
+}
+
+.browse-lesson-icon.Learn-icon path {
+    fill: #b5ce33;
+}
+
+.browse-lesson-icon.Art-icon path {
+    fill: #1caa9e;
+}
+
+.browse-lesson-icon.Nurture-icon path {
+    fill: #1375b8;
+}
+.browse-lesson-theme-title {
+    background-color: #e1edf4;
+}
+.browse-lesson-theme-title {
+    background-color: #e1edf4;
+    padding-left: 20px;
+    padding-top: 30px;
+    font-weight: 600;
+    font-style: italic;
+    font-size: 23px;
+    color: #1a71ad;
+    border-bottom: 1px solid #1a71ad;
+    padding-bottom: 5px;
+}
+.browse-lesson-title {
+    background-color: #fef2e5;
+    padding-left: 20px;
+    padding-top: 30px;
+    font-weight: 400;
+    font-size: 23px;
+    color: #1a71ad;
+    border-bottom: 1px solid #1a71ad;
+    padding-bottom: 5px;
+}
+.browse-lesson-go-btn {
+    padding-top: 30px;
+    text-align: right;
+    font-weight: 400;
+    font-size: 23px;
+    color: #1a71ad;
+    border-bottom: 1px solid #1a71ad;
+    padding-bottom: 5px;
+}
+.browse-lesson-spacer-blue {
+    background-color: #e1edf4;
+    height: 100%;
+}

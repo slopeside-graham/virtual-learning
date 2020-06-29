@@ -177,35 +177,35 @@ img.nav-btn-img {
     left: -25px;
 }
 
-.completion-icon svg {
+.completion-icon img {
     width: 12px;
     position: relative;
     top: -5px;
     display: none;
 }
 
-.lesson-completion-icon svg, .theme-completion-icon svg {
+.lesson-completion-icon img, .theme-completion-icon img {
     display: none;
     background-color: transparent;
     border: none;
     border-radius: none;
     box-shadow: none;
-    width: 20px;
+    width: 30px;
     box-shadow: none !important;
 }
 
-.completed .completion-icon svg {
+.completed .completion-icon img {
     display: inline;
 }
 
-.completed .lesson-completion-icon svg {
+.completed .lesson-completion-icon img {
     display: inline;
     position: absolute;
-    top: 0;
-    right: 0px;
+    top: -10px;
+    right: -10px;
 }
 
-.completed .theme-completion-icon svg {
+.completed .theme-completion-icon img {
     display: inline;
     position: relative;
     top: -10px;
@@ -214,10 +214,6 @@ img.nav-btn-img {
 
 .completed .theme-completion-icon svg {
     display: inline;
-}
-
-.completion-icon svg path, .lesson-completion-icon svg path, .completed .theme-completion-icon svg path {
-    fill: greenyellow;
 }
 
 .resources a {

@@ -12,6 +12,7 @@ function register_vlp_admin_settings()
     register_setting('vlp-pages-admin-group', 'vlp-gameboard');
     register_setting('vlp-pages-admin-group', 'vlp-themes');
     register_setting('vlp-pages-admin-group', 'vlp-agetree');
+    register_setting('vlp-pages-admin-group', 'vlp-lessons');
 }
 add_action('admin_init', 'register_vlp_admin_settings');
 
@@ -121,6 +122,26 @@ function vlp_page_admin()
                         <select required name="vlp-agetree" value="<?php echo esc_attr(get_option('vlp-agetree')); ?>">
                             <option value="<?php echo esc_attr(get_option('vlp-agetree')); ?>">
                                 <?php echo get_the_title(esc_attr(get_option('vlp-agetree'))) ?></option>
+                            <?php
+                            $pages = get_pages();
+                            foreach ($pages as $page) {
+                                $option = '<option value="' . $page->ID . '">';
+                                $option .= $page->post_title;
+                                $option .= '</option>';
+                                echo $option;
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th class="table-header" scope="row">
+                        Select VLP Browse Lessons Page:
+                    </th>
+                    <td class="page-select">
+                        <select required name="vlp-lessons" value="<?php echo esc_attr(get_option('vlp-lessons')); ?>">
+                            <option value="<?php echo esc_attr(get_option('vlp-lessons')); ?>">
+                                <?php echo get_the_title(esc_attr(get_option('vlp-lessons'))) ?></option>
                             <?php
                             $pages = get_pages();
                             foreach ($pages as $page) {

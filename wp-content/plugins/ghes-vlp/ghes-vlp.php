@@ -95,11 +95,17 @@ function register_vlp_script_style_frontend()
   wp_register_style('browse-themes-style', plugins_url('/ghes-vlp/css/browse-themes.css'), array(), scriptver);
   wp_enqueue_style('browse-themes-style');
 
+  wp_register_style('browse-lessons-style', plugins_url('/ghes-vlp/css/browse-lessons.css'), array(), scriptver);
+  wp_enqueue_style('browse-lessons-style');
+
   wp_register_style('agetree-style', plugins_url('/ghes-vlp/css/agetree.css'), array(), scriptver);
   wp_enqueue_style('agetree-style');
 
   wp_register_script('wp-api-browse-themes', plugins_url('ghes-vlp/js/browse-themes.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-browse-themes', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_register_script('wp-api-browse-lessons', plugins_url('ghes-vlp/js/browse-lessons.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-browse-lessons', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
   wp_register_script('wp-api-agetree', plugins_url('ghes-vlp/js/agetree.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-agetree', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));

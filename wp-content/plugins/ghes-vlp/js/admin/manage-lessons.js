@@ -3,6 +3,16 @@ var relatedMaterialsData;
 var currentLessonID;
 var customMediaLibrary;
 
+var validator = $("#lesson-grid").kendoValidator().data("kendoValidator");
+
+// Validate the input when the Save button is clicked
+$(".k-grid-update").on("click", function() {
+    if (validator.validate()) {
+        // If the form is valid, the Validator will return true
+        save();
+    }
+});
+
 $(function () {
 
     $(document).ready(function () {
@@ -136,10 +146,10 @@ $(function () {
                         VideoURL: { validation: { required: false } },
                         Image_id: { editable: true, validation: { required: false } },
                         Theme_id: { editable: true, validation: { required: true } },
-                        ThemeTitle: { editable: true, validation: { required: true } },
-                        ThemeAgeGroupName: { editable: true, validation: { required: true } },
-                        ThemeStartDate: { editable: true, validation: { required: true }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
-                        ThemeEndDate: { editable: true, validation: { required: true }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate }
+                        ThemeTitle: { editable: false },
+                        ThemeAgeGroupName: { editable: false },
+                        ThemeStartDate: { editable: false, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
+                        ThemeEndDate: { editable: false, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate }
                     }
                 }
             }
@@ -208,6 +218,17 @@ $(function () {
         function onEdit(e) {
 
             currentLessonID = e.model.id;
+
+            if (e.model.id == null ) {
+                $("#LessonRelatedMaterials").hide();
+                $(".resources").hide();
+                $(".lesson-not-saved").show();
+            } else {
+                $("#LessonRelatedMaterials").show();
+                $(".resources").show();
+                $(".lesson-not-saved").hide();
+            }
+            //console.log(currentLessonId);
 
             // Open the media uploader.
             $('#newResourceMediaButton').on('click', function (e) {

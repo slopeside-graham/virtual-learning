@@ -41,14 +41,10 @@ function vlp_browse_themes($atts, $content = null)
         $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
         $agegroupid = $agegroup->id;
         $agegroupname = $agegroup->name;
-    } else if (isset($_GET['agegroup'])) {
-        $agegroupid = $_GET['agegroup']; //TODO Make this a cookie instead, once we have the ages page
     } else {
         $output .= 'No Child or Age Group Selected';
         return $output;
     }
-
-    setcookie("AgeGroupid", $agegroupid);
 
 
 

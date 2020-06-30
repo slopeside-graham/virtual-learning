@@ -1,15 +1,12 @@
 $ = jQuery;
 
 function SetTheme(clicked_item) {
-        setCookie("VLPThemeId", clicked_item.dataset.themeId);
+        setCookie("VLPThemeId", clicked_item.dataset.themeId, 0, '/');
 }
 
 $(function () {
-
-
-
     $(document).ready(function () {
-        ageGroupid = getCookie("AgeGroupid");
+        ageGroupid = getCookie("VLPAgeGroupId");
 
         displayLoading("#themes-listView");
 

@@ -13,6 +13,7 @@ function register_vlp_admin_settings()
     register_setting('vlp-pages-admin-group', 'vlp-themes');
     register_setting('vlp-pages-admin-group', 'vlp-agetree');
     register_setting('vlp-pages-admin-group', 'vlp-lessons');
+    register_setting('vlp-pages-admin-group', 'vlp-select-child');
 }
 add_action('admin_init', 'register_vlp_admin_settings');
 
@@ -142,6 +143,26 @@ function vlp_page_admin()
                         <select required name="vlp-lessons" value="<?php echo esc_attr(get_option('vlp-lessons')); ?>">
                             <option value="<?php echo esc_attr(get_option('vlp-lessons')); ?>">
                                 <?php echo get_the_title(esc_attr(get_option('vlp-lessons'))) ?></option>
+                            <?php
+                            $pages = get_pages();
+                            foreach ($pages as $page) {
+                                $option = '<option value="' . $page->ID . '">';
+                                $option .= $page->post_title;
+                                $option .= '</option>';
+                                echo $option;
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th class="table-header" scope="row">
+                        Select VLP Select Child Page:
+                    </th>
+                    <td class="page-select">
+                        <select required name="vlp-select-child" value="<?php echo esc_attr(get_option('vlp-select-child')); ?>">
+                            <option value="<?php echo esc_attr(get_option('vlp-select-child')); ?>">
+                                <?php echo get_the_title(esc_attr(get_option('vlp-select-child'))) ?></option>
                             <?php
                             $pages = get_pages();
                             foreach ($pages as $page) {

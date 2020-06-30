@@ -22,8 +22,13 @@ function vlp_agetree($atts, $content = null)
 {
     enqueue_agetree_scripts();
 
-    $output = '';
+    $destination = $_GET["destination"];
+    $destinationURL = '';
 
+ 
+
+
+    $output = '';
     $output .= '<div class="vlp-intro">Select Curriculum By Age</div>';
     $output .= '<div id="vlp-age-tree">';
     $agegroups = AgeGroup::GetAll();
@@ -36,7 +41,7 @@ function vlp_agetree($atts, $content = null)
         $agegroupimage = $agegroup->Image_id;
         $agegroupposition = $agegroup->Position;
 
-        $output .= '<a class="age-group-icon position-' . $agegroupposition . '" href="' . get_permalink(get_option("vlp-gameboard")) . '" onclick="SetAgeGroup(this)" data-agegroupid="' . $agegroupid . '">' . wp_get_attachment_image($agegroupimage, 'large') . '</a>';
+        $output .= '<a class="age-group-icon position-' . $agegroupposition . '" href="' . get_permalink(get_option('vlp-select-child')) . '?destination=' . $destination . '&VLPAgeGroupId=' . $agegroupid . '" data-agegroupid="' . $agegroupid . '">' . wp_get_attachment_image($agegroupimage, 'large') . '</a>';
     }
 
     $output .= '</div>';

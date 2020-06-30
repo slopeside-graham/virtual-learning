@@ -17,3 +17,6 @@ add_shortcode( 'vlp_browse_lessons', 'vlp_browse_lessons' );
 
 include_once(plugin_dir_path( __FILE__ ) . 'views/agetree.php'); 
 add_shortcode( 'vlp_agetree', 'vlp_agetree' );
+
+include_once(plugin_dir_path( __FILE__ ) . 'views/select-child.php'); 
+add_shortcode( 'vlp_slelect_child', 'vlp_select_child' );

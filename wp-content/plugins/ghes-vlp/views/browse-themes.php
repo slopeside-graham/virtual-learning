@@ -24,13 +24,11 @@ function vlp_browse_themes($atts, $content = null)
 
     $output = '';
 
-    if (isset($_COOKIE['VLPAgeGroupId'])) {
-        $agegroupid = $_COOKIE['VLPAgeGroupId'];
-        $agegroupname = AgeGroup::Get($agegroupid)->name;
-        
-    } else if (isset($_COOKIE['VLPSelectedChild'])) {
+    if (isset($_COOKIE['VLPSelectedChild'])) {
         $childid = $_COOKIE['VLPSelectedChild'];
         $child = Children::Get($childid);
+        $childFirstName = $child->FirstName;
+        $childLastName = $child->LastName;
         $todaysdate = new DateTime(date("Y-m-d"));
         $childdob = $child->DOB;
         $interval = $todaysdate->diff($childdob);
@@ -41,15 +39,18 @@ function vlp_browse_themes($atts, $content = null)
         $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
         $agegroupid = $agegroup->id;
         $agegroupname = $agegroup->name;
+    } else if (isset($_COOKIE['VLPAgeGroupId'])) {
+        $agegroupid = $_COOKIE['VLPAgeGroupId'];
+        $agegroupname = AgeGroup::Get($agegroupid)->name;
     } else {
         $output .= 'No Child or Age Group Selected';
         return $output;
     }
-
+    $completionIcon = plugin_dir_url(dirname(__FILE__)) . 'assets/Star.png';
 
 
     //$BrowseThemeTemplate = file_get_contents(plugin_dir_path(__FILE__) . 'templates/browse-theme.html');
-    $output .= '<div class="browse-themes-header"><span class="browse-themes-age">' . $agegroupname . ' / </span><span class="weely-theme">Weekly Themes</span></div>';
+    $output .= '<div class="browse-themes-header"><span class="browse-themes-age">' . $agegroupname . ' / </span><span class="weely-theme">Weekly Themes</span><span class="child-name">' . $childFirstName . ' ' . $childLastName . '</span></div>';
     //$output .= $BrowseThemeTemplate;
     $output .= '<div class="k-content wide">';
     $output .= '<div id="themes-listView"></div>';
@@ -57,8 +58,9 @@ function vlp_browse_themes($atts, $content = null)
 
     $output .= '<script type="text/x-kendo-template" id="template">';
     $output .= '<div class="theme">';
-    $output .= '    <div class="theme-title">#:Title#</div>';
-    $output .= '<a class="themeaccess" href="' . get_permalink(get_option("vlp-lessons")) . '" data-theme-id="#:id#" onClick="SetTheme(this)">Access Content</a>';
+    $output .= '    <div class="theme-title Completed-#:Completed#">#:Title#<span class="theme-completion-icon"><img src="' . $completionIcon . '" /></span></div>';
+    $output .= '    <div class="theme-date">#: kendo.format("{0:MM/dd/yyyy}", StartDate)# - #: kendo.format("{0:MM/dd/yyyy}", EndDate)#</div>';
+    $output .= '<a class="themeaccess" href="' . get_permalink(get_option("vlp-gameboard")) . '" data-theme-id="#:id#" onClick="SetTheme(this)">Launch Gameboard</a>';
     $output .= ' </div>';
     $output .= '</script>';
 

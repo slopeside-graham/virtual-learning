@@ -33,10 +33,33 @@ $(function () {
                 },
             },
             sort: {
-                field: "Title",
+                field: "StartDate",
                 dir: "asc"
+            },
+            schema: {
+                model: {
+                    id: "id",
+                    fields: {
+                        id: { editable: false, nullable: true },
+                        Title: { validation: { required: true } },
+                        StartDate: { validation: { required: false }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
+                        EndDate: { validation: { required: false }, type: "date", format: "{0:yyyy-MM-dd}", parse: parseDate },
+                        Gameboard_id: { validation: { required: true } },
+                        GameboardTitle: { validation: { required: true } },
+                        AgeGroup_id: { validation: { required: true } },
+                        AgeGroupTitle: { validation: { required: true } }
+                    }
+                }
             }
         });
+
+        function parseDate(data) {
+            if (data.date) {
+                return kendo.parseDate(data.date, "yyyy-MM-dd");
+            } else {
+                return data;
+            }
+        }
 
         $(function() {
             var dataSource = themedataSource

@@ -13,8 +13,8 @@ $(function () {
         var nurtureicon = $('#nurture-icon').children('svg').get(0);
 
 
-        var themeid = getCookie("VLPThemeId");
-
+        var ageGroupid = getCookie("VLPAgeGroupId");
+        var VLPSelectedChild = getCookie("VLPSelectedChild");
 
         displayLoading("#lessons-listView");
 
@@ -25,7 +25,7 @@ $(function () {
                         url: wpApiSettings.root + "ghes-vlp/v1/lesson",
                         dataType: "json",
                         method: "GET",
-                        data: options.data,
+                        data: {ageGroupid: ageGroupid},
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
                         },
@@ -86,6 +86,10 @@ $(function () {
             $('.Art-icon').html(articon.outerHTML);
             $('.Learn-icon').html(learnicon.outerHTML);
             $('.Nurture-icon').html(nurtureicon.outerHTML);
+
+            if(this.dataSource.data().length == 0){
+                $("#lessons-listView").append("<h2>No Lessons for this Age</h2>");
+            }
         }
 
 

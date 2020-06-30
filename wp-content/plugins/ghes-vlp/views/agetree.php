@@ -22,10 +22,15 @@ function vlp_agetree($atts, $content = null)
 {
     enqueue_agetree_scripts();
 
+    //Uset all  Cookies
+    setcookie('VLPAgeGroupId', '', 1, '/');
+    setcookie('VLPSelectedChild', '', 1, '/');
+    setcookie('VLPThemeId', '', 1, '/');
+
     $destination = $_GET["destination"];
     $destinationURL = '';
 
- 
+
 
 
     $output = '';

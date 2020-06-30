@@ -434,7 +434,6 @@ function AddNewResource() {
             url: wpApiSettings.root + "ghes-vlp/v1/resource",
             method: "POST",
             beforeSend: function (xhr) {
-                // lessondataSource.sync(); //TODO: Save the lesoon, then save the resource, then dont close the popup window
                 xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
             },
             data: {

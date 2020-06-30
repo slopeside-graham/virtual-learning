@@ -24,19 +24,14 @@ function vlp_browse_lessons($atts, $content = null)
 
     $output = '';
 
-    if (isset($_COOKIE['VLPThemeId'])) {
-        $themeid = $_COOKIE['VLPThemeId'];
-    } else {
-        $output .= 'No Theme Selected';
-        return $output;
-    }
-
     $playicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/play.svg');
     $articon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/art.svg');
     $learnicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/learn.svg');
     $nurtureicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/nurture.svg');
 
     $gobutton = plugin_dir_url(dirname(__FILE__)) . '/assets/Buttons/Go Button.png';
+
+    $completionIcon = plugin_dir_url(dirname(__FILE__)) . 'assets/Star.png';
 
 
     $output .= '<div class="hiden-lesson-icons">';
@@ -58,7 +53,7 @@ function vlp_browse_lessons($atts, $content = null)
     $output .= '    <span class="browse-lesson-spacer-blue">&nbsp;</span>';
     $output .= '    <span class="browse-lesson-theme-title">#: ThemeTitle#</span>';
     $output .= '    <span class="browse-lesson-spacer">&nbsp;</span>';
-    $output .= '    <span class="browse-lesson-title">#: Title#</span>';
+    $output .= '    <span class="browse-lesson-title Completed-#: Completed#">#: Title#<span class="lesson-completion-icon"><img src="' . $completionIcon . '" /></span></span>';
     $output .= '    <span class="browse-lesson-go-btn">Lets Go!</span>';
     $output .= '    <span class="browse-lesson-spacer">&nbsp;</span>';
     $output .= '    <span class="browse-lesson-go-icon"><img src="' . $gobutton . '"></span>'; //TODO what does this link to?

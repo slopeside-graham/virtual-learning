@@ -7,12 +7,6 @@ use GHES\VLP\AgeGroup;
 use GHES\VLP\Resource;
 use GHES\Children;
 
-
-
-/*****************************************
-     Cookies Authentication
- *****************************************/
-
 function enqueue_gameboard_scripts()
 {
     wp_enqueue_script('wp-api-gameboard');
@@ -21,6 +15,17 @@ function enqueue_gameboard_scripts()
 function vlp_gameboard($atts, $content = null)
 {
     enqueue_gameboard_scripts();
+
+    // Get All Cookies
+    if (isset($_COOKIE['VLPAgeGroupId'])) {
+        $VLPAgeGroupId = $_COOKIE['VLPAgeGroupId'];
+    }
+    if (isset($_COOKIE['VLPSelectedChild'])) {
+        $VLPSelectedChild = $_COOKIE['VLPSelectedChild'];
+    }
+    if (isset($_COOKIE['VLPThemeId'])) {
+        $VLPThemeId = $_COOKIE['VLPThemeId'];
+    }
 
     $completionIcon = plugin_dir_url(dirname(__FILE__)) . 'assets/Star.png';
     $nextWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Next Week Button.png';
@@ -43,7 +48,6 @@ function vlp_gameboard($atts, $content = null)
 
         $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
         $agegroupid = $agegroup->id;
-
     } else if (isset($_COOKIE['VLPAgeGroupId'])) {
         $agegroupid = $_COOKIE['VLPAgeGroupId'];
     } else {
@@ -55,6 +59,9 @@ function vlp_gameboard($atts, $content = null)
 
     if (isset($_GET['theme-date'])) {
         $themedate = $_GET['theme-date'];
+    } else if (isset($_COOKIE['VLPThemeId'])) {
+        $theme = Theme::Get($_COOKIE['VLPThemeId']);
+        $themedate = $theme->StartDate;
     } else {
         $themedate = date("Y-m-d");
     };

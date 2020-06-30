@@ -185,6 +185,8 @@ namespace GHES\VLP {
             if ($request['id'] != '') {
                 // Call static function Get (use :: to reference static function)
                 $lesson = Lesson::Get($request['id']);
+            } else if ($request['ageGroupid'] != '') {
+                $lesson = Lesson::GetAllbyAgeGroupId($request['ageGroupid']);
             } else {
                 // Call static function Get (use :: to reference static function)
                 $lesson = Lesson::GetAll();

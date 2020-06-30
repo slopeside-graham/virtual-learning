@@ -377,13 +377,19 @@ namespace GHES\VLP {
             $themes = new NestedSerializable();
 
             try {
+                $child_id = $_COOKIE['VLPSelectedChild'];
                 $results = VLPUtils::$db->query("
                 select t.*, 
-                    gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
+                    gb.Title as GameboardTitle, 
+                    ag.Name as AgeGroupTitle, 
+                    cts.Completed, 
+                    cts.PercentComplete
                 from Theme t
+                    Left Join Child_Theme_Status cts on t.id = cts.Theme_id and cts.Child_id = %i
                     Inner Join Gameboard gb on t.Gameboard_id = gb.id
                     Inner Join AgeGroup ag on t.Agegroup_id = ag.id
-                    Where AgeGroup_id = %i", $agegroupid);
+                Where 
+                    AgeGroup_id = %i", $child_id, $agegroupid);
 
                 foreach ($results as $row) {
                     $theme = Theme::populatefromRow($row);

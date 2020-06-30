@@ -367,6 +367,55 @@ namespace GHES\VLP {
             return $lessons;
         }
 
+        public static function GetAllbyAgeGroupId($ageGroupid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $lessons = new NestedSerializable();
+
+            try {
+
+                if (isset($_COOKIE['VLPSelectedChild'])) {
+                    $child_id = $_COOKIE['VLPSelectedChild'];
+                    $results = VLPUtils::$db->query("
+                    select l.*,
+                        cls.Completed, cls.PercentComplete,
+                        t.Title as ThemeTitle, 
+                        t.AgeGroup_id as ThemeAgeGroup, 
+                        ag.Name as ThemeAgeGroupName, 
+                        t.StartDate as ThemeStartDate, 
+                        t.EndDate as ThemeEndDate  
+                    from Lesson l
+                        Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id
+                        Inner Join Theme t on l.Theme_id = t.id
+                        Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
+                    where t.AgeGroup_id = %i and (cls.Child_id = %i or isnull(cls.Child_id ))", $ageGroupid, $child_id);
+                } else {
+                    $results = VLPUtils::$db->query("                
+                    select l.*, 
+                        t.Title as ThemeTitle, 
+                        t.AgeGroup_id as ThemeAgeGroup, 
+                        ag.Name as ThemeAgeGroupName, 
+                        t.StartDate as ThemeStartDate, 
+                        t.EndDate as ThemeEndDate 
+                    from Lesson l
+                        Inner Join Theme t on l.Theme_id = t.id
+                        Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
+                    where t.AgeGroup_id = %i", $ageGroupid);
+                }
+
+                foreach ($results as $row) {
+                    $lesson = Lesson::populatefromRow($row);
+                    $lessons->add_item($lesson);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Lesson_GetAll_Error', $e->getMessage());
+            }
+            return $lessons;
+        }
+
 
         public static function GetAll()
         {

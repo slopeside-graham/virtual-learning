@@ -1,5 +1,6 @@
 #lessons-listView {
     border: none;
+    min-height: 100px;
 }
 .browse-lessons-header {
     background-color: #1a71ad;
@@ -74,4 +75,21 @@
 .browse-lesson-spacer-blue {
     background-color: #e1edf4;
     height: 100%;
+}
+
+.lesson-completion-icon img {
+    display: none;
+    background-color: transparent;
+    border: none;
+    border-radius: none;
+    box-shadow: none;
+    width: 15px;
+    box-shadow: none !important;
+    position: relative;
+    top: -10px;
+    left: 0px;
+}
+
+.Completed-1 .lesson-completion-icon img {
+    display: inline;
 }

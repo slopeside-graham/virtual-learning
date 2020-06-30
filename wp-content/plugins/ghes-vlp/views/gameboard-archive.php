@@ -37,7 +37,7 @@ function vlp_gameboard_archive($atts, $content = null)
         $agegroup = AgeGroup::GetByAgeMonths($childagemonths);
         $agegroupid = $agegroup->id;
     } else if (isset($_GET['agegroup'])) {
-        $agegroupid = $_GET['agegroup']; //TODO Make this a cookie instead, once we have the ages page
+        $agegroupid = $_GET['agegroup'];
     } else {
         $output .= 'No Child or Age Group Selected';
         return $output;

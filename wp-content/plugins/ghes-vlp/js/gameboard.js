@@ -20,6 +20,7 @@ function openLessonPopup(clicked_item) {
     currentLessonNumber = clicked_item.dataset.lessonNumber;
 }
 
+/* Close Lesson Popup */
 $(document).keydown(function (e) {
     // ESCAPE key pressed
     if (e.keyCode == 27) {
@@ -28,6 +29,14 @@ $(document).keydown(function (e) {
 });
 $(".lesson-popup .close-button").click(function () {
     $(".lesson-popup").hide();
+});
+$(document).mouseup(function (e) {
+    var container = $(".lesson-popup");
+
+    // if the target of the click isn't the container nor a descendant of the container
+    if (!container.is(e.target) && container.has(e.target).length === 0) {
+        container.hide();
+    }
 });
 
 function completeResource(clicked_item) {

@@ -121,8 +121,10 @@ function vlp_gameboard($atts, $content = null)
             if ($lessons->jsonSerialize()) {
 
                 $lessonnumber = 1; // This just sets up an order for the lessons, should be 1 - 16.
+                $lessonPopupnumber = 1; // This just sets up an order for the lessons, should be 1 - 16.
 
                 $output .= ' <div id="gameboard">';
+                $output .= '<div id="lesson-icons">';
 
                 foreach ($lessons->jsonSerialize() as $k => $lesson) {
                     $lessonid = $lesson->id;
@@ -149,7 +151,35 @@ function vlp_gameboard($atts, $content = null)
                     }
 
                     $output .= ' <span id="lesson-icon-' . $lessonNumber . '" class="lesson-icon-area L-' . $lessonNumber . '-position icon-' . $lesson->Type . ' ' . $lessonprogress . '" onclick="openLessonPopup(this)" data-lesson-number="' . $lessonNumber . '" data-lesson-id="' . $lessonid . '">' . $lessonicon . '<span class="lesson-completion-icon"><img src="' . $completionIcon . '" /></span><span class="lesson-icon-title">' . $lesson->Title . '</span></span>';
-                    $output .= '<div class="lesson-popup type-' . $lesson->Type . '" id="lesson-' . $lessonNumber . '">';
+                }
+                $output .= '</div>';
+                $output .= '<div id="lesson-popups">';
+
+                foreach ($lessons->jsonSerialize() as $k => $lesson) {
+                    $lessonid = $lesson->id;
+                    $lessonPopupNumber = $lessonPopupnumber++;
+                    $completed = $lesson->Completed;
+                    $percentcomplete = $lesson->PercentComplete;
+
+                    if ($completed) {
+                        $lessonprogress = "completed";
+                    } else {
+                        $lessonprogress = $percentcomplete;
+                    }
+
+                    if ($lesson->Type == 'Play') {
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/play.svg');
+                    } else if ($lesson->Type == 'Art') {
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/art.svg');
+                    } else if ($lesson->Type == 'Learn') {
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/learn.svg');
+                    } else if ($lesson->Type == 'Nurture') {
+                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/nurture.svg');
+                    } else {
+                        $lessonicon = "No Icon Found";
+                    }
+
+                    $output .= '<div class="lesson-popup type-' . $lesson->Type . '" id="lesson-' . $lessonPopupNumber . '">';
                     $output .= '<span class="close-button">&times;</span>';
                     $output .= '<span class="corner-icon icon-' . $lesson->Type . '">' . $lessonicon . '</span>';
                     $output .= '<div class="lesson-content">';
@@ -192,6 +222,7 @@ function vlp_gameboard($atts, $content = null)
                     $output .= '</div>';
                     $output .= '</div>';
                 }
+                $output .= '</div>';
             } else {
                 $output .= '<h2>Uh-oh, no lessons found for this age!</h2>';
             }

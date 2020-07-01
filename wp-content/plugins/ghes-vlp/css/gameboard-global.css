@@ -89,21 +89,23 @@ img.nav-btn-img {
     border-radius: 50%;
     box-shadow: 0px 0px 10px black;
 }
-
+#lesson-popups {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 5%;
+}
 .lesson-popup {
     display: none;
     position: relative;
-    top: 5%;
-    left: 0;
-    margin-left: 5%;
-    margin-right: 5%;
-    height: 90%;
     padding: 1em;
     z-index: 2;
     color: white;
     background-color: #1375b8;
     border: 5px solid white;
     border-radius: 5px;
+    height: 100%;
 }
 
 .lesson-popup.type-Play {
@@ -343,9 +345,15 @@ img.nav-btn-img {
 
 @media screen and (max-width: 499px) {
     #gameboard {
-        height: auto;
-        background-image: none;
+        height: 1000px;
+        background-image: url("/wp-content/plugins/ghes-vlp/assets/gameboards/gameboard-1-mobile.png");
         padding: 20px;
+    }
+    #lesson-icons {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: repeat(9, 1fr);
+        text-align: right;
     }
     .lesson-icon-area {
         position: relative;
@@ -353,17 +361,7 @@ img.nav-btn-img {
         margin-bottom: 20px;
     }
     .lesson-icon-area svg {
-        width: 45px;
-    }
-    .lesson-icon-title {
-        display: inline-block;
-        color: white;
-        font-weight: 600;
-        top: 5px;
-        height: 100%;
-        position: absolute;
-        margin-left: 10px;
-        font-size: 1.2em;
+        width: 60px;
     }
     .completed .lesson-completion-icon svg {
         top: -3px;

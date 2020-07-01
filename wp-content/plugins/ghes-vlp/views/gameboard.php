@@ -75,8 +75,12 @@ function vlp_gameboard($atts, $content = null)
 
     if ($themeid != null) {
 
-        $themelastweekdate = date('Y-m-d', strtotime('-7 day', strtotime($themedate)));
-        $themenextweekdate = date('Y-m-d', strtotime('+7 day', strtotime($themedate)));
+        $themeDateObjectLastWeek = new DateTime($themedate);
+        $themeDateObjectNextWeek = new DateTime($themedate);
+        $oneWeek = new DateInterval('P7D');
+
+        $themelastweekdate = $themeDateObjectLastWeek->sub($oneWeek);
+        $themenextweekdate = $themeDateObjectNextWeek->add($oneWeek);
         $themestartdate = $theme->StartDate;
         $themeenddate = $theme->EndDate;
         $themecompleted = $theme->Completed;
@@ -96,7 +100,7 @@ function vlp_gameboard($atts, $content = null)
         $output .= '<div class="navigation-button last-week">';
 
         if (!is_null($lastweekstheme)) {
-            $output .= '<a href="?theme-date=' . $themelastweekdate . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $previousWeekButton . '" /></a>';
+            $output .= '<a href="?theme-date=' . $themelastweekdate->format('Y-m-d') . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $previousWeekButton . '" /></a>';
         }
         $output .= '</div>';
 
@@ -104,7 +108,7 @@ function vlp_gameboard($atts, $content = null)
 
         $output .= '<div class="navigation-button next-week">';
         if (!is_null($nextweekstheme)) {
-            $output .= '<a href="?theme-date=' . $themenextweekdate . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $nextWeekButton . '" /></a>';
+            $output .= '<a href="?theme-date=' . $themenextweekdate->format('Y-m-d') . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $nextWeekButton . '" /></a>';
         }
         $output .= '</div>';
 

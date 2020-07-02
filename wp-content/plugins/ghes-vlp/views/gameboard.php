@@ -61,7 +61,7 @@ function vlp_gameboard($atts, $content = null)
         $themedate = $_GET['theme-date'];
     } else if (isset($_COOKIE['VLPThemeId'])) {
         $theme = Theme::Get($_COOKIE['VLPThemeId']);
-        $themedate = $theme->StartDate;
+        $themedate = $theme->StartDate->format('Y-m-d');
     } else {
         $themedate = date("Y-m-d");
     };
@@ -104,7 +104,7 @@ function vlp_gameboard($atts, $content = null)
         }
         $output .= '</div>';
 
-        $output .= '<div id="theme-title" class="' . $themeprogress . '%-completed">This weeks theme: <strong>' . $theme->Title . '</strong><span class="theme-completion-icon"><img src="' . $completionIcon . '" /></span></div>';
+        $output .= '<div id="theme-title" class="' . $themeprogress . '%-completed"><strong>' . $theme->Title . '</strong><span class="theme-completion-icon"><img src="' . $completionIcon . '" /></span></div>';
 
         $output .= '<div class="navigation-button next-week">';
         if (!is_null($nextweekstheme)) {

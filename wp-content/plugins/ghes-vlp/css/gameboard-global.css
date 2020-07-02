@@ -95,6 +95,7 @@ img.nav-btn-img {
     top: 0;
     left: 0;
     padding: 5%;
+    width: 100%;
 }
 .lesson-popup {
     display: none;

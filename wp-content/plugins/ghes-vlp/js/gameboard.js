@@ -1,9 +1,11 @@
 // TODO: On load run a check status function.
 
 $ = jQuery;
+$lessonNumber = '';
 var currentLessonId;
 var currentLessonNumber;
 var selectedChild = getCookie("VLPSelectedChild");
+
 
 $(function () {
     $(document).ready(function () {
@@ -18,17 +20,70 @@ function openLessonPopup(clicked_item) {
     $("#lesson-" + $lessonNumber).show();
     currentLessonId = clicked_item.dataset.lessonId;
     currentLessonNumber = clicked_item.dataset.lessonNumber;
+
+    var videoIframe = $('#lesson-' + $lessonNumber + ' .lesson-video iframe');
+    var player = new Vimeo.Player(videoIframe);
+
+    player.on('play', function () {
+        console.log('played the video!');
+    });
+    /*
+    if (player.data.percent >= 0.8) {
+        console.log('Watched 80%')
+    }
+    */
+    player.on('timeupdate', function (data) {
+        if (data.percent == 1) {
+            completeVideo(player);
+        };
+    })
+
+    player.getVideoTitle().then(function (title) {
+        console.log('Video Title:', title);
+    });
+
 }
+
 
 /* Close Lesson Popup */
 $(document).keydown(function (e) {
     // ESCAPE key pressed
     if (e.keyCode == 27) {
         $(".lesson-popup").hide();
+
+        pauseVimeoVideo();
     }
 });
+
+function pauseVimeoVideo() {
+    if ($lessonNumber != '') {
+        var videoIframe = $('#lesson-' + $lessonNumber + ' .lesson-video iframe');
+        var player = new Vimeo.Player(videoIframe);
+
+        player.pause().then(function () {
+            // the video was paused
+            console.log('The Video was Paused')
+        }).catch(function (error) {
+            switch (error.name) {
+                case 'PasswordError':
+                    // the video is password-protected and the viewer needs to enter the
+                    // password first
+                    break;
+
+                case 'PrivacyError':
+                    // the video is private
+                    break;
+
+                default:
+                    // some other error occurred
+                    break;
+            }
+        });
+    }
+}
 $(".lesson-popup .close-button").click(function () {
     $(".lesson-popup").hide();
+    pauseVimeoVideo();
 });
 $(document).mouseup(function (e) {
     var container = $(".lesson-popup");
@@ -36,6 +91,7 @@ $(document).mouseup(function (e) {
     // if the target of the click isn't the container nor a descendant of the container
     if (!container.is(e.target) && container.has(e.target).length === 0) {
         container.hide();
+        pauseVimeoVideo();
     }
 });
 
@@ -72,6 +128,11 @@ function completeResource(clicked_item) {
             }
         });
     }
+}
+
+function completeVideo(player) {
+    console.log('The Video was watched');
+    console.log('Video for: Lesson Number ' + $lessonNumber)
 }
 
 function completeLesson() {

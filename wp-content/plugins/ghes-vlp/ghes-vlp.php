@@ -120,6 +120,12 @@ function register_vlp_script_style_frontend()
   wp_localize_script('wp-api-frontend-utils', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
   wp_enqueue_script('wp-api-frontend-utils');
+
+  // Include Vimeo's Player API Library
+  wp_register_script('wp-api-vimeo', 'https://player.vimeo.com/api/player.js', ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-vimeo', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_enqueue_script('wp-api-vimeo');
 }
 add_action('wp_enqueue_scripts', 'register_vlp_script_style_frontend');
 

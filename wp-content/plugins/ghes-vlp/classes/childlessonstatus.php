@@ -12,6 +12,8 @@ namespace GHES\VLP {
         private $_id;
         private $_Child_id;
         private $_Lesson_id;
+        private $_VideoCompleted;
+        private $_VideoPercentComplete;
         private $_Completed;
         private $_PercentComplete;
         private $_DateCreated;
@@ -51,6 +53,37 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_Child_id;
+            }
+        }
+        protected function VideoCompleted($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                if ($value == 'true' || $value == '1') {
+                    $value = 1;
+                } else {
+                    $value = 0;
+                }
+                $this->_VideoCompleted = $value;
+                return $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                if ($this->_VideoCompleted)
+                    return $this->_VideoCompleted;
+                else
+                    return 0;
+            }
+        }
+        protected function VideoPercentComplete($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_VideoPercentComplete = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_VideoPercentComplete;
             }
         }
         protected function Completed($value = null): int
@@ -117,6 +150,8 @@ namespace GHES\VLP {
                 'id' => $this->id,
                 'Lesson_id' => $this->Lesson_id,
                 'Child_id' => $this->Child_id,
+                'VideoCompleted' => $this->VideoCompleted,
+                'VideoPercentComplete' => $this->VideoPercentComplete,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,
                 'DateCreated' => $this->DateCreated,
@@ -135,13 +170,14 @@ namespace GHES\VLP {
                 VLPUtils::$db->insert('Child_Lesson_Status', array(
                     'Lesson_id' => $this->Lesson_id,
                     'Child_id' => $this->Child_id,
+                    'VideoCompleted' => $this->VideoCompleted,
+                    'VideoPercentComplete' => $this->VideoPercentComplete,
                     'Completed' => $this->Completed,
                     'PercentComplete' => $this->PercentComplete,
                 ));
                 $this->id = VLPUtils::$db->insertId();
-
             } catch (\MeekroDBException $e) {
-                if ($e->getCode() == '1062')  { // Ignore this duplicate entry error and continue
+                if ($e->getCode() == '1062') { // Ignore this duplicate entry error and continue
                     $this->Update();
                 } else {
                     return new \WP_Error('Child_Lesson_Status_Create_Error', $e->getMessage());
@@ -163,12 +199,16 @@ namespace GHES\VLP {
                     SET
                     Lesson_id=%i, 
                     Child_id=%i, 
+                    VideoCompleted=%i,
+                    VideoPercentComplete=%i,
                     Completed=%i,
                     PercentComplete=%i
                 WHERE 
                     Lesson_id=%i and Child_id=%i",
                     $this->Lesson_id,
                     $this->Child_id,
+                    $this->VideoCompleted,
+                    $this->VideoPercentComplete,
                     $this->Completed,
                     $this->PercentComplete,
                     $this->Lesson_id,
@@ -216,6 +256,21 @@ namespace GHES\VLP {
             return $childlessonstatus;
         }
 
+        public static function GetByLessonid($thisid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            try {
+
+                $row = VLPUtils::$db->queryFirstRow("select * from Child_Lesson_Status where Lesson_id = %i", $thisid);
+                $childlessonstatus = ChildLessonStatus::populatefromRow($row);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Resource_Get_Error', $e->getMessage());
+            }
+            return $childlessonstatus;
+        }
+
 
         public static function GetAll()
         {
@@ -238,6 +293,23 @@ namespace GHES\VLP {
             return $childlessonstatus;
         }
 
+        public function updateobjectfromRow($row)
+        {
+            if (isset($row['Lesson_id']))
+                $this->Lesson_id = $row['Lesson_id'];
+            if (isset($row['Child_id']))
+                $this->Child_id = $row['Child_id'];
+            if (isset($row['VideoCompleted']))
+                $this->VideoCompleted = $row['VideoCompleted'];
+            if (isset($row['VideoPercentComplete']))
+                $this->VideoPercentComplete = $row['VideoPercentComplete'];
+            if (isset($row['Completed']))
+                $this->Completed = $row['Completed'];
+            if (isset($row['PercentComplete']))
+                $this->PercentComplete = $row['PercentComplete'];
+            return;
+        }
+
         // Helper function to populate a resource from a MeekroDB Row
         public static function populatefromRow($row): ChildLessonStatus
         {
@@ -245,6 +317,8 @@ namespace GHES\VLP {
             $childlessonstatus->id = $row['id'];
             $childlessonstatus->Lesson_id = $row['Lesson_id'];
             $childlessonstatus->Child_id = $row['Child_id'];
+            $childlessonstatus->VideoCompleted = $row['VideoCompleted'];
+            $childlessonstatus->VideoPercentComplete = $row['VideoPercentComplete'];
             $childlessonstatus->Completed = $row['Completed'];
             $childlessonstatus->PercentComplete = $row['PercentComplete'];
             return $childlessonstatus;

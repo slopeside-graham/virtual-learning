@@ -186,6 +186,12 @@ img.nav-btn-img {
     top: -5px;
     display: none;
 }
+.video-completion-icon img {
+    top: 0px;
+    position: absolute;
+    right: 0px;
+    width: 20px;
+}
 
 .lesson-completion-icon img, .theme-completion-icon img {
     display: none;

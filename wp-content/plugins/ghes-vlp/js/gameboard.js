@@ -27,21 +27,11 @@ function openLessonPopup(clicked_item) {
     player.on('play', function () {
         console.log('played the video!');
     });
-    /*
-    if (player.data.percent >= 0.8) {
-        console.log('Watched 80%')
-    }
-    */
     player.on('timeupdate', function (data) {
         if (data.percent == 1) {
             completeVideo(player);
         };
     })
-
-    player.getVideoTitle().then(function (title) {
-        console.log('Video Title:', title);
-    });
-
 }
 
 
@@ -62,7 +52,6 @@ function pauseVimeoVideo() {
 
         player.pause().then(function () {
             // the video was paused
-            console.log('The Video was Paused')
         }).catch(function (error) {
             switch (error.name) {
                 case 'PasswordError':
@@ -133,6 +122,35 @@ function completeResource(clicked_item) {
 function completeVideo(player) {
     console.log('The Video was watched');
     console.log('Video for: Lesson Number ' + $lessonNumber)
+
+    if (selectedChild != "false") {
+
+        $.ajax({
+            url: wpApiSettings.root + "ghes-vlp/v1/childlessonstatus",
+            method: "POST",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+            },
+            data: {
+                Lesson_id: currentLessonId,
+                Child_id: selectedChild,
+                VideoCompleted: 1,
+                VideoPercentComplete: 100
+            },
+            success: function (result) {
+                // notify the data source that the request succeeded
+                $('#lesson-' + $lessonNumber + ' .completion-icon img').show();
+                updateLessonStatus();
+            },
+            error: function (result) {
+                if (typeof result.responseJSON !== "undefined") {
+                    alert(result.responseJSON.message);
+                }
+                console.log(result.responseText);
+                // notify the data source that the request failed
+            }
+        });
+    }
 }
 
 function completeLesson() {
@@ -148,6 +166,8 @@ function completeLesson() {
             data: {
                 Lesson_id: currentLessonId,
                 Child_id: selectedChild,
+                VideoCompleted: 1,
+                VideoPercentComplete: 100,
                 Completed: 1,
                 PercentComplete: 100
             },

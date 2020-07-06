@@ -132,8 +132,8 @@ $(function () {
                 }
             },
             sort: {
-                field: "Title",
-                dir: "asc"
+                field: "ThemeStartDate",
+                dir: "desc"
             },
             schema: {
                 model: {

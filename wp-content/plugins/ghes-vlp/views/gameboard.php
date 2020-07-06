@@ -189,7 +189,16 @@ function vlp_gameboard($atts, $content = null)
                     $output .= '<p class="lesson-main-content">' . $lesson->MainContent . '</p>';
                     $output .= '</div>';
                     $output .= '<div class="second-column">';
-                    $output .= '<span class="lesson-video">' . wp_oembed_get($lesson->VideoURL) . '</span>';
+
+                    $videocompleted = $lesson->VideoCompleted;
+                    $videopercentcompleted = $lesson->VideoPercentCompleted;
+
+                    if ($videocompleted) {
+                        $videocompleted = "completed";
+                    } else {
+                        $videocompleted = $videopercentcompleted;
+                    }
+                    $output .= '<span class="lesson-video ' . $videocompleted . '"><iframe src="' . $lesson->VideoURL . '"frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe><span class="completion-icon video-completion-icon"><img src="' . $completionIcon . '" /></span></span>';
                     //$output .= '<p>Image ID: ' . $lesson->Image_id . '</p>';
 
                     $resources = Resource::GetAllbyLessonId($lessonid);

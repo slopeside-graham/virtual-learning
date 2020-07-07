@@ -25,7 +25,7 @@ $(function () {
                         url: wpApiSettings.root + "ghes-vlp/v1/lesson",
                         dataType: "json",
                         method: "GET",
-                        data: {ageGroupid: ageGroupid},
+                        data: { ageGroupid: ageGroupid },
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
                         },
@@ -87,7 +87,7 @@ $(function () {
             $('.Learn-icon').html(learnicon.outerHTML);
             $('.Nurture-icon').html(nurtureicon.outerHTML);
 
-            if(this.dataSource.data().length == 0){
+            if (this.dataSource.data().length == 0) {
                 $("#lessons-listView").append("<h2>No Lessons for this Age</h2>");
             }
             /*
@@ -104,6 +104,8 @@ function openLessonPopup(clicked_item) {
     $lessonId = clicked_item.dataset.lessonId;
     console.log("Lesson Number: " + $lessonId);
     $("#lesson-" + $lessonId).show();
+
+    getLessonResources($lessonId);
 
     var videoIframe = $('#lesson-' + $lessonId + ' .lesson-video iframe');
     var player = new Vimeo.Player(videoIframe);
@@ -168,3 +170,56 @@ $(document).mouseup(function (e) {
         pauseVimeoVideo();
     }
 });
+
+function getLessonResources($lessonId) {
+
+    displayLoading("#resources-listView-lesson-" + $lessonId);
+    $("#resources-listView-lesson-" + $lessonId).empty();
+
+    resourcedataSource = new kendo.data.DataSource({
+        transport: {
+            read: function (options) {
+                $.ajax({
+                    url: wpApiSettings.root + "ghes-vlp/v1/resource",
+                    dataType: "json",
+                    method: "GET",
+                    data: { lesson_id: $lessonId },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+                    },
+                    success: function (result) {
+                        hideLoading("#resources-listView-lesson-" + $lessonId);
+                        options.success(result);
+                    },
+                    error: function (result) {
+                        hideLoading("#resources-listView-lesson-" + $lessonId);
+                        options.error(result);
+                    }
+                });
+            },
+        },
+        sort: {
+            field: "Title",
+            dir: "asc"
+        },
+        schema: {
+            model: {
+                id: "id",
+                fields: {
+                    id: { editable: false, nullable: true },
+                    Title: { validation: { required: true } },
+                    Media_id: { validation: { required: false } },
+                    Link: { validation: { required: false } },
+                    Lesson_id: { validation: { required: false } },
+                }
+            }
+        }
+    });
+
+    var dataSource = resourcedataSource
+    $("#resources-listView-lesson-" + $lessonId).kendoListView({
+        dataSource: dataSource,
+        template: kendo.template($("#lesson-resources-template").html()),
+    });
+
+}

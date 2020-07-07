@@ -23,6 +23,9 @@
 .browse-lesson-go-icon img {
     width: 45px;
 }
+.browse-lesson-go-icon img:hover {
+    cursor: pointer;
+}
 
 .browse-lesson-icon.Play-icon path, #lessons-listView .lesson-popup .Play-icon path {
     fill: #f69e33;
@@ -106,4 +109,13 @@
 #lessons-listView .lesson-popup .lesson-content {
     height: 100%;
     margin-left: 75px;
+}
+
+#lessons-listView .related-materials-list {
+    background-color: transparent;
+    border: none;
+    min-height: 50px;
+}
+#lessons-listView  .resources {
+    margin-top: 20px;
 }

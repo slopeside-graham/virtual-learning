@@ -71,14 +71,16 @@ function vlp_browse_lessons($atts, $content = null)
                     $output .= '<div class="lesson-video">';
                         $output .= '<iframe src="#: VideoURL #"frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe><span class="completion-icon video-completion-icon"><img src="' . $completionIcon . '" /></span>';
                     $output .= '</div>';
-                    $output .= '<div id="lessons-listView"></div>';
-                    $output .= '<script type="text/x-kendo-template" id="lesson-resources-template">';
-                    $output .= '    <span class="resource-title">#: Title#</span>';
-                    $output .= '</script>';
+                    $output .= '<div class="resources"><span class="related-materials-title">Related Materials</span><br/>';
+                        $output .= '<ul id="resources-listView-lesson-#: id#" class="related-materials-list"></ul>';
+                    $output .= '</div>';
                 $output .= '</div>';
             $output .= ' </div>';
         $output .= ' </div>';
     $output .= ' </script>';
+    $output .= '<script type="text/x-kendo-template" id="lesson-resources-template">';
+    $output .= '    <li class="resource-title"><a href="#: ResourceLink #" target="_blank">#: Title#</a></li>';
+    $output .= '</script>';
 
     return $output;
 }

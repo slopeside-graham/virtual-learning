@@ -198,7 +198,11 @@ function vlp_gameboard($atts, $content = null)
                     } else {
                         $videocompleted = $videopercentcompleted;
                     }
-                    $output .= '<span class="lesson-video ' . $videocompleted . '"><iframe src="' . $lesson->VideoURL . '"frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe><span class="completion-icon video-completion-icon"><img src="' . $completionIcon . '" /></span></span>';
+                    $output .= '<span class="lesson-video ' . $videocompleted . '">';
+                    if ($lesson->VideoURL) {
+                        $output .= '<iframe src="' . $lesson->VideoURL . '"frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe><span class="completion-icon video-completion-icon"><img src="' . $completionIcon . '" /></span>';
+                    }
+                    $output .= '</span>';
                     //$output .= '<p>Image ID: ' . $lesson->Image_id . '</p>';
 
                     $resources = Resource::GetAllbyLessonId($lessonid);

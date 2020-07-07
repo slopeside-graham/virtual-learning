@@ -224,7 +224,8 @@ function updateLessonStatus() {
     if (selectedChild != "false") {
         currentLessonId;
         var totalResources = $("#lesson-" + currentLessonNumber + " .resources .related-materials-list li").length;
-        var totalItems = totalResources + 1 // Add the video
+        var totalVideo = $('#lesson-' + $lessonNumber + ' .lesson-video iframe').length;
+        var totalItems = totalResources + totalVideo
         var completedVideo = $('#lesson-' + $lessonNumber + ' .lesson-video.completed').length;
         var completedResources = $("#lesson-" + currentLessonNumber + " .resources .related-materials-list .completed").length;
         var totalCompletedItems = completedVideo + completedResources;

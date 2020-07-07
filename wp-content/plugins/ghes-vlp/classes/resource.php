@@ -306,8 +306,11 @@ namespace GHES\VLP {
         }
 
         // Helper function to populate a resource from a MeekroDB Row
-        public static function populatefromRow($row): Resource
+        public static function populatefromRow($row): ?Resource
         {
+            if ($row == null)
+            return null;
+            
             $resource = new Resource();
             $resource->id = $row['id'];
             $resource->Title = $row['Title'];

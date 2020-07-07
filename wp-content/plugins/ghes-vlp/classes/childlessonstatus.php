@@ -271,6 +271,21 @@ namespace GHES\VLP {
             return $childlessonstatus;
         }
 
+        public static function GetByLessonidandChildid($lessonid, $childid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            try {
+
+                $row = VLPUtils::$db->queryFirstRow("select * from Child_Lesson_Status where Lesson_id = %i and Child_id = %i", $lessonid, $childid);
+                $childlessonstatus = ChildLessonStatus::populatefromRow($row);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Resource_Get_Error', $e->getMessage());
+            }
+            return $childlessonstatus;
+        }
+
 
         public static function GetAll()
         {
@@ -311,8 +326,11 @@ namespace GHES\VLP {
         }
 
         // Helper function to populate a resource from a MeekroDB Row
-        public static function populatefromRow($row): ChildLessonStatus
+        public static function populatefromRow($row): ?ChildLessonStatus
         {
+            if ($row == null)
+            return null;
+            
             $childlessonstatus = new ChildLessonStatus();
             $childlessonstatus->id = $row['id'];
             $childlessonstatus->Lesson_id = $row['Lesson_id'];

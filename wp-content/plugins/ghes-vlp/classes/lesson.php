@@ -474,8 +474,11 @@ namespace GHES\VLP {
         }
 
         // Helper function to populate a lesson from a MeekroDB Row
-        public static function populatefromRow($row): Lesson
+        public static function populatefromRow($row): ?Lesson
         {
+            if ($row == null)
+            return null;
+            
             $lesson = new Lesson();
             $lesson->id = $row['id'];
             $lesson->Title = $row['Title'];

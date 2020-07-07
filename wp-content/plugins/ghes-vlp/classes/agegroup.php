@@ -269,8 +269,11 @@ namespace GHES\VLP {
         }
 
         // Helper function to populate a lesson from a MeekroDB Row
-        public static function populatefromRow($row): AgeGroup
+        public static function populatefromRow($row): ?AgeGroup
         {
+            if ($row == null)
+            return null;
+            
             $ageGroup = new AgeGroup();
             $ageGroup->id = $row['id'];
             $ageGroup->Name = $row['Name'];

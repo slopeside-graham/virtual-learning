@@ -250,7 +250,7 @@ namespace GHES\VLP {
         public function create_item($request)
         {
 
-            $childlessonstatus = ChildLessonStatus::GetByLessonid($request["Lesson_id"]);
+            $childlessonstatus = ChildLessonStatus::GetByLessonidandChildid($request["Lesson_id"], $request["Child_id"]);
             if ($childlessonstatus) {
                 $childlessonstatus->updateobjectfromRow($request);
                 $childlessonstatus->Update();

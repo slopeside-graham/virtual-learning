@@ -174,8 +174,11 @@ namespace GHES\VLP {
         }
 
         // Helper function to populate a theme from a MeekroDB Row
-        public static function populatefromRow($row): Gameboard
+        public static function populatefromRow($row): ?Gameboard
         {
+            if ($row == null)
+            return null;
+            
             $gameboard = new Gameboard();
             $gameboard->id = $row['id'];
             $gameboard->Title = $row['Title'];

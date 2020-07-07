@@ -442,8 +442,11 @@ namespace GHES\VLP {
         }
 
         // Helper function to populate a theme from a MeekroDB Row
-        public static function populatefromRow($row): Theme
+        public static function populatefromRow($row): ?Theme
         {
+            if ($row == null)
+            return null;
+            
             $theme = new Theme();
             $theme->id = $row['id'];
             $theme->Title = $row['Title'];

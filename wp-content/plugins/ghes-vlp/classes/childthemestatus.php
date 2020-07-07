@@ -239,8 +239,11 @@ namespace GHES\VLP {
         }
 
         // Helper function to populate a resource from a MeekroDB Row
-        public static function populatefromRow($row): ChildThemeStatus
+        public static function populatefromRow($row): ?ChildThemeStatus
         {
+            if ($row == null)
+            return null;
+            
             $childthemestatus = new ChildThemeStatus();
             $childthemestatus->id = $row['id'];
             $childthemestatus->Theme_id = $row['Theme_id'];

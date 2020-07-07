@@ -65,7 +65,7 @@ function vlp_browse_lessons($atts, $content = null)
                 $output .= '<div class="first-column">';
                     $output .= '<span class="type-heading">#: Type# Activity</span><br/>';
                     $output .= '<span class="lesson-title">#: Title #</span><br/>';
-                    $output .= '<p class="lesson-main-content">#: MainContent #</p>';
+                    $output .= '<p class="lesson-main-content">#= MainContent #</p>';
                 $output .= '</div>';
                 $output .= '<div class="second-column">';
                     $output .= '<div class="lesson-video">';

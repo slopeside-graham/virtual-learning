@@ -210,8 +210,8 @@ img.nav-btn-img {
 .completed .lesson-completion-icon img {
     display: inline;
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: 0px;
+    right: 0px;
 }
 
 .completed .theme-completion-icon img {

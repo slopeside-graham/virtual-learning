@@ -104,7 +104,7 @@ function vlp_gameboard($atts, $content = null)
         }
         $output .= '</div>';
 
-        $output .= '<div id="theme-title" class="' . $themeprogress . '%-completed"><strong>' . $theme->Title . '</strong><span class="theme-completion-icon"><img src="' . $completionIcon . '" /></span></div>';
+        $output .= '<div id="theme-title" class="' . $themeprogress . '"><strong>' . $theme->Title . '</strong><span class="theme-completion-icon"><img src="' . $completionIcon . '" /></span></div>';
 
         $output .= '<div class="navigation-button next-week">';
         if (!is_null($nextweekstheme)) {

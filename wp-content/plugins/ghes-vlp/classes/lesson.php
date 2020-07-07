@@ -21,6 +21,8 @@ namespace GHES\VLP {
         private $_ThemeAgeGroupName; // Not in the DB, queries will build it
         private $_ThemeStartDate; // Not in the DB, queries will build it
         private $_ThemeEndDate; // Not in the DB, queries will build it
+        private $_VideoCompleted;
+        private $_VideoPercentComplete;
         private $_Completed;
         private $_PercentComplete;
 
@@ -170,6 +172,28 @@ namespace GHES\VLP {
                 return $this->_ThemeEndDate;
             }
         }
+        protected function VideoCompleted($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_VideoCompleted = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_VideoCompleted;
+            }
+        }
+        protected function VideoPercentComplete($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_VideoPercentComplete = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_VideoPercentComplete;
+            }
+        }
         protected function Completed($value = null)
         {
             // If value was provided, set the value
@@ -210,6 +234,8 @@ namespace GHES\VLP {
                 'ThemeAgeGroupName' => $this->ThemeAgeGroupName,
                 'ThemeStartDate' => $this->ThemeStartDate,
                 'ThemeEndDate' => $this->ThemeEndDate,
+                'VideoCompleted' => $this->VideoCompleted,
+                'VideoPercentComplete' => $this->VideoPercentComplete,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,
             ];
@@ -331,7 +357,7 @@ namespace GHES\VLP {
                     $child_id = $_COOKIE['VLPSelectedChild'];
                     $results = VLPUtils::$db->query("
                     select l.*,
-                        cls.Completed, cls.PercentComplete,
+                        cls.Completed, cls.PercentComplete, cls.VideoCompleted, cls.VideoPercentComplete,
                         t.Title as ThemeTitle, 
                         t.AgeGroup_id as ThemeAgeGroup, 
                         ag.Name as ThemeAgeGroupName, 
@@ -380,7 +406,7 @@ namespace GHES\VLP {
                     $child_id = $_COOKIE['VLPSelectedChild'];
                     $results = VLPUtils::$db->query("
                     select l.*,
-                        cls.Completed, cls.PercentComplete,
+                        cls.Completed, cls.PercentComplete, cls.VideoCompleted, cls.VideoPercentComplete,
                         t.Title as ThemeTitle, 
                         t.AgeGroup_id as ThemeAgeGroup, 
                         ag.Name as ThemeAgeGroupName, 
@@ -463,6 +489,8 @@ namespace GHES\VLP {
             $lesson->ThemeAgeGroupName = $row['ThemeAgeGroupName'];
             $lesson->ThemeStartDate = $row['ThemeStartDate'];
             $lesson->ThemeEndDate = $row['ThemeEndDate'];
+            $lesson->VideoCompleted = $row['VideoCompleted'];
+            $lesson->VideoPercentComplete = $row['VideoPercentComplete'];
             $lesson->Completed = $row['Completed'];
             $lesson->PercentComplete = $row['PercentComplete'];
             $lesson->DateCreated = $row['DateCreated'];

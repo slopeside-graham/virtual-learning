@@ -105,7 +105,7 @@ function completeResource(clicked_item) {
                 console.log("Resource ID: " + clicked_item.dataset.resourceId + " completed.");
                 console.log("Done:" + result);
                 $(clicked_item).parent().addClass("completed");
-                $(clicked_item).siblings(".completion-icon").children("svg").show();
+                $(clicked_item).siblings(".completion-icon").children("img").show();
                 updateLessonStatus();
             },
             error: function (result) {
@@ -140,6 +140,7 @@ function completeVideo(player) {
             success: function (result) {
                 // notify the data source that the request succeeded
                 $('#lesson-' + $lessonNumber + ' .completion-icon img').show();
+                $('#lesson-' + $lessonNumber + ' .lesson-video').addClass('completed');
                 updateLessonStatus();
             },
             error: function (result) {
@@ -223,11 +224,12 @@ function updateLessonStatus() {
     if (selectedChild != "false") {
         currentLessonId;
         var totalResources = $("#lesson-" + currentLessonNumber + " .resources .related-materials-list li").length;
+        var totalItems = totalResources + 1 // Add the video
+        var completedVideo = $('#lesson-' + $lessonNumber + ' .lesson-video.completed').length;
         var completedResources = $("#lesson-" + currentLessonNumber + " .resources .related-materials-list .completed").length;
-        console.log("Total Resources: " + totalResources);
-        console.log("Completed Resources: " + completedResources);
+        var totalCompletedItems = completedVideo + completedResources;
 
-        var percentCompleted = (completedResources / totalResources) * 100;
+        var percentCompleted = (totalCompletedItems / totalItems) * 100;
         console.log("Percent Completed: " + percentCompleted);
 
         if (percentCompleted == 100) {

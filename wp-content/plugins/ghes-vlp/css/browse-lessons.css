@@ -24,7 +24,7 @@
     width: 45px;
 }
 
-.browse-lesson-icon.Play-icon path {
+.browse-lesson-icon.Play-icon path, #lessons-listView .lesson-popup .Play-icon path {
     fill: #f69e33;
 }
 
@@ -92,4 +92,18 @@
 
 .Completed-1 .lesson-completion-icon img {
     display: inline;
+}
+
+/* CSS for the POPup */
+#lessons-listView .lesson-popup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: -webkit-fill-available;
+    margin: 30px;
+    height: 400px;
+}
+#lessons-listView .lesson-popup .lesson-content {
+    height: 100%;
+    margin-left: 75px;
 }

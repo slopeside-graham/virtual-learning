@@ -1,5 +1,5 @@
 $ = jQuery;
-
+$lessonId = '';
 
 $(function () {
 
@@ -90,8 +90,81 @@ $(function () {
             if(this.dataSource.data().length == 0){
                 $("#lessons-listView").append("<h2>No Lessons for this Age</h2>");
             }
+            /*
+            if($('.lesson-video iframe[src="null"]')) {
+                $('.lesson-video').hide();
+            }
+            */
         }
 
-
     });
+});
+
+function openLessonPopup(clicked_item) {
+    $lessonId = clicked_item.dataset.lessonId;
+    console.log("Lesson Number: " + $lessonId);
+    $("#lesson-" + $lessonId).show();
+
+    var videoIframe = $('#lesson-' + $lessonId + ' .lesson-video iframe');
+    var player = new Vimeo.Player(videoIframe);
+
+    player.on('play', function () {
+        console.log('played the video!');
+    });
+    player.on('timeupdate', function (data) {
+        if (data.percent == 1) {
+            completeVideo(player);
+        };
+    })
+}
+
+function closeLessonPopup(clicked_item) {
+    $(".lesson-popup").hide();
+
+    pauseVimeoVideo();
+}
+
+
+/* Close Lesson Popup */
+$(document).keydown(function (e) {
+    // ESCAPE key pressed
+    if (e.keyCode == 27) {
+        closeLessonPopup();
+    }
+});
+
+function pauseVimeoVideo() {
+    if ($lessonId != '') {
+        var videoIframe = $('#lesson-' + $lessonId + ' .lesson-video iframe');
+        var player = new Vimeo.Player(videoIframe);
+
+        player.pause().then(function () {
+            // the video was paused
+        }).catch(function (error) {
+            switch (error.name) {
+                case 'PasswordError':
+                    // the video is password-protected and the viewer needs to enter the
+                    // password first
+                    break;
+
+                case 'PrivacyError':
+                    // the video is private
+                    break;
+
+                default:
+                    // some other error occurred
+                    break;
+            }
+        });
+    }
+}
+
+$(document).mouseup(function (e) {
+    var container = $(".lesson-popup");
+
+    // if the target of the click isn't the container nor a descendant of the container
+    if (!container.is(e.target) && container.has(e.target).length === 0) {
+        container.hide();
+        pauseVimeoVideo();
+    }
 });

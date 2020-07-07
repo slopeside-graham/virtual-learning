@@ -284,10 +284,12 @@ namespace GHES\VLP {
             try {
                 if (isset($_COOKIE['VLPSelectedChild'])) {
                     $child_id = $_COOKIE['VLPSelectedChild'];
-                    $results = VLPUtils::$db->query("select r.*, crs.Completed, crs.PercentComplete from Resource r
-                                                    Left Join Child_Resource_Status crs on r.id = crs.Resource_id
-                                                    where Lesson_id = %i
-                                                    and (crs.Child_id = %i or isnull(crs.Child_id ))", $lessonid, $child_id);
+                    $results = VLPUtils::$db->query("
+                        select r.*, 
+                            crs.Completed, crs.PercentComplete 
+                        from Resource r
+                            Left Join Child_Resource_Status crs on r.id = crs.Resource_id and crs.Child_id = %i
+                        where Lesson_id = %i", $child_id, $lessonid);
                 } else {
                     $results = VLPUtils::$db->query("select * from Resource where Lesson_id = %i", $lessonid);
                 }

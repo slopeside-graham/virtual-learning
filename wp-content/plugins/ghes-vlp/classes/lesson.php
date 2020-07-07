@@ -364,10 +364,10 @@ namespace GHES\VLP {
                         t.StartDate as ThemeStartDate, 
                         t.EndDate as ThemeEndDate  
                     from Lesson l
-                        Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id
+                        Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id and cls.Child_id = %i
                         Inner Join Theme t on l.Theme_id = t.id
                         Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
-                    where Theme_id = %i and (cls.Child_id = %i or isnull(cls.Child_id ))", $themeid, $child_id);
+                    where Theme_id = %i", $child_id, $themeid);
                 } else {
                     $results = VLPUtils::$db->query("                
                     select l.*, 

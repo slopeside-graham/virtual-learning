@@ -327,12 +327,16 @@ namespace GHES\VLP {
             try {
                 if (isset($_COOKIE['VLPSelectedChild'])) {
                     $child_id = $_COOKIE['VLPSelectedChild'];
-                    $row = VLPUtils::$db->queryFirstRow("select t.*, cts.Completed, cts.PercentComplete from Theme t
-                                                                    Left Join Child_Theme_Status cts on t.id = cts.Theme_id
-                                                                where
-                                                                 %t between t.StartDate and t.EndDate
-                                                                 and (cts.Child_id = %i or isnull(cts.Child_id ))
-                                                                 and t.AgeGroup_id = %i", $date, $child_id, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow("
+                        select t.*, 
+                            cts.Completed, 
+                            cts.PercentComplete 
+                        from Theme t
+                            Left Join Child_Theme_Status cts on t.id = cts.Theme_id and cts.Child_id = %i
+                        where
+                            %t between t.StartDate and t.EndDate
+                            and t.AgeGroup_id = %i", $child_id, $date, $agegroupid);
+
                 } else if (isset($_COOKIE['VLPAgeGroupId']) && !isset($_COOKIE['VLPSelectedChild'])) {
                     $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate
                     and AgeGroup_id = %i", $date, $agegroupid);

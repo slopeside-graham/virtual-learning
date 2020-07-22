@@ -196,7 +196,6 @@ $(function () {
                 { field: "ThemeTitle", title: "Theme", editable: false, template: '#: ThemeTitle #: #: kendo.format("{0:MM/dd/yyyy}", ThemeStartDate)# - #: kendo.format("{0:MM/dd/yyyy}", ThemeEndDate)#' },
                 { field: "ThemeAgeGroupName", title: "Age Group", editable: false },
                 { field: "Type", title: "Type", required: true },
-                { field: "MainContent", title: "Main Content", width: "400px", encoded: false },
                 { field: "VideoURL", title: "Video URL" },
                 //{ field: "Image_id", title: "Image ID", width: "100px" },
                 { command: ["edit", "destroy"], title: "&nbsp;" }
@@ -396,6 +395,10 @@ $(function () {
                 });
             }
         },
+        sort: {
+            field: "StartDate",
+            dir: "asc"
+        },
         schema: {
             model: {
                 id: "id",
@@ -458,6 +461,7 @@ function AddNewResource() {
                 // refreshes the ListView
                 listView.dataSource.read();
                 listView.refresh();
+                $(".k-grid-update").removeClass("k-state-disabled");
             },
             error: function (result) {
                 hideLoading("#LessonRelatedMaterials");
@@ -510,7 +514,9 @@ function UpdateVideo(video) {
 function ResourceRequired() {
     if (($("#newResourceTitle").val() != "") && ($("#newResourceId").val() != "") || $("#newResourceLink").val() != "") {
         $("#addResource").removeClass("k-state-disabled");
+        $("#addResource").addClass("k-primary");
     } else if ($("#newResourceTitle").val() == "") {
         $("#addResource").addClass("k-state-disabled");
+        $(".k-grid-update").addClass("k-state-disabled");
     }
 }

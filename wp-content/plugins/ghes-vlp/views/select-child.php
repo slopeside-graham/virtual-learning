@@ -50,8 +50,17 @@ function vlp_select_child($atts, $content = null)
         header('Location: ' . $destinationURL);
         exit;
     } else if ($children->count() < 1) {
-        $output .= "You have no children";
-        return $output;
+        
+        // let's not do this...
+        //$output .= "You have no children";
+        //return $output;
+
+        // Let's see what this does instead:
+        setcookie('VLPSelectedChild', '', 1, '/');
+        setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
+        header('Location: ' . $destinationURL);
+        exit;
+
     } else if ($children->count() > 1) {
         setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
 

@@ -324,6 +324,7 @@ namespace GHES\VLP {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
+<<<<<<< Updated upstream
             // Get any theme between the dates provided, UNION that with the any theme published before the date provided, order by StartDate desc so that we get the most recent
             $SQL = 'select t.*, 
                         cts.Completed, 
@@ -403,8 +404,27 @@ namespace GHES\VLP {
                         t.StartDate > (Select StartDate from Theme where id=%i)
                     Order By StartDate asc;';
                     $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid);
-                }
+=======
+            try {
+                if (isset($_COOKIE['VLPSelectedChild'])) {
+                    $child_id = $_COOKIE['VLPSelectedChild'];
+                    $row = VLPUtils::$db->queryFirstRow("
+                        select t.*, 
+                            cts.Completed, 
+                            cts.PercentComplete 
+                        from Theme t
+                            Left Join Child_Theme_Status cts on t.id = cts.Theme_id and cts.Child_id = %i
+                        where
+                            %t between t.StartDate and t.EndDate
+                            and t.AgeGroup_id = %i", $child_id, $date, $agegroupid);
 
+                } else if (isset($_COOKIE['VLPAgeGroupId']) && !isset($_COOKIE['VLPSelectedChild'])) {
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate
+                    and AgeGroup_id = %i", $date, $agegroupid);
+                } else {
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate", $date);
+>>>>>>> Stashed changes
+                }
                 if (isset($row)) {
                     $theme = Theme::populatefromRow($row);
                 } else {
@@ -419,6 +439,7 @@ namespace GHES\VLP {
             return $theme;
         }
 
+<<<<<<< Updated upstream
         public static function GetbyDateandAgeGroupPrevious($themeid, $agegroupid)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -471,6 +492,8 @@ namespace GHES\VLP {
             }
             return $theme;
         }
+=======
+>>>>>>> Stashed changes
 
         public static function GetbyAgeGroup($agegroupid)
         {
@@ -478,8 +501,13 @@ namespace GHES\VLP {
             VLPUtils::$db->throw_exception_on_error = true;
 
             try {
+<<<<<<< Updated upstream
                 $row = VLPUtils::$db->queryFirstRow("select * from Theme where AgeGroup_id = %i", $agegroupid);
                 $theme = Theme::populatefromRow($row);
+=======
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where AgeGroup_id = %i", $agegroupid);
+                    $theme = Theme::populatefromRow($row);
+>>>>>>> Stashed changes
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_Get_Error', $e->getMessage());
             } catch (Exception $e) {
@@ -517,9 +545,15 @@ namespace GHES\VLP {
                 }
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
+<<<<<<< Updated upstream
             } catch (Exception $e) {
                 return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
             } catch (Exception $e) {
+=======
+            } catch (Exception $e) {
+                return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
+            } catch (Exception $e) {
+>>>>>>> Stashed changes
                 return new \WP_Error('Theme_Get_Error', $e->getMessage());
             }
             return $themes;
@@ -560,8 +594,8 @@ namespace GHES\VLP {
         public static function populatefromRow($row): ?Theme
         {
             if ($row == null)
-                return null;
-
+            return null;
+            
             $theme = new Theme();
             $theme->id = $row['id'];
             $theme->Title = $row['Title'];

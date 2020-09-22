@@ -1,17 +1,16 @@
 <?php
-
 namespace GHES\VLP {
 
     /**
-     * Add rest api endpoint for resources
+     * Add rest api endpoint for Subscription Definitions
      */
 
-    use GHES\VLP\ChildLessonStatus;
+    use GHES\VLP\Gameboards;
 
     /**
-     * Class ChildLessonStatus_Rest
+     * Class SubscriptionDefinition_Rest
      */
-    class ChildLessonStatus_Rest extends \WP_REST_Controller
+    class SubscriptionDefinition_Rest extends \WP_REST_Controller
     {
         /**
          * The namespace.
@@ -28,13 +27,13 @@ namespace GHES\VLP {
         protected $rest_base;
 
         /**
-         * ChildLessonStatus_Rest constructor.
+         * SubscriptionDefinition_Rest constructor.
          */
         public function __construct()
         {
 
             $this->namespace = 'ghes-vlp/v1';
-            $this->rest_base = 'childlessonstatus';
+            $this->rest_base = 'subscriptiondefinition';
         }
 
         /**
@@ -87,24 +86,24 @@ namespace GHES\VLP {
             register_rest_route($this->namespace, '/' . $this->rest_base, array(
 
                 array(
-                    'methods'             => ChildLessonStatus_Rest::READABLE,
+                    'methods'             => SubscriptionDefinition_Rest::READABLE,
                     'callback'            => array($this, 'get_item'),
                     'permission_callback' => array($this, 'get_item_permissions_check'),
                 ),
                 array(
-                    'methods'         => ChildLessonStatus_Rest::EDITABLE,
+                    'methods'         => SubscriptionDefinition_Rest::EDITABLE,
                     'callback'        => array($this, 'update_item'),
                     'permission_callback' => array($this, 'update_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(false),
                 ),
                 array(
-                    'methods'         => ChildLessonStatus_Rest::CREATABLE,
+                    'methods'         => SubscriptionDefinition_Rest::CREATABLE,
                     'callback'        => array($this, 'create_item'),
                     'permission_callback' => array($this, 'create_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(true),
                 ),
                 array(
-                    'methods'         => ChildLessonStatus_Rest::DELETABLE,
+                    'methods'         => SubscriptionDefinition_Rest::DELETABLE,
                     'callback'        => array($this, 'delete_item'),
                     'permission_callback' => array($this, 'delete_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(true),
@@ -125,7 +124,7 @@ namespace GHES\VLP {
             if (is_user_logged_in()) {
                 return true;
             } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot get this child resource status.'), array('status' => $this->authorization_status_code()));
+                return new \WP_Error('rest_forbidden', esc_html__('You cannot get this Subscription Definition resource.'), array('status' => $this->authorization_status_code()));
         }
 
         /**
@@ -140,7 +139,7 @@ namespace GHES\VLP {
             if (is_user_logged_in() && current_user_can('vlp_manage_entries')) {
                 return true;
             } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot update this child resource status.'), array('status' => $this->authorization_status_code()));
+                return new \WP_Error('rest_forbidden', esc_html__('You cannot update this Subscription Definition resource.'), array('status' => $this->authorization_status_code()));
         }
 
         /**
@@ -152,10 +151,10 @@ namespace GHES\VLP {
          */
         public function create_item_permissions_check($request)
         {
-            if (is_user_logged_in()) {
+            if (is_user_logged_in() && current_user_can('vlp_manage_entries')) {
                 return true;
             } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot create this child resource status.'), array('status' => $this->authorization_status_code()));
+                return new \WP_Error('rest_forbidden', esc_html__('You cannot create this Subscription Definition resource.'), array('status' => $this->authorization_status_code()));
         }
 
         /**
@@ -170,11 +169,11 @@ namespace GHES\VLP {
             if (is_user_logged_in() && current_user_can('vlp_manage_entries')) {
                 return true;
             } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot delete this child resource status.'), array('status' => $this->authorization_status_code()));
+                return new \WP_Error('rest_forbidden', esc_html__('You cannot delete this Subscription Definition resource.'), array('status' => $this->authorization_status_code()));
         }
 
         /**
-         * Get the resource list.
+         * Get the Subscription Definition list.
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -184,22 +183,22 @@ namespace GHES\VLP {
         {
             if ($request['id'] != '') {
                 // Call static function Get (use :: to reference static function)
-                $childlessonstatus = ChildLessonStatus::Get($request['id']);
+                $subscriptiondefinition = SubscriptionDefinition::Get($request['id']);
             } else {
                 // Call static function Get (use :: to reference static function)
-                $childlessonstatus = ChildLessonStatus::GetAll();
+                $subscriptiondefinition = SubscriptionDefinition::GetAll();
             }
 
-            if (!is_wp_error($childlessonstatus))
-                return rest_ensure_response($childlessonstatus);
+            if (!is_wp_error($subscriptiondefinition))
+                return rest_ensure_response($subscriptiondefinition);
             else {
-                $error_string = $childlessonstatus->get_error_message();
-                return new \WP_Error('ChildLessonStatus_Get_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                $error_string = $subscriptiondefinition->get_error_message();
+                return new \WP_Error('SubscriptionDefinition_Get_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
         /**
-         * Update ChildLessonStatus
+         * Update Subscription Definition
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -207,21 +206,21 @@ namespace GHES\VLP {
          */
         public function update_item($request)
         {
-            $childlessonstatus = ChildLessonStatus::populatefromRow($request);
-            $success = $childlessonstatus->Update();
+            $subscriptiondefinition = SubscriptionDefinition::populatefromRow($request);
+            $success = $subscriptiondefinition->Update();
 
-            $childlessonstatus = ChildLessonStatus::Get($childlessonstatus->id);
+            $subscriptiondefinition = SubscriptionDefinition::Get($subscriptiondefinition->id);
 
             if (!is_wp_error($success))
-                return rest_ensure_response($childlessonstatus);
+                return rest_ensure_response($subscriptiondefinition);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('ChildLessonStatus_Update_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('SubscriptionDefinition_Update_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
         /**
-         * Delete resource
+         * Delete Subscription Definition
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -229,19 +228,19 @@ namespace GHES\VLP {
          */
         public function delete_item($request)
         {
-            $childlessonstatus = ChildLessonStatus::Get($request['id']);
-            $success = $childlessonstatus->Delete();
+            $subscriptiondefinition = SubscriptionDefinition::Get($request['id']);
+            $success = $subscriptiondefinition->Delete();
 
             if (!is_wp_error($success))
-                return rest_ensure_response($childlessonstatus);
+                return rest_ensure_response($subscriptiondefinition);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('ChildLessonStatus_Delete_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('SubscriptionDefinition_Delete_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
         /**
-         * Create ChildLessonStatus
+         * Create Subscription Definition
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -250,24 +249,15 @@ namespace GHES\VLP {
         public function create_item($request)
         {
 
-            $childlessonstatus = ChildLessonStatus::GetByLessonidandChildid($request["Lesson_id"], $request["Child_id"]);
-            if ($childlessonstatus) {
-                $childlessonstatus->updateobjectfromRow($request);
-                $childlessonstatus->Update();
-                $success = true; // if we got here, it was successful
-            } else {
-                $childlessonstatus = ChildLessonStatus::populatefromRow($request);
-                $success = $childlessonstatus->Create();
-            }
-            if ($success == true) {
-                $childlessonstatus = ChildLessonStatus::Get($childlessonstatus->id);
-            }
+            $subscriptiondefinition = SubscriptionDefinition::populatefromRow($request);
+            $success = $subscriptiondefinition->Create();
+            $subscriptiondefinition = SubscriptionDefinition::Get($subscriptiondefinition->id);
 
             if (!is_wp_error($success))
-                return rest_ensure_response($childlessonstatus);
+                return rest_ensure_response($subscriptiondefinition);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('ChildLessonStatus_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('SubscriptionDefinition_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 

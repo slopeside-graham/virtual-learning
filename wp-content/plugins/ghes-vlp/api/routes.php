@@ -36,6 +36,14 @@ include_once(plugin_dir_path(__FILE__) . '/childthemestatus_rest.php');    // Ag
 include_once(plugin_dir_path(__FILE__) . '/../classes/gameboard.php');  // AgeGroup class
 include_once(plugin_dir_path(__FILE__) . '/gameboard_rest.php');    // AgeGroup REST controller
 
+// Include Theme Resource Status REST controller and class
+include_once(plugin_dir_path(__FILE__) . '/../classes/SubscriptionDefinition.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/SubscriptionDefinition_rest.php');    // AgeGroup REST controller
+
+// Include Theme Resource Status REST controller and class
+include_once(plugin_dir_path(__FILE__) . '/../classes/Subscription.php');  // AgeGroup class
+include_once(plugin_dir_path(__FILE__) . '/Subscription_rest.php');    // AgeGroup REST controller
+
 /**
  * Register our API routes.
  */
@@ -75,6 +83,14 @@ function register_vlp_controllers()
 
     // Resource Controller
     $controller = new GHES\VLP\Gameboard_Rest();
+    $controller->register_routes();
+
+    // Resource Controller
+    $controller = new GHES\VLP\SubscriptionDefinition_Rest();
+    $controller->register_routes();
+
+    // Resource Controller
+    $controller = new GHES\VLP\Subscription_Rest();
     $controller->register_routes();
 }
 

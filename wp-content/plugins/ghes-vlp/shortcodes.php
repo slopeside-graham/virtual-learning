@@ -20,3 +20,9 @@ add_shortcode( 'vlp_agetree', 'vlp_agetree' );
 
 include_once(plugin_dir_path( __FILE__ ) . 'views/select-child.php'); 
 add_shortcode( 'vlp_slelect_child', 'vlp_select_child' );
+
+include_once(plugin_dir_path( __FILE__ ) . 'views/purchase.php'); 
+add_shortcode( 'vlp_purchase', 'vlp_purchase' );
+
+include_once(plugin_dir_path( __FILE__ ) . 'views/manage-subscription.php'); 
+add_shortcode( 'vlp_manage_subscription', 'vlp_manage_subscription' );

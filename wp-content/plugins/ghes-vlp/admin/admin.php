@@ -14,6 +14,8 @@ function register_vlp_admin_settings()
     register_setting('vlp-pages-admin-group', 'vlp-agetree');
     register_setting('vlp-pages-admin-group', 'vlp-lessons');
     register_setting('vlp-pages-admin-group', 'vlp-select-child');
+    register_setting('vlp-pages-admin-group', 'vlp-purchase');
+    register_setting('vlp-pages-admin-group', 'vlp-manage');
 }
 add_action('admin_init', 'register_vlp_admin_settings');
 
@@ -163,6 +165,46 @@ function vlp_page_admin()
                         <select required name="vlp-select-child" value="<?php echo esc_attr(get_option('vlp-select-child')); ?>">
                             <option value="<?php echo esc_attr(get_option('vlp-select-child')); ?>">
                                 <?php echo get_the_title(esc_attr(get_option('vlp-select-child'))) ?></option>
+                            <?php
+                            $pages = get_pages();
+                            foreach ($pages as $page) {
+                                $option = '<option value="' . $page->ID . '">';
+                                $option .= $page->post_title;
+                                $option .= '</option>';
+                                echo $option;
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th class="table-header" scope="row">
+                        Select VLP Purchase Page:
+                    </th>
+                    <td class="page-select">
+                        <select required name="vlp-purchase" value="<?php echo esc_attr(get_option('vlp-purchase')); ?>">
+                            <option value="<?php echo esc_attr(get_option('vlp-purchase')); ?>">
+                                <?php echo get_the_title(esc_attr(get_option('vlp-purchase'))) ?></option>
+                            <?php
+                            $pages = get_pages();
+                            foreach ($pages as $page) {
+                                $option = '<option value="' . $page->ID . '">';
+                                $option .= $page->post_title;
+                                $option .= '</option>';
+                                echo $option;
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th class="table-header" scope="row">
+                        Select VLP Subscription Management Page:
+                    </th>
+                    <td class="page-select">
+                        <select required name="vlp-manage" value="<?php echo esc_attr(get_option('vlp-manage')); ?>">
+                            <option value="<?php echo esc_attr(get_option('vlp-manage')); ?>">
+                                <?php echo get_the_title(esc_attr(get_option('vlp-manage'))) ?></option>
                             <?php
                             $pages = get_pages();
                             foreach ($pages as $page) {

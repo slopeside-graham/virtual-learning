@@ -3,7 +3,11 @@
 use GHES\Utils;
 use GHES\VLP\Utils as VLPUtils;
 
+<<<<<<< Updated upstream
 const vlpscriptver = '1.0.7-7-2020-1';  // Use this in register script calls to bypass cache.
+=======
+const vlpscriptver = '1.0.8-25-2020-1';  // Use this in register script calls to bypass cache.
+>>>>>>> Stashed changes
 /**
  * Plugin Name: GHES Virtual Learning Platform
  * Version: 0.1
@@ -119,6 +123,9 @@ function register_vlp_script_style_frontend()
   wp_register_script('wp-api-frontend-utils', plugins_url('ghes-vlp/js/utils.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-frontend-utils', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
+  wp_register_script('wp-api-purchase', plugins_url('ghes-vlp/js/purchase.js', dirname(__FILE__)), ['jquery'], scriptver, true);
+  wp_localize_script('wp-api-purcahse', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
   wp_enqueue_script('wp-api-frontend-utils');
 
   // Include Vimeo's Player API Library
@@ -217,3 +224,11 @@ function ghes_vlp_add_custom_roles()
   $admin_role->add_cap('vlp_manage_entries');
 }
 register_activation_hook(__FILE__, 'ghes_vlp_add_custom_roles');
+
+// The following script is used to add arole
+/*
+$u = new \WP_User( 482 );
+
+// Add role
+$u->add_role( 'VLP Parent' );
+*/

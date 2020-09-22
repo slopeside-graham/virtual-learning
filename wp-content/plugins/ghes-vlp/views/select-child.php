@@ -50,13 +50,7 @@ function vlp_select_child($atts, $content = null)
         header('Location: ' . $destinationURL);
         exit;
     } else if ($children->count() < 1) {
-<<<<<<< Updated upstream
         $output .= "You have no children";
-=======
-        setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
-        $output .= "You have no children in this agegroup, do you want to continue?";
-        // TODO Add a continue button to $destinationURL for the agegroup.
->>>>>>> Stashed changes
         return $output;
     } else if ($children->count() > 1) {
         setcookie('VLPAgeGroupId', $agegroupid, 0, '/');

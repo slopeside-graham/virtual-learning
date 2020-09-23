@@ -29,7 +29,7 @@ function vlp_purchase($atts, $content = null)
 
     $output .= '<div id="validation-summary">';
     $output .= '</div>';
-    $output .= '<form id="purchase-vll">';
+    $output .= '<form id="select-subscription-vll">';
     $output .= '<h3>Select Subscription Level:</h3>';
     $subscriptiondefinitions = SubscriptionDefinition::GetAll();
 
@@ -53,7 +53,7 @@ function vlp_purchase($atts, $content = null)
     $output .= '<h3>Subscription End Date: <span id="sub-end-date">' . $oneyear . '</span><h3>';
     $output .= '<h3 id="subscription-total-area">Total: </h3>';
 
-    $output .= '<button name="purchase" id="purchase-vlp" class="ghes-save" type="submit">Purchase</button>';
+    $output .= '<button name="continue-payment-vlp" id="continue-payment-vlp" class="ghes-save" type="submit">Continue to Payment</button>';
     $output .= '</form>';
     // $output .= $billinginfo;
     return $output;

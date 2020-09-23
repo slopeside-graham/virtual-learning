@@ -13,7 +13,7 @@ namespace GHES\VLP {
         private $_ParentID;
         private $_StartDate;
         private $_EndDate;
-        private $_PaymentStatus;
+        private $_Status;
         private $_PaymentFrequency;
         private $_SubscriptionDefinition_id;
         private $_Total;
@@ -67,15 +67,15 @@ namespace GHES\VLP {
             }
         }
 
-        protected function PaymentStatus($value = null)
+        protected function Status($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_PaymentStatus = $value;
+                $this->_Status = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_PaymentStatus;
+                return $this->_Status;
             }
         }
         protected function PaymentFrequency($value = null)
@@ -143,7 +143,7 @@ namespace GHES\VLP {
                 'ParentID' => $this->ParentID,
                 'StartDate' => $this->StartDate,
                 'EndDate' => $this->EndDate,
-                'PaymentStatus' => $this->PaymentStatus,
+                'Status' => $this->Status,
                 'PaymentFrequency' => $this->PaymentFrequency,
                 'SubscriptionDefinition_id' => $this->SubscriptionDefinition_id,
                 'Total' => $this->Total,
@@ -159,13 +159,13 @@ namespace GHES\VLP {
             VLPUtils::$db->throw_exception_on_error = true;
 
             try {
-
+                \DB::startTransaction();
                 VLPUtils::$db->insert('Subscription', array(
                     'id' => $this->id,
                     'ParentID' => $this->ParentID,
                     'StartDate' => $this->StartDate,
                     'EndDate' => $this->EndDate,
-                    'PaymentStatus' => $this->PaymentStatus,
+                    'Status' => $this->Status,
                     'PaymentFrequency' => $this->PaymentFrequency,
                     'SubscriptionDefinition_id' => $this->SubscriptionDefinition_id,
                     'Total' => $this->Total
@@ -173,22 +173,51 @@ namespace GHES\VLP {
                 $this->id = VLPUtils::$db->insertId();
                 // Create Subsciption Payments
                 try {
-                    //TODO Create Subsciption Payments
-                    /*
-                    for ($x = 0; $x <= 10; $x++) {
+                    if ($this->PaymentFrequency == "monthly") {
+                        for ($x = 0; $x <= 11; $x++) {
 
+                            $subscriptionpayment = new SubscriptionPayment();
+
+                            $subscriptionpayment->Status = "Unpaid";
+                            $subscriptionpayment->Amount = $this->Total;
+                            $subscriptionpayment->Subscription_id = $this->id;
+
+                            $monthlystartdate = new \DateTime($this->StartDate);
+                            $subscriptionpayment->StartDate = $monthlystartdate->add(new \DateInterval('P'. $x .'M'));
+
+                            $monthlyenddate = new \DateTime($this->StartDate);
+                            $endDateAddMonth = $x + 1;
+                            $endDateWithoutMinusDay = $monthlyenddate->add(new \DateInterval('P'. $endDateAddMonth . 'M'));
+                            $subscriptionpayment->EndDate = $endDateWithoutMinusDay->sub(new \DateInterval('P1D'));
+
+                            $subscriptionpayment->Payment_id = null;
+
+                            $subscriptionpayment->Create();
+                        }
+                    } else if ($this->PaymentFrequency == "yearly") {
                         $subscriptionpayment = new SubscriptionPayment();
 
                         $subscriptionpayment->Status = "Unpaid";
+                        $subscriptionpayment->Amount = $this->Total;
                         $subscriptionpayment->Subscription_id = $this->id;
+                        $subscriptionpayment->StartDate = $this->StartDate;
+                        $subscriptionpayment->EndDate = $this->EndDate;
+                        $subscriptionpayment->Payment_id = null;
+
                         $subscriptionpayment->Create();
-                    } */
+                    } else {
+                        \DB::rollback();
+                        return new \WP_Error('Subscription_Create_Error', "No Payment Frequency Selected.");
+                    }
                 } catch (\MeekroDBException $e) {
+                    \DB::rollback();
                     return new \WP_Error('Subscription_Create_Error', $e->getMessage());
                 }
             } catch (\MeekroDBException $e) {
+                \DB::rollback();
                 return new \WP_Error('Subscription_Create_Error', $e->getMessage());
             }
+            \DB::commit();
             return true;
         }
 
@@ -206,7 +235,7 @@ namespace GHES\VLP {
                     ParentID=%i, 
                     StartDate=%s, 
                     EndDate=%s,
-                    PaymentStatus=%s,
+                    Status=%s,
                     PaymentFrequency=%s,
                     SubscriptionDefinition_id=%i,
                     Total=%i
@@ -215,7 +244,7 @@ namespace GHES\VLP {
                     $this->ParentID,
                     $this->StartDate,
                     $this->EndDate,
-                    $this->PaymentStatus,
+                    $this->Status,
                     $this->PaymentFrequency,
                     $this->SubscriptionDefinition_id,
                     $this->Total
@@ -295,7 +324,7 @@ namespace GHES\VLP {
             $Subscription->ParentID = $row['ParentID'];
             $Subscription->StartDate = $row['StartDate'];
             $Subscription->EndDate = $row['EndDate'];
-            $Subscription->PaymentStatus = $row['PaymentStatus'];
+            $Subscription->Status = $row['Status'];
             $Subscription->PaymentFrequency = $row['PaymentFrequency'];
             $Subscription->SubscriptionDefinition_id = $row['SubscriptionDefinition_id'];
             $Subscription->Total = $row['Total'];

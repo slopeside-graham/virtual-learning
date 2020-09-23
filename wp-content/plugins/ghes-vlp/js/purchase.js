@@ -2,11 +2,11 @@ $ = jQuery;
 
 
 $(document).ready(function () {
-    var validator = $("#purchase-vll").kendoValidator({
+    var validator = $("#select-subscription-vll").kendoValidator({
         rules: {
             radio: function (input) {
                 if (input.filter("[type=radio]") && input.attr("required")) {
-                    return $("#purchase-vll").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
+                    return $("#select-subscription-vll").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
                 }
                 return true;
             }
@@ -18,7 +18,7 @@ $(document).ready(function () {
 
     var validationSummary = $("#validation-summary");
 
-    $("form").submit(function (event) {
+    $("#select-subscription-vll").submit(function (event) {
         event.preventDefault();
 
         if (validator.validate()) {
@@ -78,7 +78,7 @@ function createSubscription() {
             ParentID: $("#parent-id").text(),
             StartDate: $("#sub-start-date").text(),
             EndDate: $("#sub-end-date").text(),
-            PaymentStatus: "",
+            Status: "",
             PaymentFrequency: $("input[name='payment-frequency']:checked").val(),
             SubscriptionDefinition_id: $("input[name='subscription-select']:checked").val(),
             Total: $("#subscription-total").text()

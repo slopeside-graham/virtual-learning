@@ -44,6 +44,12 @@ include_once(plugin_dir_path(__FILE__) . '/SubscriptionDefinition_rest.php');   
 include_once(plugin_dir_path(__FILE__) . '/../classes/Subscription.php');  // AgeGroup class
 include_once(plugin_dir_path(__FILE__) . '/Subscription_rest.php');    // AgeGroup REST controller
 
+
+// Include SubscriptionPayment class
+include_once(plugin_dir_path(__FILE__) . '/../classes/SubscriptionPayment.php');
+//No need for a rest api for this at the moment, so leaving it off.
+
+
 /**
  * Register our API routes.
  */

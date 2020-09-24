@@ -16,18 +16,14 @@ $(document).ready(function () {
         }
     }).getKendoValidator();
 
-    var validationSummary = $("#validation-summary");
 
     $("#select-subscription-vll").submit(function (event) {
         event.preventDefault();
 
         if (validator.validate()) {
-            validationSummary.html("<div class='k-messagebox k-messagebox-success'>Form is Valid</div>");
-            kendo.ui.progress($(".loading-window"), true);
-            $(".loading-window").show();
+            displayLoading('form');
             createSubscription();
         } else {
-            validationSummary.html("<div class='k-messagebox k-messagebox-error'>Oops! There is invalid data in the form.</div>");
             $(".k-invalid:first").scrollToMe();
             $(".k-invalid:first").focus();
             $(".k-invalid:first").click();
@@ -78,10 +74,8 @@ function createSubscription() {
             ParentID: $("#parent-id").text(),
             StartDate: $("#sub-start-date").text(),
             EndDate: $("#sub-end-date").text(),
-            Status: "",
             PaymentFrequency: $("input[name='payment-frequency']:checked").val(),
-            SubscriptionDefinition_id: $("input[name='subscription-select']:checked").val(),
-            Total: $("#subscription-total").text()
+            SubscriptionDefinition_id: $("input[name='subscription-select']:checked").val()
         },
         success: function (result) {
             console.log("Success:" + result);
@@ -91,8 +85,10 @@ function createSubscription() {
                 conversionValue: $("#subscription-total").val(),
                 event: "new_vll_subscription"
             });
+            window.location.replace(manageSubscriptionPage);
         },
         error: function (result) {
+            hideLoading('form');
             console.log("Failed");
 
             if (typeof result.responseJSON !== "undefined") {
@@ -106,3 +102,4 @@ function createSubscription() {
         }
     })
 }
+

@@ -21,14 +21,17 @@ function vlp_purchase($atts, $content = null)
     enqueue_purchase_scripts();
 
     $output = '';
+    ?>
+    <script>
+        var manageSubscriptionPage = "<?php echo(get_permalink(get_option('vlp-manage'))); ?>";
+    </script>
+    <?php
 
     $purchasebodyfilepath = plugin_dir_path(__FILE__) . '/templates/purchase.html';
     $purchasebody = file_get_contents($purchasebodyfilepath);
     $billinginfofilepath = plugin_dir_path(__FILE__) . '/templates/purchase-billing.html';
     $billinginfo = file_get_contents($billinginfofilepath);
 
-    $output .= '<div id="validation-summary">';
-    $output .= '</div>';
     $output .= '<form id="select-subscription-vll">';
     $output .= '<h3>Select Subscription Level:</h3>';
     $subscriptiondefinitions = SubscriptionDefinition::GetAll();
@@ -54,6 +57,7 @@ function vlp_purchase($atts, $content = null)
     $output .= '<h3 id="subscription-total-area">Total: </h3>';
 
     $output .= '<button name="continue-payment-vlp" id="continue-payment-vlp" class="ghes-save" type="submit">Continue to Payment</button>';
+    $output .= '<div id="window"></div>';
     $output .= '</form>';
     // $output .= $billinginfo;
     return $output;

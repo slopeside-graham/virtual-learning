@@ -8,3 +8,4 @@ function hideLoading(target) {
     var element = $(target);
     kendo.ui.progress(element, false);
 }
+

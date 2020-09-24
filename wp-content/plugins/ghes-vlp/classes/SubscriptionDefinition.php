@@ -12,7 +12,6 @@ namespace GHES\VLP {
         private $_Name;
         private $_MonthlyAmount;
         private $_YearlyAmount;
-        private $_PaymentFrequency;
         private $_AllowAutoRenew;
         private $_StartDate;
         private $_EndDate;
@@ -67,17 +66,6 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_YearlyAmount;
-            }
-        }
-        protected function PaymentFrequency($value = null)
-        {
-            // If value was provided, set the value
-            if ($value) {
-                $this->_PaymentFrequency = $value;
-            }
-            // If no value was provided return the existing value
-            else {
-                return $this->_PaymentFrequency;
             }
         }
         protected function AllowAutoRenew($value = null)
@@ -155,7 +143,6 @@ namespace GHES\VLP {
                 'Name' => $this->Name,
                 'MonthlyAmount' => $this->MonthlyAmount,
                 'YearlyAmount' => $this->YearlyAmount,
-                'PaymentFrequency' => $this->PaymentFrequency,
                 'AllowAutoRenew' => $this->AllowAutoRenew,
                 'StartDate' => $this->StartDate,
                 'EndDate' => $this->EndDate,
@@ -178,7 +165,6 @@ namespace GHES\VLP {
                     'Name' => $this->Name,
                     'MonthlyAmount' => $this->MonthlyAmount,
                     'YearlyAmount' => $this->YearlyAmount,
-                    'PaymentFrequency' => $this->PaymentFrequency,
                     'AllowAutoRenew' => $this->AllowAutoRenew,
                     'StartDate' => $this->StartDate,
                     'EndDate' => $this->EndDate,
@@ -206,7 +192,6 @@ namespace GHES\VLP {
                     Name=%s, 
                     MonthlyAmount=%i, 
                     YearlyAmount=%i,
-                    PaymentFrequency=%i,
                     AllowAutoRenew=%i,
                     StartDate=%i,
                     EndDate=%i,
@@ -215,7 +200,6 @@ namespace GHES\VLP {
                     id=%i",
                     $this->MonthlyAmount,
                     $this->YearlyAmount,
-                    $this->PaymentFrequency,
                     $this->AllowAutoRenew,
                     $this->StartDate,
                     $this->EndDate,
@@ -297,7 +281,6 @@ namespace GHES\VLP {
             $SubscriptionDefinition->Name = $row['Name'];
             $SubscriptionDefinition->MonthlyAmount = $row['MonthlyAmount'];
             $SubscriptionDefinition->YearlyAmount = $row['YearlyAmount'];
-            $SubscriptionDefinition->PaymentFrequency = $row['PaymentFrequency'];
             $SubscriptionDefinition->AllowAutoRenew = $row['AllowAutoRenew'];
             $SubscriptionDefinition->StartDate = $row['StartDate'];
             $SubscriptionDefinition->EndDate = $row['EndDate'];

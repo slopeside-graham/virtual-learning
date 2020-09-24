@@ -160,15 +160,24 @@ namespace GHES\VLP {
 
             try {
                 \DB::startTransaction();
+
+                $subscriptionDefenition = SubscriptionDefinition::Get($this->SubscriptionDefinition_id);
+
+                if ($this->PaymentFrequency == "monthly") {
+                    $subscriptionTotal = $subscriptionDefenition->MonthlyAmount;
+                } else if ($this->PaymentFrequency == "yearly") {
+                    $subscriptionTotal = $subscriptionDefenition->YearlyAmount;
+                }
+
                 VLPUtils::$db->insert('Subscription', array(
                     'id' => $this->id,
                     'ParentID' => $this->ParentID,
                     'StartDate' => $this->StartDate,
                     'EndDate' => $this->EndDate,
-                    'Status' => $this->Status,
+                    'Status' => "Unpaid",
                     'PaymentFrequency' => $this->PaymentFrequency,
                     'SubscriptionDefinition_id' => $this->SubscriptionDefinition_id,
-                    'Total' => $this->Total
+                    'Total' => $subscriptionDefenition->YearlyAmount
                 ));
                 $this->id = VLPUtils::$db->insertId();
                 // Create Subsciption Payments
@@ -179,15 +188,15 @@ namespace GHES\VLP {
                             $subscriptionpayment = new SubscriptionPayment();
 
                             $subscriptionpayment->Status = "Unpaid";
-                            $subscriptionpayment->Amount = $this->Total;
+                            $subscriptionpayment->Amount = $subscriptionTotal;
                             $subscriptionpayment->Subscription_id = $this->id;
 
                             $monthlystartdate = new \DateTime($this->StartDate);
-                            $subscriptionpayment->StartDate = $monthlystartdate->add(new \DateInterval('P'. $x .'M'));
+                            $subscriptionpayment->StartDate = $monthlystartdate->add(new \DateInterval('P' . $x . 'M'));
 
                             $monthlyenddate = new \DateTime($this->StartDate);
                             $endDateAddMonth = $x + 1;
-                            $endDateWithoutMinusDay = $monthlyenddate->add(new \DateInterval('P'. $endDateAddMonth . 'M'));
+                            $endDateWithoutMinusDay = $monthlyenddate->add(new \DateInterval('P' . $endDateAddMonth . 'M'));
                             $subscriptionpayment->EndDate = $endDateWithoutMinusDay->sub(new \DateInterval('P1D'));
 
                             $subscriptionpayment->Payment_id = null;
@@ -198,10 +207,10 @@ namespace GHES\VLP {
                         $subscriptionpayment = new SubscriptionPayment();
 
                         $subscriptionpayment->Status = "Unpaid";
-                        $subscriptionpayment->Amount = $this->Total;
+                        $subscriptionpayment->Amount = $subscriptionTotal;
                         $subscriptionpayment->Subscription_id = $this->id;
-                        $subscriptionpayment->StartDate = $this->StartDate;
-                        $subscriptionpayment->EndDate = $this->EndDate;
+                        $subscriptionpayment->StartDate = new \DateTime($this->StartDate);
+                        $subscriptionpayment->EndDate = new \DateTime($this->EndDate);
                         $subscriptionpayment->Payment_id = null;
 
                         $subscriptionpayment->Create();

@@ -54,15 +54,15 @@ function vlp_manage_subscription($atts, $content = null)
 
         $output .= '<h2>Current Due Payment</h2>';
         $output .= '<ul>';
-        foreach ($unpaidSubscriptions->jsonSerialize() as $k => $subscription) {
-            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($subscription->SubscriptionDefinition_id);
-            $subscriptionPayments = \GHES\VLP\SubscriptionPayment::GetCurrentDueBySubscriptionId($subscription->id);
-            if ($subscription->PaymentFrequency = "yearly") {
+        foreach ($unpaidSubscriptions->jsonSerialize() as $k => $currentUnpaidSubscription) {
+            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($currentUnpaidSubscription->SubscriptionDefinition_id);
+            $subscriptionPayments = \GHES\VLP\SubscriptionPayment::GetCurrentDueBySubscriptionId($currentUnpaidSubscription->id);
+            if ($currentUnpaidSubscription->PaymentFrequency == "yearly") {
                 $paymentFrequency = "Yearly";
-            } else if ($subscription->PaymentFrequency = "monthly") {
+            } else if ($currentUnpaidSubscription->PaymentFrequency == "monthly") {
                 $paymentFrequency = "Monthly";
             }
-            $output .= '<li>' . $paymentFrequency . ' Subscription: ' . $subscriptionDefinition->Name . ' - ' . $subscription->Status . '</li>';
+            $output .= '<li>' . $paymentFrequency . ' Subscription: ' . $subscriptionDefinition->Name . ' - ' . $currentUnpaidSubscription->Status . '</li>';
             $output .= '<ul class="checkbox-list">';
             foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
                 $output .= '<li><label><input class="current-due subscription-payment" type="checkbox" checked value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
@@ -76,15 +76,15 @@ function vlp_manage_subscription($atts, $content = null)
 
         $output .= '<h4>My Upcoming Payments</h4>';
         $output .= '<ul>';
-        foreach ($unpaidSubscriptions->jsonSerialize() as $k => $subscription) {
-            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($subscription->SubscriptionDefinition_id);
-            $subscriptionPayments = \GHES\VLP\SubscriptionPayment::GetUpcomingBySubscriptionId($subscription->id);
-            if ($subscription->PaymentFrequency = "yearly") {
+        foreach ($unpaidSubscriptions->jsonSerialize() as $k => $futureUnpaidSubscription) {
+            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($futureUnpaidSubscription->SubscriptionDefinition_id);
+            $subscriptionPayments = \GHES\VLP\SubscriptionPayment::GetUpcomingBySubscriptionId($futureUnpaidSubscription->id);
+            if ($futureUnpaidSubscription->PaymentFrequency == "yearly") {
                 $paymentFrequency = "Yearly";
-            } else if ($subscription->PaymentFrequency = "monthly") {
+            } else if ($futureUnpaidSubscription->PaymentFrequency == "monthly") {
                 $paymentFrequency = "Monthly";
             }
-            $output .= '<li>' . $paymentFrequency . ' Subscription: ' . $subscriptionDefinition->Name . ' - ' . $subscription->Status . '</li>';
+            $output .= '<li>' . $paymentFrequency . ' Subscription: ' . $subscriptionDefinition->Name . ' - ' . $futureUnpaidSubscription->Status . '</li>';
             $output .= '<ul class="checkbox-list">';
             if ($subscriptionPayments->jsonSerialize()) {
                 foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {

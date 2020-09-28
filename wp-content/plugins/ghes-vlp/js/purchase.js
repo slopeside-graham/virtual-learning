@@ -31,6 +31,34 @@ $(document).ready(function () {
     });
 });
 
+window.onload = function () {
+    calculateTotal();
+};
+
+$(".subscription-payment").click(function() {
+    calculateTotal();
+});
+
+function calculateTotal() {
+    var currentDue = 0;
+    var futureDue = 0;
+    $(".current-due:checked").each(function () {
+        currentDue += +$(this).val();
+    });
+    $(".future-due:checked").each(function () {
+        futureDue += +$(this).val();
+    });
+
+    var totalDue = currentDue + futureDue;
+
+    $("#current-due").text("Current Due: $" + currentDue);
+    $("#total-due").text("Total Due: $" + totalDue);
+
+    console.log("Total Checked Current Payment: " + currentDue);
+    console.log("Total Checked Future Payment: " + futureDue);
+    console.log("Total Payment: " + totalDue);
+};
+
 
 
 $("input[name='subscription-select'").click(function (e) {
@@ -53,13 +81,13 @@ $("input[name='subscription-select'").click(function (e) {
         console.log("Selected Price: " + $price);
     };
 
-})
+});
 
 $("input[name='payment-frequency']").click(function (e) {
     $price = e.currentTarget.dataset.price;
     console.log("Selected Price: " + $price);
     $("#subscription-total-area").html("Total: $<span id='subscription-total'>" + $price + '</span>');
-})
+});
 
 
 function createSubscription() {
@@ -101,5 +129,5 @@ function createSubscription() {
             console.log(result.responseText);
         }
     })
-}
+};
 

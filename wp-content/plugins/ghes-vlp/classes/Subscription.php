@@ -321,6 +321,68 @@ namespace GHES\VLP {
             }
             return $Subscriptions;
         }
+        public static function GetAllByParentId($parentid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $Subscriptions = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("select * from Subscription Where ParentID = %i", $parentid);
+
+                foreach ($results as $row) {
+                    $Subscription = Subscription::populatefromRow($row);
+                    $Subscriptions->add_item($Subscription);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Subscription_GetAll_Error', $e->getMessage());
+            }
+            return $Subscriptions;
+        }
+
+        public static function GetAllPaidByParentId($parentid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $Subscriptions = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("select * from Subscription Where ParentID = %i and Status = 'Paid'", $parentid);
+
+                foreach ($results as $row) {
+                    $Subscription = Subscription::populatefromRow($row);
+                    $Subscriptions->add_item($Subscription);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Subscription_GetAll_Error', $e->getMessage());
+            }
+            return $Subscriptions;
+        }
+
+        public static function GetAllUnpaidByParentId($parentid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $Subscriptions = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("select * from Subscription Where ParentID = %i and Status = 'Unpaid'", $parentid);
+
+                foreach ($results as $row) {
+                    $Subscription = Subscription::populatefromRow($row);
+                    $Subscriptions->add_item($Subscription);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Subscription_GetAll_Error', $e->getMessage());
+            }
+            return $Subscriptions;
+        }
 
         // Helper function to populate a lesson from a MeekroDB Row
         public static function populatefromRow($row): ?Subscription

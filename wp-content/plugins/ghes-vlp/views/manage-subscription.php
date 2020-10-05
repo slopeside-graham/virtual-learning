@@ -37,19 +37,19 @@ function vlp_manage_subscription($atts, $content = null)
     }
     */
 
-    $paidSubscriptions = GHES\VLP\Subscription::GetAllPaidByParentId($parentid);
-    if ($paidSubscriptions->jsonSerialize()) {
-        $output .= '<h3>My Paid Subscriptions</h3>';
+    $activeSubscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
+    if ($activeSubscriptions->jsonSerialize()) {
+        $output .= '<h3>My Active Subscriptions</h3>';
         $output .= '<ul>';
-        foreach ($paidSubscriptions->jsonSerialize() as $k => $subscription) {
-            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($subscription->SubscriptionDefinition_id);
-            $output .= '<li>' . $subscriptionDefinition->Name . ' - ' . $subscription->Status . '</li>';
+        foreach ($activeSubscriptions->jsonSerialize() as $k => $activeSubscription) {
+            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($activeSubscription->SubscriptionDefinition_id);
+            $output .= '<li>' . $subscriptionDefinition->Name . ' - ' . $activeSubscription->id . '</li>';
         }
         $output .= '</ul>';
     }
 
 
-    $unpaidSubscriptions = GHES\VLP\Subscription::GetAllUnpaidByParentId($parentid);
+    $unpaidSubscriptions = GHES\VLP\Subscription::GetAllByParentId($parentid);
     if ($unpaidSubscriptions->jsonSerialize()) {
 
         $output .= '<h2>Current Due Payment</h2>';
@@ -65,7 +65,7 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '<li>' . $paymentFrequency . ' Subscription: ' . $subscriptionDefinition->Name . ' - ' . $currentUnpaidSubscription->Status . '</li>';
             $output .= '<ul class="checkbox-list">';
             foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                $output .= '<li><label><input class="current-due subscription-payment" type="checkbox" checked value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
+                $output .= '<li><label><input class="current-due subscription-payment" data-id="' . $subscriptionPayment->id . '" type="checkbox" checked value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
             }
             $output .= '</ul>';
         }
@@ -74,6 +74,10 @@ function vlp_manage_subscription($atts, $content = null)
         $output .= '<h3 id="current-due">Current Due: $0.00</h3>';
         $output .= '<h3 id="total-due">Total Due: $0.00</h3><br/>';
 
+        $billinginfofilepath = plugin_dir_path(__FILE__) . '/templates/purchase-billing.html';
+        $billinginfo = file_get_contents($billinginfofilepath);
+
+        $output .= $billinginfo;
         $output .= '<h4>My Upcoming Payments</h4>';
         $output .= '<ul>';
         foreach ($unpaidSubscriptions->jsonSerialize() as $k => $futureUnpaidSubscription) {
@@ -88,7 +92,7 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '<ul class="checkbox-list">';
             if ($subscriptionPayments->jsonSerialize()) {
                 foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                    $output .= '<li><label><input type="checkbox" class="future-due subscription-payment" value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
+                    $output .= '<li><label><input type="checkbox" class="future-due subscription-payment" data-id="' . $subscriptionPayment->id . '" value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
                 }
             } else {
                 $output .= '<li><label>All Payments are Currently due.</label></li>';

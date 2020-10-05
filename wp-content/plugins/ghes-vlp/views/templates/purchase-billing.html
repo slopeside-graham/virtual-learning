@@ -1,27 +1,54 @@
 <h3>Billing Information</h3>
-    <label for="name">Name</label>
-    <input type="text" name="name" id="vlp-bill-name" required autocomplete="name"><br />
-    <label for="billingAddress">Billing Address</label>
-    <input type="text" name="billingAddress" id="vlp-bill-billingAddress" required autocomplete="street-address"><br />
-    <label for="city">City</label>
-    <input type="text" name="city" id="vlp-bill-city" required autocomplete="address-level2"><br />
-    <label for="state">State</label>
-    <input type="text" name="state" id="vlp-bill-state" required autocomplete="address-level1"><br />
-    <label for="zipcode">Zip Code</label>
-    <input type="text" name="zipcode" id="vlp-bill-zipcode" required autocomplete="postal-code"><br />
-    <label for="telephone">Telephone</label>
-    <input type="tel" name="telephone" id="vlp-bill-telephone" required autocomplete="tel-national"><br />
-    <label for="nameCard">Name on Credit Card</label>
-    <input type="text" name="nameCard" id="vlp-bill-nameCard" required autocomplete="cc-name"><br />
-    <label for="ccNumber">Cresid Card Number</label>
-    <input type="text" name="ccNumber" id="vlp-bill-ccNumber" required autocomplete="cc-number"><br />
-    <label for="ccExpMonth">Expiration Month</label>
-    <input type="text" pattern="^[0-9]{2}$" minlength="2" maxlength="2" size="2" name="ccExpMonth"
-        id="vlp-bill-ccExpMonth" required autocomplete="cc-exp-month"><br />
-    <label for="ccExpYear">Expiration Year</label>
-    <input type="text" pattern="\d{4}" minlength="4" maxlength="4" size="4" name="ccExpYear" id="vlp-bill-ccExpYear"
-        required autocomplete="cc-exp-year"><br />
-    <label for="ccCSV">Code</label>
-    <input type="text" pattern="\d{3}|\d{4}" name="ccCSV" id="vlp-bill-ccCSV" required autocomplete="cc-csc"><br />
-    <button onclick="purchaseSubscription()">Submit</button>
-</form>
+<div class="purchase-vll-billing">
+    <div>
+        <label for="name">Name</label>
+        <input type="text" name="name" id="vlp-bill-name" autocomplete="name">
+    </div>
+    <div class="address-section">
+        <div>
+            <label for="billingAddress">Billing Address</label>
+            <input type="text" name="billingAddress" id="vlp-bill-billingAddress" autocomplete="street-address">
+        </div>
+        <div>
+            <label for="city">City</label>
+            <input type="text" name="city" id="vlp-bill-city" autocomplete="address-level2">
+        </div>
+        <div>
+            <label for="state">State</label>
+            <input type="text" name="state" id="vlp-bill-state" autocomplete="address-level1">
+        </div>
+        <div>
+            <label for="zipcode">Zip Code</label>
+            <input type="text" name="zipcode" id="vlp-bill-zipcode" autocomplete="postal-code">
+        </div>
+    </div>
+    <div>
+        <label for="telephone">Telephone</label>
+        <input type="tel" name="telephone" id="vlp-bill-telephone" autocomplete="tel-national">
+    </div>
+    <div class="credit-card-section">
+        <div>
+            <label for="nameCard">Name on Credit Card</label>
+            <input type="text" name="nameCard" id="vlp-bill-nameCard" autocomplete="cc-name">
+        </div>
+        <div>
+            <label for="ccNumber">Credit Card Number</label>
+            <input type="text" name="ccNumber" id="vlp-bill-ccNumber" autocomplete="cc-number">
+        </div>
+        <div>
+            <label for="ccExpMonth">Expiration Month</label>
+            <input type="text" pattern="^[0-9]{2}$" minlength="2" maxlength="2" size="2" name="ccExpMonth"
+                id="vlp-bill-ccExpMonth" autocomplete="cc-exp-month">
+        </div>
+        <div>
+            <label for="ccExpYear">Expiration Year</label>
+            <input type="text" pattern="\d{4}" minlength="4" maxlength="4" size="4" name="ccExpYear"
+                id="vlp-bill-ccExpYear" autocomplete="cc-exp-year"><br />
+        </div>
+        <div>
+            <label for="ccCSV">Code</label>
+            <input type="text" pattern="\d{3}|\d{4}" name="ccCSV" id="vlp-bill-ccCSV" autocomplete="cc-csc">
+        </div>
+    </div>
+    <button onclick="purchaseSubscription()">Purchase</button>
+</div>

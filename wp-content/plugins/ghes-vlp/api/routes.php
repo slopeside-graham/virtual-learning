@@ -47,7 +47,7 @@ include_once(plugin_dir_path(__FILE__) . '/Subscription_rest.php');    // AgeGro
 
 // Include SubscriptionPayment class
 include_once(plugin_dir_path(__FILE__) . '/../classes/SubscriptionPayment.php');
-//No need for a rest api for this at the moment, so leaving it off.
+include_once(plugin_dir_path(__FILE__) . '/SubscriptionPayment_rest.php');    // SubscriptionPayment REST controller
 
 
 /**
@@ -98,6 +98,10 @@ function register_vlp_controllers()
     // Resource Controller
     $controller = new GHES\VLP\Subscription_Rest();
     $controller->register_routes();
+
+        // Resource Controller
+        $controller = new GHES\VLP\SubscriptionPayment_Rest();
+        $controller->register_routes();
 }
 
 add_action('rest_api_init', 'register_vlp_controllers');

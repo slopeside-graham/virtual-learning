@@ -268,6 +268,32 @@ namespace GHES\VLP {
             return $Subscription;
         }
 
+        public static function updateStatus($id)
+        {
+
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            try {
+
+                VLPUtils::$db->query(
+                    "UPDATE Subscription
+                    SET
+                    Status='Active'
+                WHERE 
+                    id=%i",
+                    $id
+                );
+
+                $counter = VLPUtils::$db->affectedRows();
+
+                $Subscription = Subscription::Get($id);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionDefinition_Update_Error', $e->getMessage());
+            }
+            return $Subscription;
+        }
+
         public function Delete()
         {
 
@@ -342,7 +368,7 @@ namespace GHES\VLP {
             return $Subscriptions;
         }
 
-        public static function GetAllPaidByParentId($parentid)
+        public static function GetAllActiveByParentId($parentid)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
@@ -350,8 +376,16 @@ namespace GHES\VLP {
             $Subscriptions = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select * from Subscription Where ParentID = %i and Status = 'Paid'", $parentid);
-
+                $results = VLPUtils::$db->query("select distinct S.* from Subscription S
+                                                    Inner Join SubscriptionPayment SP
+                                                        on S.id = SP.Subscription_id
+                                                    Where 
+                                                        S.ParentID = %i
+                                                        and
+                                                        SP.Status = 'Paid'
+                                                        and
+                                                        Date(Now()) between Date(SP.StartDate) and Date(SP.EndDate)",
+                                                        $parentid);
                 foreach ($results as $row) {
                     $Subscription = Subscription::populatefromRow($row);
                     $Subscriptions->add_item($Subscription);  // Add the lesson to the collection

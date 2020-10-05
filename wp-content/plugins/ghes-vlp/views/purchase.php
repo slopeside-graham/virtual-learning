@@ -27,11 +27,6 @@ function vlp_purchase($atts, $content = null)
     </script>
     <?php
 
-    $purchasebodyfilepath = plugin_dir_path(__FILE__) . '/templates/purchase.html';
-    $purchasebody = file_get_contents($purchasebodyfilepath);
-    $billinginfofilepath = plugin_dir_path(__FILE__) . '/templates/purchase-billing.html';
-    $billinginfo = file_get_contents($billinginfofilepath);
-
     $output .= '<form id="select-subscription-vll">';
     $output .= '<h3>Select Subscription Level:</h3>';
     $subscriptiondefinitions = SubscriptionDefinition::GetAll();

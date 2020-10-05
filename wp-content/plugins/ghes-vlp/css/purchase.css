@@ -1,3 +1,19 @@
 .checkbox-list {
     list-style: none;
 }
+.address-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 5px;
+}
+.credit-card-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 5px;
+}
+.purchase-vll-billing div {
+    margin-bottom: 5px;
+}
+.purchase-vll-billing input {
+    float: right;
+}

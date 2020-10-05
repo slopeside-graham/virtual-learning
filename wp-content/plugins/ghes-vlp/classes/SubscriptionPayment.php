@@ -3,6 +3,7 @@
 namespace GHES\VLP {
 
     use GHES\VLP\Utils as VLPUtils;
+    use GHES\VLP\Subscription as VLPSubscription;
     /**
      * Class SubscriptionPayment
      */
@@ -175,26 +176,19 @@ namespace GHES\VLP {
                 VLPUtils::$db->query(
                     "UPDATE SubscriptionPayment 
                     SET
-                    Status=%s, 
-                    Amount=%i, 
-                    Subscription_id=%i,
-                    StartDate=%i,
-                    EndDate=%i,
-                    Payment_id=%i
+                    Status=%s
                 WHERE 
                     id=%i",
                     $this->Status,
-                    $this->Amount,
-                    $this->Subscription_id,
-                    $this->StartDate,
-                    $this->EndDate,
-                    $this->Payment_id,
                     $this->id
                 );
 
                 $counter = VLPUtils::$db->affectedRows();
 
                 $SubscriptionPayment = SubscriptionPayment::Get($this->id);
+
+                Subscription::updateStatus($SubscriptionPayment->Subscription_id);
+
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('SubscriptionPayment_Update_Error', $e->getMessage());
             }
@@ -287,7 +281,8 @@ namespace GHES\VLP {
                     $results = VLPUtils::$db->query("select * from SubscriptionPayment 
                                                         where 
                                                             Subscription_id = %i 
-                                                            and Date(StartDate) <= Date(Now())", $subscriptionId);
+                                                            and Date(StartDate) <= Date(Now())
+                                                            and Status = 'Unpaid'", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -311,7 +306,7 @@ namespace GHES\VLP {
                     $results = VLPUtils::$db->query("select * from SubscriptionPayment 
                                                         where 
                                                             Subscription_id = %i
-                                                            Limit 999 Offset 1", $subscriptionId);
+                                                            and Status = 'Unpaid'", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);

@@ -1,5 +1,21 @@
 $ = jQuery;
 
+$(function () {
+    var container = $(".purchase-vll-billing");
+    kendo.init(container);
+    container.kendoValidator({
+        rules: {
+            validmask: function (input) {
+                console.log(input);
+                if (input.is("[data-validmask-msg]") && input.val() != "") {
+                    var maskedtextbox = input.data("kendoMaskedTextBox");
+                    return maskedtextbox.value().indexOf(maskedtextbox.options.promptChar) === -1;
+                }
+                return true;
+            }
+        }
+    });
+});
 
 $(document).ready(function () {
     var validator = $("#select-subscription-vll").kendoValidator({
@@ -16,7 +32,6 @@ $(document).ready(function () {
         }
     }).getKendoValidator();
 
-
     $("#select-subscription-vll").submit(function (event) {
         event.preventDefault();
 
@@ -24,6 +39,7 @@ $(document).ready(function () {
             displayLoading('form');
             createSubscription();
         } else {
+            alert("invalid data");
             $(".k-invalid:first").scrollToMe();
             $(".k-invalid:first").focus();
             $(".k-invalid:first").click();
@@ -52,7 +68,13 @@ function calculateTotal() {
     var totalDue = currentDue + futureDue;
 
     $("#current-due").text("Current Due: $" + currentDue);
-    $("#total-due").text("Total Due: $" + totalDue);
+    $(".total-due").text("Total Due: $" + totalDue);
+
+    if (totalDue > 0) {
+        $("#showpaymentbtn").prop('disabled', false);
+    } else {
+        $("#showpaymentbtn").prop('disabled', true);
+    }
 
     console.log("Total Checked Current Payment: " + currentDue);
     console.log("Total Checked Future Payment: " + futureDue);
@@ -130,12 +152,16 @@ function createSubscription() {
         }
     })
 };
+function showPurchase() {
+    $("#showpaymentbtn").hide();
+    $(".purchase-vll-billing").show();
+}
 
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
     // Collect the total
 
-    //Charge payment
+    //Charge payment - payment_rest.php
 
     // If successful payment, do the following:
     // Collect the id's of checked items
@@ -167,6 +193,7 @@ function updatePaymentStatus(x) {
             //Success!
             window.dataLayer = window.dataLayer || [];
             hideLoading('.purchase-vll-billing');
+            location.reload();
         },
         error: function (result) {
             console.log("Failed");

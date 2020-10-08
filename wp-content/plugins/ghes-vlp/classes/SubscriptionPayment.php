@@ -270,6 +270,27 @@ namespace GHES\VLP {
             return $SubscriptionPayments;
         }
 
+        public static function GetAllPaidBySubscriptionId($subscriptionId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                    $results = VLPUtils::$db->query("select * from SubscriptionPayment where Subscription_id = %i and Status = 'Paid'", $subscriptionId);
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
         public static function GetCurrentDueBySubscriptionId($subscriptionId)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -306,6 +327,7 @@ namespace GHES\VLP {
                     $results = VLPUtils::$db->query("select * from SubscriptionPayment 
                                                         where 
                                                             Subscription_id = %i
+                                                            and Date(StartDate) > Date(Now())
                                                             and Status = 'Unpaid'", $subscriptionId);
 
                 foreach ($results as $row) {

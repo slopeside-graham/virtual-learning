@@ -1,6 +1,7 @@
 <?php
 
 use GHES\ghes_base;
+
 namespace GHES\VLP {
 
     /**
@@ -11,7 +12,7 @@ namespace GHES\VLP {
     /**
      * Class Payment_Rest
      */
-    class Paymnet_Rest extends \WP_REST_Controller
+    class Payment_Rest extends \WP_REST_Controller
     {
         /**
          * The namespace.
@@ -122,7 +123,7 @@ namespace GHES\VLP {
          */
         public function get_item_permissions_check($request)
         {
-            if (is_user_logged_in()) {
+            if (current_user_can('administrator')) {
                 return true;
             } else
                 return new \WP_Error('rest_forbidden', esc_html__('You cannot get this Payment resource.'), array('status' => $this->authorization_status_code()));
@@ -137,7 +138,7 @@ namespace GHES\VLP {
          */
         public function update_item_permissions_check($request)
         {
-            if (is_user_logged_in() && current_user_can('vlp_manage_entries')) {
+            if (current_user_can('administrator')) {
                 return true;
             } else
                 return new \WP_Error('rest_forbidden', esc_html__('You cannot update this Payment resource.'), array('status' => $this->authorization_status_code()));
@@ -167,7 +168,7 @@ namespace GHES\VLP {
          */
         public function delete_item_permissions_check($request)
         {
-            if (is_user_logged_in() && current_user_can('vlp_manage_entries')) {
+            if (current_user_can('administrator')) {
                 return true;
             } else
                 return new \WP_Error('rest_forbidden', esc_html__('You cannot delete this Payment resource.'), array('status' => $this->authorization_status_code()));

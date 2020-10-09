@@ -159,9 +159,11 @@ function showPurchase() {
 
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
+
     // Collect the total
 
     //Charge payment - payment_rest.php
+    createPayment();
 
     // If successful payment, do the following:
     // Collect the id's of checked items
@@ -211,3 +213,37 @@ function updatePaymentStatus(x) {
     })
 }
 
+function createPayment() {
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/payment",
+        method: "PUT",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        timeout: 60000,
+        data: {
+            id: x,
+            Status: "Paid"
+        },
+        success: function (result) {
+            console.log("Success:" + result);
+            //Success!
+            window.dataLayer = window.dataLayer || [];
+            hideLoading('.purchase-vll-billing');
+            location.reload();
+        },
+        error: function (result) {
+            console.log("Failed");
+
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            } else {
+                alert(
+                    "An unexpected error occured.  Please review your submission and try again."
+                );
+            }
+            hideLoading('.purchase-vll-billing');
+            console.log(result.responseText);
+        }
+    })
+}

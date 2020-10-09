@@ -9,16 +9,23 @@ namespace GHES\VLP {
     class Payment extends ghes_vlp_base implements \JsonSerializable
     {
         private $_id;
-        private $_Name;
-        private $_MonthlyAmount;
-        private $_YearlyAmount;
-        private $_PaymentFrequency;
-        private $_AllowAutoRenew;
-        private $_StartDate;
-        private $_EndDate;
-        private $_Hidden;
+        private $_Type;
+        private $_User_id;
+        private $_Amount;
+        private $_Status;
+        private $_Recurring;
+        private $_Description;
+        private $_ResponseCode;
+        private $_authCode;
+        private $_avsResultCode;
+        private $_CvvResultCode;
+        private $_CavvResultCode;
+        private $_transId;
+        private $_accountNumber;
+        private $_accountType;
+        private $_prePaidCard;
+        private $_errors;
         private $_DateCreated;
-        private $_DateModified;
 
 
         protected function id($value = null)
@@ -33,135 +40,252 @@ namespace GHES\VLP {
             }
         }
 
-        protected function Name($value = null)
+        protected function Type($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_Name = $value;
+                $this->_Type = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_Name;
+                return $this->_Type;
             }
         }
 
-        protected function MonthlyAmount($value = null)
+        protected function Applications_id($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_MonthlyAmount = $value;
+                $this->_Applications_id = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_MonthlyAmount;
+                return $this->_Applications_id;
             }
         }
 
+        protected function User_id($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_User_id = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_User_id;
+            }
+        }
 
-        protected function YearlyAmount($value = null)
+        protected function Amount($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_YearlyAmount = $value;
+                $this->_Amount = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_YearlyAmount;
+                return $this->_Amount;
             }
         }
-        protected function PaymentFrequency($value = null)
+
+        protected function Status($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_PaymentFrequency = $value;
+                $this->_Status = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_PaymentFrequency;
+                return $this->_Status;
             }
         }
-        protected function AllowAutoRenew($value = null)
+
+        protected function Recurring($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_AllowAutoRenew = $value;
+                $this->_Recurring = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_AllowAutoRenew;
+                return $this->_Recurring;
             }
         }
-        protected function StartDate($value = null)
+
+        protected function Description($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_StartDate = $value;
+                $this->_Description = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_StartDate;
+                return $this->_Description;
             }
         }
-        protected function EndDate($value = null)
+
+        protected function ResponseCode($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_EndDate = $value;
+                $this->_ResponseCode = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_EndDate;
+                return $this->_ResponseCode;
             }
         }
-        protected function DateCreated($value = null)
+
+        protected function authCode($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_DateCreated = $value;
+                $this->_authCode = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_authCode;
+            }
+        }
+
+        protected function avsResultCode($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_avsResultCode = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_avsResultCode;
+            }
+        }
+
+        protected function CvvResultCode($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_CvvResultCode = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_CvvResultCode;
+            }
+        }
+
+        protected function CavvResultCode($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_CavvResultCode = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_CavvResultCode;
+            }
+        }
+
+        protected function transId($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_transId = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_transId;
+            }
+        }
+
+        protected function accountNumber($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_accountNumber = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_accountNumber;
+            }
+        }
+
+        protected function accountType($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_accountType = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_accountType;
+            }
+        }
+
+        protected function prePaidCard($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_prePaidCard = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_prePaidCard;
+            }
+        }
+
+        protected function errors($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_errors = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_errors;
+            }
+        }
+        protected function DateCreated($value = null): \DateTime
+        {
+            // If value was provided, set the value
+            if ($value) {
+                if (strlen($value) > 10) {
+                    $theDate = \DateTime::createFromFormat('D M d Y H:i:s e+', $value);
+                    if (!$theDate)
+                        $theDate = \DateTime::createFromFormat('Y-m-d H:i:s', $value);
+                    if (!$theDate)
+                        return null;
+                    else
+                        $this->_DateCreated = $theDate;
+                } else
+                    $this->_DateCreated = \DateTime::createFromFormat('Y-m-d', $value);
+                return $this->_DateCreated;
             }
             // If no value was provided return the existing value
             else {
                 return $this->_DateCreated;
             }
         }
-        protected function Hidden($value = null)
-        {
-            // If value was provided, set the value
-            if ($value) {
-                $this->_Hidden = $value;
-            }
-            // If no value was provided return the existing value
-            else {
-                return $this->_Hidden;
-            }
-        }
-        protected function DateModified($value = null)
-        {
-            // If value was provided, set the value
-            if ($value) {
-                $this->_DateModified = $value;
-            }
-            // If no value was provided return the existing value
-            else {
-                return $this->_DateModified;
-            }
-        }
-        
 
         public function jsonSerialize()
         {
             return [
                 'id' => $this->id,
-                'Name' => $this->Name,
-                'MonthlyAmount' => $this->MonthlyAmount,
-                'YearlyAmount' => $this->YearlyAmount,
-                'PaymentFrequency' => $this->PaymentFrequency,
-                'AllowAutoRenew' => $this->AllowAutoRenew,
-                'StartDate' => $this->StartDate,
-                'EndDate' => $this->EndDate,
-                'Hidden' => $this->Hidden,
-                'DateCreated' => $this->DateCreated,
-                'DateModified' => $this->DateModified,
+                'Type' => $this->Type,
+                'User_id' => $this->User_id,
+                'Amount' => $this->Amount,
+                'Status' => $this->Status,
+                'Recurring' => $this->Recurring,
+                'Description' => $this->Description,
+                'ResponseCode' => $this->ResponseCode,
+                'authCode' => $this->authCode,
+                'avsResultCode' => $this->avsResultCode,
+                'CvvResultCode' => $this->CvvResultCode,
+                'CavvResultCode' => $this->CavvResultCode,
+                'transId' => $this->transId,
+                'accountNumber' => $this->accountNumber,
+                'accountType' => $this->accountType,
+                'prePaidCard' => $this->prePaidCard,
+                'errors' => $this->errors,
+                'DateCreated' => $this->DateCreated
             ];
         }
 
@@ -175,14 +299,22 @@ namespace GHES\VLP {
 
                 VLPUtils::$db->insert('Payment', array(
                     'id' => $this->id,
-                    'Name' => $this->Name,
-                    'MonthlyAmount' => $this->MonthlyAmount,
-                    'YearlyAmount' => $this->YearlyAmount,
-                    'PaymentFrequency' => $this->PaymentFrequency,
-                    'AllowAutoRenew' => $this->AllowAutoRenew,
-                    'StartDate' => $this->StartDate,
-                    'EndDate' => $this->EndDate,
-                    'Hidden' => $this->Hidden
+                    'Type' => $this->Type,
+                    'User_id' => $this->User_id,
+                    'Amount' => $this->Amount,
+                    'Status' => $this->Status,
+                    'Recurring' => $this->Recurring,
+                    'Description' => $this->Description,
+                    'ResponseCode' => $this->ResponseCode,
+                    'authCode' => $this->authCode,
+                    'avsResultCode' => $this->avsResultCode,
+                    'CvvResultCode' => $this->CvvResultCode,
+                    'CavvResultCode' => $this->CavvResultCode,
+                    'transId' => $this->transId,
+                    'accountNumber' => $this->accountNumber,
+                    'accountType' => $this->accountType,
+                    'prePaidCard' => $this->prePaidCard,
+                    'errors' => $this->errors
                 ));
                 $this->id = VLPUtils::$db->insertId();
 
@@ -191,7 +323,7 @@ namespace GHES\VLP {
             }
             return true;
         }
-
+/* We are not using any functionbesides Create at the moment. So I am not updating these.
         public function Update()
         {
 
@@ -285,7 +417,7 @@ namespace GHES\VLP {
             }
             return $Payments;
         }
-
+*/
         // Helper function to populate a lesson from a MeekroDB Row
         public static function populatefromRow($row): ?Payment
         {
@@ -294,14 +426,23 @@ namespace GHES\VLP {
             
             $Payment = new Payment();
             $Payment->id = $row['id'];
-            $Payment->Name = $row['Name'];
-            $Payment->MonthlyAmount = $row['MonthlyAmount'];
-            $Payment->YearlyAmount = $row['YearlyAmount'];
-            $Payment->PaymentFrequency = $row['PaymentFrequency'];
-            $Payment->AllowAutoRenew = $row['AllowAutoRenew'];
-            $Payment->StartDate = $row['StartDate'];
-            $Payment->EndDate = $row['EndDate'];
-            $Payment->Hidden = $row['Hidden'];
+            $Payment->Type = $row['Type'];
+            $Payment->User_id = $row['User_id'];
+            $Payment->Amount = $row['Amount'];
+            $Payment->Status = $row['Status'];
+            $Payment->Recurring = $row['Recurring'];
+            $Payment->Description = $row['Description'];
+            $Payment->ResponseCode = $row['ResponseCode'];
+            $Payment->authCode = $row['authCode'];
+            $Payment->avsResultCode = $row['avsResultCode'];
+            $Payment->CvvResultCode = $row['CvvResultCode'];
+            $Payment->CavvResultCode = $row['CavvResultCode'];
+            $Payment->transId = $row['transId'];
+            $Payment->accountNumber = $row['accountNumber'];
+            $Payment->accountType = $row['accountType'];
+            $Payment->prePaidCard = $row['prePaidCard'];
+            $Payment->errors = $row['errors'];
+            $Payment->DateCreated = $row['DateCreated'];
             return $Payment;
         }
     }

@@ -50,8 +50,8 @@ include_once(plugin_dir_path(__FILE__) . '/../classes/SubscriptionPayment.php');
 include_once(plugin_dir_path(__FILE__) . '/SubscriptionPayment_rest.php');    // SubscriptionPayment REST controller
 
 // Include SubscriptionPayment class
-include_once(plugin_dir_path(__FILE__) . '/../classes/Payment.php');
-include_once(plugin_dir_path(__FILE__) . '/Payment_rest.php');    // SubscriptionPayment REST controller
+include_once(plugin_dir_path(__FILE__) . '/../classes/payment.php');
+include_once(plugin_dir_path(__FILE__) . '/payment_rest.php');    // SubscriptionPayment REST controller
 
 
 /**

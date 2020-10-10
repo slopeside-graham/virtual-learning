@@ -1,4 +1,5 @@
 $ = jQuery;
+var totalDue
 
 $(function () {
     var container = $(".purchase-vll-billing");
@@ -18,26 +19,43 @@ $(function () {
 });
 
 $(document).ready(function () {
-    var validator = $("#select-subscription-vll").kendoValidator({
-        rules: {
-            radio: function (input) {
-                if (input.filter("[type=radio]") && input.attr("required")) {
-                    return $("#select-subscription-vll").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
-                }
-                return true;
-            }
-        },
-        messages: {
-            radio: "This is a required field"
-        }
-    }).getKendoValidator();
 
     $("#select-subscription-vll").submit(function (event) {
+        var validator = $("#select-subscription-vll").kendoValidator({
+            rules: {
+                radio: function (input) {
+                    if (input.filter("[type=radio]") && input.attr("required")) {
+                        return $("#select-subscription-vll").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
+                    }
+                    return true;
+                }
+            },
+            messages: {
+                radio: "This is a required field"
+            }
+        }).getKendoValidator();
+
         event.preventDefault();
 
         if (validator.validate()) {
             displayLoading('form');
             createSubscription();
+        } else {
+            alert("invalid data");
+            $(".k-invalid:first").scrollToMe();
+            $(".k-invalid:first").focus();
+            $(".k-invalid:first").click();
+        }
+    });
+
+
+    $(".purchase-vll-billing").submit(function (event) {
+        var validator = $(".purchase-vll-billing").kendoValidator().getKendoValidator();
+        event.preventDefault();
+
+        if (validator.validate()) {
+            displayLoading('form');
+            purchaseSubscription();
         } else {
             alert("invalid data");
             $(".k-invalid:first").scrollToMe();
@@ -159,6 +177,7 @@ function showPurchase() {
 
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
+    calculateTotal();
 
     // Collect the total
 
@@ -216,14 +235,13 @@ function updatePaymentStatus(x) {
 function createPayment() {
     $.ajax({
         url: wpApiSettings.root + "ghes-vlp/v1/payment",
-        method: "PUT",
+        method: "POST",
         beforeSend: function (xhr) {
             xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
         },
         timeout: 60000,
         data: {
-            id: x,
-            Status: "Paid"
+            Amount: totalDue //TODO this is not populating 
         },
         success: function (result) {
             console.log("Success:" + result);

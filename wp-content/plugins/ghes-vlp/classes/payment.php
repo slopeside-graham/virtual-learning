@@ -289,7 +289,7 @@ namespace GHES\VLP {
             ];
         }
 
-        public function Create()
+        public function Create($request)
         {
 
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -323,7 +323,8 @@ namespace GHES\VLP {
             }
             return true;
         }
-/* We are not using any functionbesides Create at the moment. So I am not updating these.
+
+// We are not using any function besides Create at the moment. So I am not updating these.
         public function Update()
         {
 
@@ -417,7 +418,6 @@ namespace GHES\VLP {
             }
             return $Payments;
         }
-*/
         // Helper function to populate a lesson from a MeekroDB Row
         public static function populatefromRow($row): ?Payment
         {

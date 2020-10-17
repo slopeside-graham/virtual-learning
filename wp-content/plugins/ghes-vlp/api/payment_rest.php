@@ -254,9 +254,15 @@ namespace GHES\VLP {
             $success = $payment->Create($request);
             $payment = Payment::Get($payment->id);
 
-            if (!is_wp_error($success))
-                return rest_ensure_response($payment);
-            else {
+            if (!is_wp_error($success)) {
+                if (\GHES\ghes_base::UserIsVLPParent()) {
+                    return rest_ensure_response($payment);
+                } else {
+                    $UserId = get_current_user_id();
+                    Utils::AddVLPRole($UserId);
+                    return rest_ensure_response($payment);
+                }
+            } else {
                 $error_string = $success->get_error_message();
                 return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }

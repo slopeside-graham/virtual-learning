@@ -1,5 +1,4 @@
 $ = jQuery;
-var totalDue
 
 $(function () {
     var container = $(".purchase-vll-billing");
@@ -97,6 +96,8 @@ function calculateTotal() {
     console.log("Total Checked Current Payment: " + currentDue);
     console.log("Total Checked Future Payment: " + futureDue);
     console.log("Total Payment: " + totalDue);
+
+    return totalDue;
 };
 
 
@@ -177,7 +178,6 @@ function showPurchase() {
 
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
-    calculateTotal();
 
     // Collect the total
 
@@ -241,7 +241,7 @@ function createPayment() {
         },
         timeout: 60000,
         data: {
-            Amount: totalDue //TODO this is not populating 
+            Amount: calculateTotal() //TODO this is not populating 
         },
         success: function (result) {
             console.log("Success:" + result);

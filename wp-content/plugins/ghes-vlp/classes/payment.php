@@ -3,6 +3,7 @@
 namespace GHES\VLP {
 
     use GHES\VLP\Utils as VLPUtils;
+
     /**
      * Class Payment
      */
@@ -243,6 +244,7 @@ namespace GHES\VLP {
                 return $this->_errors;
             }
         }
+        /*
         protected function DateCreated($value = null): \DateTime
         {
             // If value was provided, set the value
@@ -264,6 +266,7 @@ namespace GHES\VLP {
                 return $this->_DateCreated;
             }
         }
+        */
 
         public function jsonSerialize()
         {
@@ -291,7 +294,42 @@ namespace GHES\VLP {
 
         public function Create($request)
         {
+            // Get the User ID
+            $User_id = get_current_user_id();
+            // Get the Parent Objuct
+            $Parent = \GHES\Parents::GetByUserID($User_id);
+            // Get the Parent ID
+            $Parent_id = $Parent->id;
+            // Get the Customer Profile ID
+            if ($Parent->customerProfileId != NULL && $Parent->customerPaymentProfileId != NULL) {
+                $customerProfileId = $Parent->customerProfileId;
+                $customerPaymentProfileId = $Parent->customerPaymentProfileId;
 
+                $customerPaymentProfile = New CustomerPaymentProfile();
+                $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
+                $customerPaymentProfile->id = $customerPaymentProfileId;
+                $customerPaymentProfile->Update();
+
+                $customerProfile = New CustomerProfile();
+                $customerProfile = CustomerProfile::populatefromrow($request);
+                $customerProfile->id = $customerProfileId;
+               // $customerProfile->customerPaymentProfile = $customerPaymentProfile;
+                $customerProfile->Update();
+            } else {
+                $customerPaymentProfile = New CustomerPaymentProfile();
+                $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
+               // $customerPaymentProfile->Create();
+
+                $customerProfile = New CustomerProfile();
+                $customerProfile = CustomerProfile::populatefromrow($request);
+                $customerProfile->customerPaymentProfile = $customerPaymentProfile;
+                $customerProfile->Create();
+            }
+            // Charge customerPaymentProfileId
+
+            // Get the response
+
+            // Create the payment record from the response.
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -317,14 +355,13 @@ namespace GHES\VLP {
                     'errors' => $this->errors
                 ));
                 $this->id = VLPUtils::$db->insertId();
-
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Payment_Create_Error', $e->getMessage());
             }
             return true;
         }
 
-// We are not using any function besides Create at the moment. So I am not updating these.
+        // We are not using any function besides Create at the moment. So I am not updating these.
         public function Update()
         {
 
@@ -395,8 +432,8 @@ namespace GHES\VLP {
                 return new \WP_Error('Payment_Get_Error', $e->getMessage());
             }
             return $Payment;
-        }        
-        
+        }
+
 
         public static function GetAll()
         {
@@ -406,7 +443,7 @@ namespace GHES\VLP {
             $Payments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from Payment");
+                $results = VLPUtils::$db->query("select * from Payment");
 
                 foreach ($results as $row) {
                     $Payment = Payment::populatefromRow($row);
@@ -422,8 +459,8 @@ namespace GHES\VLP {
         public static function populatefromRow($row): ?Payment
         {
             if ($row == null)
-            return null;
-            
+                return null;
+
             $Payment = new Payment();
             $Payment->id = $row['id'];
             $Payment->Type = $row['Type'];

@@ -2,52 +2,58 @@
     <h3>Billing Information</h3>
     <div class="three-column">
         <div>
-            <label for="name">Name</label><br />
-            <input type="text" required="required" class="k-textbox" placeholder="John Smith" name="name"
-                id="vlp-bill-name" autocomplete="name" validationMessage="Name is Required">
+            <label for="fname">First Name</label><br />
+            <input type="text" required="required" class="k-textbox" placeholder="John" name="fname"
+                id="vlp-bill-FirstName" autocomplete="given-name" validationMessage="First Name is Required">
+        </div>
+        <div>
+            <label for="lname">Last Name</label><br />
+            <input type="text" required="required" class="k-textbox" placeholder="Smith" name="lname"
+                id="vlp-bill-LastName" autocomplete="family-name" validationMessage="Last Name is Required">
         </div>
         <div>
             <label for="telephone">Telephone</label><br />
-            <input type="text" data-role='maskedtextbox' data-mask="(999) 000-0000" id="vlp-bill-telephone"
+            <input type="text" data-role='maskedtextbox' data-mask="(999) 000-0000" id="vlp-bill-PhoneNumber"
                 name="telephone" data-validmask-msg="Phone number is incomplete" required="required" validationMessage="Telephone is Required" />
             <span data-for='telephone' class='k-invalid-msg'></span>
+        </div>
+        <div>
+            <label for="email">Email</label><br />
+            <input type="text" data-role='maskedtextbox' id="vlp-bill-Email"
+                name="email" required="required" validationMessage="Email is Required" />
+            <span data-for='email' class='k-invalid-msg'></span>
         </div>
     </div>
     <div class="address-section">
         <div>
             <label for="billingAddress">Billing Address</label><br />
             <input type="text" required="required" class="k-textbox" placeholder="Your Billing Address"
-                name="billingAddress" id="vlp-bill-billingAddress" autocomplete="street-address" validationMessage="Billing Address is Required">
+                name="billingAddress" id="vlp-bill-Address" autocomplete="street-address" validationMessage="Billing Address is Required">
         </div>
         <div class="three-column">
             <div>
                 <label for="city">City</label><br />
                 <input type="text" required="required" class="k-textbox" placeholder="City" name="city"
-                    id="vlp-bill-city" autocomplete="address-level2" validationMessage="City is Required">
+                    id="vlp-bill-City" autocomplete="address-level2" validationMessage="City is Required">
             </div>
             <div>
                 <label for="state">State</label><br />
                 <input type="text" required="required" class="k-textbox" placeholder="State" name="state"
-                    id="vlp-bill-state" autocomplete="address-level1" validationMessage="State is Required">
+                    id="vlp-bill-State" autocomplete="address-level1" validationMessage="State is Required">
             </div>
             <div>
                 <label for="zipcode">Zip Code</label><br />
                 <input type="text" required="required" class="k-textbox" placeholder="Zip Code" name="zipcode"
-                    id="vlp-bill-zipcode" autocomplete="postal-code" validationMessage="Zip Code is Required">
+                    id="vlp-bill-Zip" autocomplete="postal-code" validationMessage="Zip Code is Required">
             </div>
         </div>
     </div>
     <hr>
     <div class="credit-card-section">
         <div>
-            <label for="nameCard">Name on Credit Card</label><br />
-            <input type="text" required="required" class="k-textbox" placeholder="John Smith" name="nameCard"
-                id="vlp-bill-nameCard" autocomplete="cc-name" validationMessage="Credit Card Name is Required">
-        </div>
-        <div>
             <label for="ccNumber">Credit Card Number</label><br />
             <input type="text" required="required" data-role='maskedtextbox' data-mask="0000 0000 0000 0000"
-                name="ccNumber" id="vlp-bill-ccNumber" autocomplete="cc-number"
+                name="ccNumber" id="vlp-bill-CardNumber" autocomplete="cc-number"
                 data-validmask-msg="Credit Card Number is incomplete" validationMessage="Credit Card Number is Required">
             <span data-for='ccNumber' class='k-invalid-msg'></span>
         </div>
@@ -55,17 +61,17 @@
             <div>
                 <label for="ccExpMonth">Expiration Month</label><br />
                 <input type="text" required="required" class="k-textbox" placeholder="01" pattern="^[0-9]{2}$"
-                    minlength="2" maxlength="2" name="ccExpMonth" id="vlp-bill-ccExpMonth" autocomplete="cc-exp-month" validationMessage="Expiration Month is Required">
+                    minlength="2" maxlength="2" name="ccExpMonth" id="vlp-bill-ExpirationMonth" autocomplete="cc-exp-month" validationMessage="Expiration Month is Required">
             </div>
             <div>
                 <label for="ccExpYear">Expiration Year</label><br />
                 <input type="text" required="required" class="k-textbox" placeholder="2022" pattern="\d{4}" minlength="4"
-                    maxlength="4" name="ccExpYear" id="vlp-bill-ccExpYear" autocomplete="cc-exp-year" validationMessage="Expiration Year is Required"><br />
+                    maxlength="4" name="ccExpYear" id="vlp-bill-ExpirationYear" autocomplete="cc-exp-year" validationMessage="Expiration Year is Required"><br />
             </div>
             <div>
                 <label for="ccCSV">Code</label><br />
                 <input type="text" required="required" class="k-textbox" placeholder="123" pattern="\d{3}|\d{4}"
-                    name="ccCSV" id="vlp-bill-ccCSV" autocomplete="cc-csc" validationMessage="Security Code is Required">
+                    name="ccCSV" id="vlp-bill-CardCode" autocomplete="cc-csc" validationMessage="Security Code is Required">
             </div>
         </div>
     </div>

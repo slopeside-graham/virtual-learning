@@ -2,10 +2,13 @@
 
 namespace GHES\VLP {
 
+    use Exception;
     use net\authorize\api\contract\v1 as AnetAPI;
     use net\authorize\api\contract\v1\CustomerAddressType;
     use net\authorize\api\controller as AnetController;
     use GHES\Utils as VLPUtils;
+    use GHES\VLP\ghes_vlp_base;
+    use GHES\Parents;
 
     class customerProfile extends ghes_vlp_base implements \JsonSerializable
     {
@@ -19,13 +22,12 @@ namespace GHES\VLP {
         private $merchantAuthentication;
         public $responseText;
 
-        public function jsonSerialize()
-        {
-            // Look at what in in this and make it return that
-            return [
-                'id' => $this->id
-            ];
-        }
+        private $_id;
+        private $_merchantCustomerId;
+        private $_description;
+        private $_Email;
+
+        private $_anCustomerProfile;
 
         public function __construct()
         {
@@ -37,6 +39,72 @@ namespace GHES\VLP {
             $this->refId = 'ref' . time();
             $this->merchantAuthentication = $this->setMerchantAuthentication();
             $this->responseText = array("1" => "Approved", "2" => "Declined", "3" => "Error", "4" => "Held for Review");
+            $this->_anCustomerProfile = new AnetAPI\CustomerProfileType();
+
+            $this->description = "GHES VLL Parent";
+        }
+
+
+
+        protected function id($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_id = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_id;
+            }
+        }
+
+        protected function merchantCustomerId($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anCustomerProfile->setMerchantCustomerId($value);
+                $this->_merchantCustomerId = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_merchantCustomerId;
+            }
+        }
+
+        protected function description($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anCustomerProfile->setDescription($value);
+                $this->_description = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_description;
+            }
+        }
+
+        protected function Email($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anCustomerProfile->setEmail($value);
+                $this->_Email = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Email;
+            }
+        }
+
+        public function jsonSerialize()
+        {
+            return [
+                'id' => $this->id,
+                'merchantCustomerId' => $this->merchantCustomerId,
+                'description' => $this->description,
+                'Email' => $this->Email
+            ];
         }
 
         public function getEnvironment()
@@ -54,7 +122,7 @@ namespace GHES\VLP {
             return $merchantAuthentication;
         }
 
-        function createCustomerPaymentProfile($existingcustomerprofileid, $phoneNumber)
+        public function createCustomerProfile(&$paymentProfiles, $Parent_id)
         {
             $merchantAuthentication = $this->setMerchantAuthentication();
 
@@ -62,64 +130,121 @@ namespace GHES\VLP {
             $refId = 'ref' . time();
 
             // Create a Customer Profile Request
-            //  1. (Optionally) create a Payment Profile
-            //  2. (Optionally) create a Shipping Profile
             //  3. Create a Customer Profile (or specify an existing profile)
             //  4. Submit a CreateCustomerProfile Request
             //  5. Validate Profile ID returned
 
-            // Set credit card information for payment profile
-            $creditCard = new AnetAPI\CreditCardType();
-            $creditCard->setCardNumber("4242424242424242");
-            $creditCard->setExpirationDate("2038-12");
-            $creditCard->setCardCode("142");
-            $paymentCreditCard = new AnetAPI\PaymentType();
-            $paymentCreditCard->setCreditCard($creditCard);
 
-            // Create the Bill To info for new payment type
-            $billto = new AnetAPI\CustomerAddressType();
-            $billto->setFirstName("Ellen" . $phoneNumber);
-            $billto->setLastName("Johnson");
-            $billto->setCompany("Souveniropolis");
-            $billto->setAddress("14 Main Street");
-            $billto->setCity("Pecan Springs");
-            $billto->setState("TX");
-            $billto->setZip("44628");
-            $billto->setCountry("USA");
-            $billto->setPhoneNumber($phoneNumber);
-            $billto->setfaxNumber("999-999-9999");
+            // Create a new CustomerProfileType and add the payment profile object
+            $this->_anCustomerProfile->setpaymentProfiles($paymentProfiles);
 
-            // Create a new Customer Payment Profile object
-            $paymentprofile = new AnetAPI\CustomerPaymentProfileType();
-            $paymentprofile->setCustomerType('individual');
-            $paymentprofile->setBillTo($billto);
-            $paymentprofile->setPayment($paymentCreditCard);
-            $paymentprofile->setDefaultPaymentProfile(true);
-
-            $paymentprofiles[] = $paymentprofile;
 
             // Assemble the complete transaction request
-            $paymentprofilerequest = new AnetAPI\CreateCustomerPaymentProfileRequest();
-            $paymentprofilerequest->setMerchantAuthentication($merchantAuthentication);
-
-            // Add an existing profile id to the request
-            $paymentprofilerequest->setCustomerProfileId($existingcustomerprofileid);
-            $paymentprofilerequest->setPaymentProfile($paymentprofile);
-            $paymentprofilerequest->setValidationMode("liveMode");
+            $request = new AnetAPI\CreateCustomerProfileRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setProfile($this->_anCustomerProfile);
 
             // Create the controller and get the response
-            $controller = new AnetController\CreateCustomerPaymentProfileController($paymentprofilerequest);
+            $controller = new AnetController\CreateCustomerProfileController($request);
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
-                // Ignore error below - nothig to be done about it.
-                echo "Create Customer Payment Profile SUCCESS: " . $response->getCustomerPaymentProfileId() . "\n";
+                echo "Succesfully created customer profile : " . $response->getCustomerProfileId() . "\n";
+                $paymentProfileid = $response->getCustomerPaymentProfileIdList();
+                echo "SUCCESS: PAYMENT PROFILE ID : " . $paymentProfileid[0] . "\n";
+                try {
+                    $this->id = $response->getCustomerProfileId();
+                    $parent = \GHES\Parents::Get($Parent_id);
+                    $parent->customerProfileId = $this->id;
+                    $parent->customerPaymentProfileId = $paymentProfileid[0];
+                    $parent->Update();
+                } catch (Exception $e) {
+                    echo $e;
+                }
+                $this->id = $response->getCustomerProfileId();
+                $paymentProfiles[0]->id = $paymentProfileid[0];
+
+                return true;
             } else {
-                echo "Create Customer Payment Profile: ERROR Invalid response\n";
                 $errorMessages = $response->getMessages()->getMessage();
-                echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+                return new \WP_Error('AN_CreateCustomerProfile_Error', "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
             }
-            return $response;
+            return true;
+        }
+
+        public function chargeCustomerProfile($profileid, $paymentprofileid, $amount)
+        {
+            /* Create a merchantAuthenticationType object with authentication details */
+            $merchantAuthentication = $this->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            $profileToCharge = new AnetAPI\CustomerProfilePaymentType();
+            $profileToCharge->setCustomerProfileId($profileid);
+            $paymentProfile = new AnetAPI\PaymentProfileType();
+            $paymentProfile->setPaymentProfileId($paymentprofileid);
+            $profileToCharge->setPaymentProfile($paymentProfile);
+
+            $transactionRequestType = new AnetAPI\TransactionRequestType();
+            $transactionRequestType->setTransactionType("authCaptureTransaction");
+            $transactionRequestType->setAmount($amount);
+            $transactionRequestType->setProfile($profileToCharge);
+
+            $request = new AnetAPI\CreateTransactionRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setTransactionRequest($transactionRequestType);
+            $controller = new AnetController\CreateTransactionController($request);
+            $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+            if ($response != null) {
+                if ($response->getMessages()->getResultCode() == "Ok") {
+                    $tresponse = $response->getTransactionResponse();
+
+                    if ($tresponse != null && $tresponse->getMessages() != null) {
+                        echo " Transaction Response code : " . $tresponse->getResponseCode() . "\n";
+                        echo  "Charge Customer Profile APPROVED  :" . "\n";
+                        echo " Charge Customer Profile AUTH CODE : " . $tresponse->getAuthCode() . "\n";
+                        echo " Charge Customer Profile TRANS ID  : " . $tresponse->getTransId() . "\n";
+                        echo " Code : " . $tresponse->getMessages()[0]->getCode() . "\n";
+                        echo " Description : " . $tresponse->getMessages()[0]->getDescription() . "\n";
+                    } else {
+                        echo "Transaction Failed \n";
+                        if ($tresponse->getErrors() != null) {
+                            echo " Error code  : " . $tresponse->getErrors()[0]->getErrorCode() . "\n";
+                            echo " Error message : " . $tresponse->getErrors()[0]->getErrorText() . "\n";
+                        }
+                    }
+                } else {
+                    echo "Transaction Failed \n";
+                    $tresponse = $response->getTransactionResponse();
+                    if ($tresponse != null && $tresponse->getErrors() != null) {
+                        $errorMessages =  " Error code  : " . $tresponse->getErrors()[0]->getErrorCode() . "\n" + " Error message : " . $tresponse->getErrors()[0]->getErrorText() . "\n";
+                    } else {
+                        $errorMessages =  " Error code  : " . $response->getMessages()->getMessage()[0]->getCode() . "\n" + " Error message : " . $response->getMessages()->getMessage()[0]->getText() . "\n";
+                    }
+                    return new \WP_Error('AN_ChargePaymentProfile_Error', "Response : " . $errorMessages);
+                }
+            } else {
+                return new \WP_Error('AN_ChargePaymentProfile_Error', "No response returned \n");
+            }
+            return true;
+        }
+
+        // Helper function to populate a lesson from a MeekroDB Row
+        public static function populatefromRow($row): ?customerProfile
+        {
+            if ($row == null)
+                return null;
+
+            $customerProfile = new customerProfile();
+            $customerProfile->id = $row['id'];
+            $customerProfile->merchantCustomerId = $row['merchantCustomerId'];
+            $customerProfile->description = $row['description'];
+            $customerProfile->Email = $row['Email'];
+            return $customerProfile;
         }
     }
 }

@@ -179,22 +179,21 @@ function showPurchase() {
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
 
+    var idSelector = function () { return this.dataset.id; };
+    var selectedPayments = $(".subscription-payment:checked").map(idSelector).get();
+
     // Collect the total
 
     //Charge payment - payment_rest.php
-    createPayment();
+    createPayment(selectedPayments);
 
     // If successful payment, do the following:
     // Collect the id's of checked items
 
-    var idSelector = function () { return this.dataset.id; };
-    var selectedPayments = $(".subscription-payment:checked").map(idSelector).get();
-    var x;
+
 
     // Run a payment status update on each of the id's.
-    for (x of selectedPayments) {
-        updatePaymentStatus(x);
-    }
+
 }
 
 function updatePaymentStatus(x) {
@@ -241,14 +240,28 @@ function createPayment() {
         },
         timeout: 60000,
         data: {
-            Amount: calculateTotal() //TODO this is not populating 
+            Amount: calculateTotal(),
+            CardNumber: $("#vlp-bill-CardNumber").val().replace(/\s/g,''),
+            ExpirationDate: $("#vlp-bill-ExpirationYear").val()+"-"+$("#vlp-bill-ExpirationMonth").val(),
+            CardCode: $("#vlp-bill-CardCode").val(),
+            FirstName: $("#vlp-bill-FirstName").val(),
+            LastName: $("#vlp-bill-LastName").val(),
+            Address: $("#vlp-bill-Address").val(),
+            City: $("#vlp-bill-City").val(),
+            State: $("#vlp-bill-State").val(),
+            Zip: $("#vlp-bill-Zip").val(),
+            PhoneNumber: $("#vlp-bill-PhoneNumber").val(),
+            Email: $("#vlp-bill-Email").val()
         },
         success: function (result) {
             console.log("Success:" + result);
             //Success!
             window.dataLayer = window.dataLayer || [];
             hideLoading('.purchase-vll-billing');
-            location.reload();
+            var x;
+            for (x of selectedPayments) {
+                updatePaymentStatus(x);
+            }
         },
         error: function (result) {
             console.log("Failed");

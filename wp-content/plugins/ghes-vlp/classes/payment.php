@@ -2,7 +2,10 @@
 
 namespace GHES\VLP {
 
+    use Exception;
     use GHES\VLP\Utils as VLPUtils;
+    use GHES\VLP\customerProfile;
+    use GHES\VLP\customerPaymentProfile;
 
     /**
      * Class Payment
@@ -301,32 +304,44 @@ namespace GHES\VLP {
             // Get the Parent ID
             $Parent_id = $Parent->id;
             // Get the Customer Profile ID
-            if ($Parent->customerProfileId != NULL && $Parent->customerPaymentProfileId != NULL) {
-                $customerProfileId = $Parent->customerProfileId;
-                $customerPaymentProfileId = $Parent->customerPaymentProfileId;
+            try {
+                if ($Parent->customerProfileId != NULL && $Parent->customerPaymentProfileId != NULL) {
+                    $customerProfileId = $Parent->customerProfileId;
+                    $customerPaymentProfileId = $Parent->customerPaymentProfileId;
 
-                $customerPaymentProfile = New CustomerPaymentProfile();
-                $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
-                $customerPaymentProfile->id = $customerPaymentProfileId;
-                $customerPaymentProfile->Update();
+                    $customerProfile = new CustomerProfile();
+                    $customerProfile = CustomerProfile::populatefromrow($request);
+                    $customerProfile->id = $customerProfileId;
 
-                $customerProfile = New CustomerProfile();
-                $customerProfile = CustomerProfile::populatefromrow($request);
-                $customerProfile->id = $customerProfileId;
-               // $customerProfile->customerPaymentProfile = $customerPaymentProfile;
-                $customerProfile->Update();
-            } else {
-                $customerPaymentProfile = New CustomerPaymentProfile();
-                $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
-               // $customerPaymentProfile->Create();
-
-                $customerProfile = New CustomerProfile();
-                $customerProfile = CustomerProfile::populatefromrow($request);
-                $customerProfile->customerPaymentProfile = $customerPaymentProfile;
-                $customerProfile->Create();
+                    $customerPaymentProfile = new CustomerPaymentProfile();
+                    $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
+                    $customerPaymentProfile->id = $customerPaymentProfileId;
+                    $customerPaymentProfile->updateCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+                    // $customerProfile->customerPaymentProfile = $customerPaymentProfile;
+                } else {
+                    $customerProfile = new customerProfile();
+                    $customerProfile = customerProfile::populatefromrow($request);
+                    $customerProfile->merchantCustomerId = $Parent_id;
+                    $customerPaymentProfile = new customerPaymentProfile();
+                    $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
+                    $anCustomerPaymentProfile = $customerPaymentProfile->getanCustomerPaymentProfile();
+                    $result = $customerProfile->createCustomerProfile($anCustomerPaymentProfile, $Parent_id);
+                    if ($result == TRUE) {
+                        $customerPaymentProfileId = $customerProfile->id;
+                        $customerPaymentProfileId = $anCustomerPaymentProfile->id;
+                    } else {
+                        return $result;
+                    }
+                }
+            } catch (Exception $e) {
+                return new \WP_Error('Payment_Create_Error', $e->getMessage());
             }
-            // Charge customerPaymentProfileId
-
+            // Charge customerProfile
+            try {
+                $customerProfile->chargeCustomerProfile($customerProfile->id, $customerPaymentProfileId, $this->Amount);
+            } catch (Exception $e) {
+                return new \WP_Error('CharedPaymentProfile_Error', $e->getMessage());
+            }
             // Get the response
 
             // Create the payment record from the response.

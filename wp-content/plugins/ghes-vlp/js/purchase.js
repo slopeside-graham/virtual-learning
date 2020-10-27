@@ -177,61 +177,12 @@ function showPurchase() {
 }
 
 function purchaseSubscription() {
+
     displayLoading('.purchase-vll-billing');
 
     var idSelector = function () { return this.dataset.id; };
     var selectedPayments = $(".subscription-payment:checked").map(idSelector).get();
 
-    // Collect the total
-
-    //Charge payment - payment_rest.php
-    createPayment(selectedPayments);
-
-    // If successful payment, do the following:
-    // Collect the id's of checked items
-
-
-
-    // Run a payment status update on each of the id's.
-
-}
-
-function updatePaymentStatus(x) {
-    $.ajax({
-        url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
-        method: "PUT",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
-        },
-        timeout: 60000,
-        data: {
-            id: x,
-            Status: "Paid"
-        },
-        success: function (result) {
-            console.log("Success:" + result);
-            //Success!
-            window.dataLayer = window.dataLayer || [];
-            hideLoading('.purchase-vll-billing');
-            location.reload();
-        },
-        error: function (result) {
-            console.log("Failed");
-
-            if (typeof result.responseJSON !== "undefined") {
-                alert(result.responseJSON.message);
-            } else {
-                alert(
-                    "An unexpected error occured.  Please review your submission and try again."
-                );
-            }
-            hideLoading('.purchase-vll-billing');
-            console.log(result.responseText);
-        }
-    })
-}
-
-function createPayment() {
     $.ajax({
         url: wpApiSettings.root + "ghes-vlp/v1/payment",
         method: "POST",
@@ -251,17 +202,14 @@ function createPayment() {
             State: $("#vlp-bill-State").val(),
             Zip: $("#vlp-bill-Zip").val(),
             PhoneNumber: $("#vlp-bill-PhoneNumber").val(),
-            Email: $("#vlp-bill-Email").val()
+            Email: $("#vlp-bill-Email").val(),
+            SubscriptionPayments: selectedPayments
         },
         success: function (result) {
             console.log("Success:" + result);
             //Success!
             window.dataLayer = window.dataLayer || [];
             hideLoading('.purchase-vll-billing');
-            var x;
-            for (x of selectedPayments) {
-                updatePaymentStatus(x);
-            }
         },
         error: function (result) {
             console.log("Failed");
@@ -277,4 +225,5 @@ function createPayment() {
             console.log(result.responseText);
         }
     })
+
 }

@@ -187,7 +187,36 @@ namespace GHES\VLP {
 
                 $SubscriptionPayment = SubscriptionPayment::Get($this->id);
 
-                Subscription::updateStatus($SubscriptionPayment->Subscription_id);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_Update_Error', $e->getMessage());
+            }
+            return $SubscriptionPayment;
+        }
+
+        public static function UpdateAllPendingByParentId($Parent_id, $paymentResultid)
+        {
+
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            try {
+
+                VLPUtils::$db->query(
+                    "UPDATE SubscriptionPayment sp
+                        Left Join Subscription s on sp.Subscription_id = s.id
+                    SET
+                    sp.Status='Paid',
+                    sp.Payment_id=%i
+                WHERE 
+                    sp.Status='Pending'
+                        and
+                    s.ParentId=%i",
+                    $paymentResultid, $Parent_id
+                );
+
+                $counter = VLPUtils::$db->affectedRows();
+
+                $SubscriptionPayment = SubscriptionPayment::GetAllByPaymentId($paymentResultid);
 
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('SubscriptionPayment_Update_Error', $e->getMessage());
@@ -303,7 +332,7 @@ namespace GHES\VLP {
                                                         where 
                                                             Subscription_id = %i 
                                                             and Date(StartDate) <= Date(Now())
-                                                            and Status = 'Unpaid'", $subscriptionId);
+                                                            and Status <> 'Paid'", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -314,6 +343,60 @@ namespace GHES\VLP {
                 return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
             }
             return $SubscriptionPayments;
+        }
+        public static function GetAllByPaymentId($paymentResultid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                    $results = VLPUtils::$db->query("select * from SubscriptionPayment where Payment_id = %i", $paymentResultid);
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
+        /**
+         * Get all pending by parent id
+         *
+         * @param int $parentId is the id of a parent
+         *
+         * @return mixed|WP_Error|NestedSerializable
+         */
+        public static function GetAllPendingByParentId($parentId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $PendingPayments = new NestedSerializable();
+
+            try {
+                    $results = VLPUtils::$db->query("select sp.*,
+                                                        s.ParentID as ParentId 
+                                                    from SubscriptionPayment sp
+                                                        Left Join Subscription s on sp.Subscription_id = s.id
+                                                    where 
+                                                        ParentId = %i 
+                                                        and sp.Status = 'Pending'", $parentId);
+
+                foreach ($results as $row) {
+                    $PendingPayment = SubscriptionPayment::populatefromRow($row);
+                    $PendingPayments->add_item($PendingPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAllPending_Error', $e->getMessage());
+            }
+            return $PendingPayments;
         }
 
         public static function GetUpcomingBySubscriptionId($subscriptionId)
@@ -328,7 +411,7 @@ namespace GHES\VLP {
                                                         where 
                                                             Subscription_id = %i
                                                             and Date(StartDate) > Date(Now())
-                                                            and Status = 'Unpaid'", $subscriptionId);
+                                                            and Status <> 'Paid'", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);

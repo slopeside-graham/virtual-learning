@@ -66,9 +66,21 @@ $(document).ready(function () {
 
 window.onload = function () {
     calculateTotal();
+
+    var idselector = function() { return this.dataset.id; };
+    var paymentsChecked = $(".subscription-payment:checked").map(idselector).get();
+    paymentsChecked.forEach(function(paymentChecked) {
+        pendingPayment(paymentChecked);
+    })
 };
 
-$(".subscription-payment").click(function () {
+$(".subscription-payment").click(function (e) {
+    paymentId = e.currentTarget.dataset.id;
+    if ($(event.target).prop("checked")) {
+        pendingPayment(paymentId);
+    } else {
+        unpendingPayment(paymentId);
+    }
     calculateTotal();
 });
 
@@ -192,8 +204,8 @@ function purchaseSubscription() {
         timeout: 60000,
         data: {
             Amount: calculateTotal(),
-            CardNumber: $("#vlp-bill-CardNumber").val().replace(/\s/g,''),
-            ExpirationDate: $("#vlp-bill-ExpirationYear").val()+"-"+$("#vlp-bill-ExpirationMonth").val(),
+            CardNumber: $("#vlp-bill-CardNumber").val().replace(/\s/g, ''),
+            ExpirationDate: $("#vlp-bill-ExpirationYear").val() + "-" + $("#vlp-bill-ExpirationMonth").val(),
             CardCode: $("#vlp-bill-CardCode").val(),
             FirstName: $("#vlp-bill-FirstName").val(),
             LastName: $("#vlp-bill-LastName").val(),
@@ -208,11 +220,10 @@ function purchaseSubscription() {
         success: function (result) {
             console.log("Success:" + result);
             //Success!
-            window.dataLayer = window.dataLayer || [];
             hideLoading('.purchase-vll-billing');
         },
         error: function (result) {
-            console.log("Failed");
+            console.log("Purchase Subscription Failed"); //TODO: there is something wrong here. It is not actually failing, but is returning a failed result.
 
             if (typeof result.responseJSON !== "undefined") {
                 alert(result.responseJSON.message);
@@ -226,4 +237,70 @@ function purchaseSubscription() {
         }
     })
 
+}
+
+function pendingPayment(paymentId) {
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
+        method: "PUT",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        timeout: 60000,
+        data: {
+            id: paymentId,
+            Status: "Pending"
+        },
+        success: function (result) {
+            console.log("Success:" + result);
+            //Success!
+            window.dataLayer = window.dataLayer || [];
+        },
+        error: function (result) {
+            console.log("Update Payment Status to Pending Failed");
+
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            } else {
+                alert(
+                    "An unexpected error occured.  Please review your submission and try again."
+                );
+            }
+            hideLoading('.purchase-vll-billing');
+            console.log(result.responseText);
+        }
+    })
+}
+
+function unpendingPayment(paymentId) {
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
+        method: "PUT",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        timeout: 60000,
+        data: {
+            id: paymentId,
+            Status: "Unpaid"
+        },
+        success: function (result) {
+            console.log("Success:" + result);
+            //Success!
+            window.dataLayer = window.dataLayer || [];
+        },
+        error: function (result) {
+            console.log("Update Status to Unpaid Failed");
+
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            } else {
+                alert(
+                    "An unexpected error occured.  Please review your submission and try again."
+                );
+            }
+            hideLoading('.purchase-vll-billing');
+            console.log(result.responseText);
+        }
+    })
 }

@@ -71,7 +71,7 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '<ul class="checkbox-list">';
             if ($subscriptionPayments->jsonSerialize()) {
                 foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                    $output .= '<li><label><input class="current-due subscription-payment" data-id="' . $subscriptionPayment->id . '" type="checkbox" checked value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
+                    $output .= '<li><label><input class="current-due subscription-payment" data-id="' . $subscriptionPayment->id . '" type="checkbox" checked disabled value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
                 }
             } else {
                 $output .= '<li>You have no current payments.</li>';
@@ -94,7 +94,12 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '<ul class="checkbox-list">';
             if ($subscriptionPayments->jsonSerialize()) {
                 foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                    $output .= '<li><label><input type="checkbox" class="future-due subscription-payment" data-id="' . $subscriptionPayment->id . '" value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
+                    if ($subscriptionPayment->Status == "Pending") {
+                        $checked = 'checked';
+                    } else {
+                        $checked = null;
+                    }
+                    $output .= '<li><label><input type="checkbox" ' .  $checked . ' class="future-due subscription-payment" data-id="' . $subscriptionPayment->id . '" value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
                 }
             } else {
                 $output .= '<li><label>All Payments are Currently due.</label></li>';

@@ -339,7 +339,13 @@ namespace GHES\VLP {
             return true;
         }
 
-
+        /**
+         * Get Customer Payment Profiles
+         *
+         * @param WP_REST_Request $request get data from request.
+         *
+         * @return mixed|Object
+         */
         public function getanCustomerPaymentProfile()
         {
             // Set credit card information for payment profile

@@ -6,6 +6,7 @@ namespace GHES\VLP {
     use GHES\VLP\Utils as VLPUtils;
     use GHES\VLP\customerProfile;
     use GHES\VLP\customerPaymentProfile;
+    use GHES\VLP\SubscriptionPayment;
 
     /**
      * Class Payment
@@ -295,7 +296,7 @@ namespace GHES\VLP {
             ];
         }
 
-        public function Create($request)
+        public function ChargePayment($request)
         {
             // Get the User ID
             $User_id = get_current_user_id();
@@ -338,25 +339,97 @@ namespace GHES\VLP {
             }
             // Charge customerProfile
             try {
-                $customerProfile->chargeCustomerProfile($customerProfile->id, $customerPaymentProfileId, $this->Amount);
+                $pendingPayments = SubscriptionPayment::GetAllPendingByParentId($Parent_id);
+                if (!is_wp_error($pendingPayments)) {
+                    $backendAmount = 0;
+                    foreach ($pendingPayments->jsonSerialize() as $i => $pendingPayment) {
+                        $backendAmount += $pendingPayment->Amount;
+                    }
+                } else {
+                    return new \WP_Error('CalculateTotal_Error', $pendingPayments->getMessage());
+                }
+                if ($this->Amount == $backendAmount) {
+                    $Amount = $backendAmount;
+                } else {
+                    return new \WP_Error('CalculateTotal_Error', 'Something went wrong with your total. Please refresh the page and try again.');
+                }
+                $chargeResult = $customerProfile->chargeCustomerProfile($customerProfile->id, $customerPaymentProfileId, $Amount);
+
+                // Create the payment record from the response.
+                $paymentResult = $this->CreatePaymentFromResponse($chargeResult);
+                $paymentResultid = $paymentResult->id;
+
+                if ($chargeResult->getMessages()->getResultCode() == "Ok") {
+                    // if successful update Pending Payments
+                    $pendingPaymentResult = SubscriptionPayment::UpdateAllPendingByParentId($Parent_id, $paymentResultid);
+                    if (!is_wp_error($pendingPaymentResult)) {
+                        //TODO:  Update the subscription
+                    } else {
+                        return new \WP_Error('PaymentUpdate_Error', 'Something went wrong updating your subscription payments.');
+                    }
+                } else {
+                    return new \WP_Error('ChargeFailed_Error', $chargeResult->getMessages()); //TODO: Get the proper message for this
+                }
+
             } catch (Exception $e) {
                 return new \WP_Error('CharedPaymentProfile_Error', $e->getMessage());
             }
             // Get the response
+            return true;
+        }
 
-            // Create the payment record from the response.
+        public function CreatePaymentFromResponse($chargeResult)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $response = $chargeResult;
+            $tresponse = $chargeResult->getTransactionResponse();
+
+            if ($response->getMessages()->getResultCode() == "Ok") {  // Transaction response was OK.
+                $chargeStatus = "Successful";
+                $paymentErrors = null;
+            } else {
+                $chargeStatus = "Failed";
+                if ($tresponse != null && $tresponse->getErrors() != null) {
+                    $paymentErrors = "Error Code  : " . $tresponse->getErrors()[0]->getErrorCode() . "\n";
+                    $paymentErrors .= "Error Message : " . $tresponse->getErrors()[0]->getErrorText() . "\n";
+                } else {
+                    if ($response != null && $response->getMessages() != null) {
+                        $paymentErrors = "Error Code  : " . $response->getMessages()->getMessage()[0]->getCode() . "\n";
+                        $paymentErrors .= "Error Message : " . $response->getMessages()->getMessage()[0]->getText() . "\n";
+                    }
+                }
+            }
+                    $this->User_id = get_current_user_id();
+                    $this->Status = $chargeStatus;
+                    $this->ResponseCode = $tresponse->getResponseCode();
+                    $this->authCode = $tresponse->getAuthCode();
+                    $this->avsResultCode = $tresponse->getAvsResultCode();
+                    $this->CvvResultCode = $tresponse->getCvvResultCode();
+                    $this->CavvResultCode = $tresponse->getCavvResultCode();
+                    $this->transId = $tresponse->getTransId();
+                    $this->accountNumber = $tresponse->getAccountNumber();
+                    $this->accountType = $tresponse->getAccountType();
+                    $this->prePaidCard = $tresponse->getPrePaidCard();
+                    $this->errors = $paymentErrors;
+
+                    $this->Create();
+                    return $this;
+            }
+
+        public function Create()
+        {
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
             try {
 
                 VLPUtils::$db->insert('Payment', array(
-                    'id' => $this->id,
-                    'Type' => $this->Type,
                     'User_id' => $this->User_id,
                     'Amount' => $this->Amount,
                     'Status' => $this->Status,
-                    'Recurring' => $this->Recurring,
                     'Description' => $this->Description,
                     'ResponseCode' => $this->ResponseCode,
                     'authCode' => $this->authCode,
@@ -371,7 +444,7 @@ namespace GHES\VLP {
                 ));
                 $this->id = VLPUtils::$db->insertId();
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Payment_Create_Error', $e->getMessage());
+                return new \WP_Error('Payments_Create_Error', $e->getMessage());
             }
             return true;
         }

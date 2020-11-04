@@ -172,7 +172,13 @@ namespace GHES\VLP {
             }
             return true;
         }
-
+        /**
+         * Charge Customer Profile
+         *
+         * @param WP_REST_Request $request get data from request.
+         *
+         * @return mixed|WP_Error|Object
+         */
         public function chargeCustomerProfile($profileid, $paymentprofileid, $amount)
         {
             /* Create a merchantAuthenticationType object with authentication details */
@@ -225,12 +231,12 @@ namespace GHES\VLP {
                     } else {
                         $errorMessages =  " Error code  : " . $response->getMessages()->getMessage()[0]->getCode() . "\n" + " Error message : " . $response->getMessages()->getMessage()[0]->getText() . "\n";
                     }
-                    return new \WP_Error('AN_ChargePaymentProfile_Error', "Response : " . $errorMessages);
+                    return $response;
                 }
             } else {
                 return new \WP_Error('AN_ChargePaymentProfile_Error', "No response returned \n");
             }
-            return true;
+            return $response;
         }
 
         // Helper function to populate a lesson from a MeekroDB Row

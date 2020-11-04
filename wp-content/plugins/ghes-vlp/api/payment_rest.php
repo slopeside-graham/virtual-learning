@@ -251,12 +251,10 @@ namespace GHES\VLP {
         public function create_item($request)
         {
             $payment = Payment::populatefromRow($request);
-            $success = $payment->Create($request);
-            
-            ($request);
+            $paymentsuccess = $payment->ChargePayment($request);
             $payment = Payment::Get($payment->id);
 
-            if (!is_wp_error($success)) {
+            if (!is_wp_error($paymentsuccess)) {
                 if (\GHES\ghes_base::UserIsVLPParent()) {
                     return rest_ensure_response($payment);
                 } else {
@@ -265,7 +263,7 @@ namespace GHES\VLP {
                     return rest_ensure_response($payment);
                 }
             } else {
-                $error_string = $success->get_error_message();
+                $error_string = $paymentsuccess->get_error_message();
                 return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }

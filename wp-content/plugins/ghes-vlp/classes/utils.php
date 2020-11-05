@@ -21,5 +21,13 @@ namespace GHES\VLP {
                 throw new \Exception("The parent doesn't have an ID");
             }
         }
+
+        public static function CheckLoggedInParent() {
+            $user = wp_get_current_user();
+            if ( !in_array( 'Parent', (array) $user->roles ) ) {
+                $registrationpage = get_permalink(esc_attr(get_option('registration_welcome_url')));
+               header("Location: $registrationpage");
+            } 
+        }
     }
 }

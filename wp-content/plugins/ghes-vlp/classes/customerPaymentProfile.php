@@ -284,6 +284,20 @@ namespace GHES\VLP {
             return true;
         }
 
+        public static function updateProfile($Parent, $request)
+        {
+            $customerProfileId = $Parent->customerProfileId;
+            $customerPaymentProfileId = $Parent->customerPaymentProfileId;
+
+            $customerProfile = CustomerProfile::populatefromrow($request);
+            $customerProfile->id = $customerProfileId;
+
+            $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
+            $customerPaymentProfile->id = $customerPaymentProfileId;
+            $customerPaymentProfile->updateCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+        }
+
+
         function updateCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId)
         {
             $merchantAuthentication = $this->setMerchantAuthentication();

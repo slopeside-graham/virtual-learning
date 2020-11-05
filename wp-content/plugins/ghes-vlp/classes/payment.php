@@ -296,6 +296,17 @@ namespace GHES\VLP {
             ];
         }
 
+        private function GetErrorMessage($response)
+        {
+            $tresponse = $response->getTransactionResponse();
+            if ($tresponse != null && $tresponse->getErrors() != null) {
+                $errorMessages =  "Transaction Error code  : " . $tresponse->getErrors()[0]->getErrorCode() . "\n" + " Error message : " . $tresponse->getErrors()[0]->getErrorText() . "\n";
+            } else {
+                $errorMessages =  "Response Error code  : " . $response->getMessages()->getMessage()[0]->getCode() . "\n" + " Error message : " . $response->getMessages()->getMessage()[0]->getText() . "\n";
+            }
+            return $errorMessages;
+        }
+
         public function ChargePayment($request)
         {
             // Get the User ID
@@ -307,23 +318,11 @@ namespace GHES\VLP {
             // Get the Customer Profile ID
             try {
                 if ($Parent->customerProfileId != NULL && $Parent->customerPaymentProfileId != NULL) {
-                    $customerProfileId = $Parent->customerProfileId;
-                    $customerPaymentProfileId = $Parent->customerPaymentProfileId;
-
-                    $customerProfile = new CustomerProfile();
-                    $customerProfile = CustomerProfile::populatefromrow($request);
-                    $customerProfile->id = $customerProfileId;
-
-                    $customerPaymentProfile = new CustomerPaymentProfile();
-                    $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
-                    $customerPaymentProfile->id = $customerPaymentProfileId;
-                    $customerPaymentProfile->updateCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
-                    // $customerProfile->customerPaymentProfile = $customerPaymentProfile;
+                    customerPaymentProfile::updateProfile($Parent, $request);
                 } else {
-                    $customerProfile = new customerProfile();
                     $customerProfile = customerProfile::populatefromrow($request);
                     $customerProfile->merchantCustomerId = $Parent_id;
-                    $customerPaymentProfile = new customerPaymentProfile();
+
                     $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
                     $anCustomerPaymentProfile = $customerPaymentProfile->getanCustomerPaymentProfile();
                     $result = $customerProfile->createCustomerProfile($anCustomerPaymentProfile, $Parent_id);
@@ -360,19 +359,37 @@ namespace GHES\VLP {
                 $paymentResultid = $paymentResult->id;
 
                 if ($chargeResult->getMessages()->getResultCode() == "Ok") {
-                    // if successful update Pending Payments
-                    $pendingPaymentResult = SubscriptionPayment::UpdateAllPendingByParentId($Parent_id, $paymentResultid);
-                    if (!is_wp_error($pendingPaymentResult)) {
-                        //TODO:  Update the subscription
+                    $tresponse = $chargeResult->getTransactionResponse();
+
+                    if ($tresponse != null && $tresponse->getMessages() != null) {
+                        // Everything worked.. 
+                        /* 
+                        echo " Transaction Response code : " . $tresponse->getResponseCode() . "\n";
+                        echo  "Charge Customer Profile APPROVED  :" . "\n";
+                        echo " Charge Customer Profile AUTH CODE : " . $tresponse->getAuthCode() . "\n";
+                        echo " Charge Customer Profile TRANS ID  : " . $tresponse->getTransId() . "\n";
+                        echo " Code : " . $tresponse->getMessages()[0]->getCode() . "\n";
+                        echo " Description : " . $tresponse->getMessages()[0]->getDescription() . "\n";
+                        */
+                        // if successful update Pending Payments
+                        $pendingPaymentResult = SubscriptionPayment::UpdateAllPendingByParentId($Parent_id, $paymentResultid);
+                        if (!is_wp_error($pendingPaymentResult)) {
+                            //TODO:  Update the subscription
+                            return true;
+                        } else {
+                            // response is ok, but tresponse is failed (Fail)
+                            return new \WP_Error('ChargePayment_Error', $this->GetErrorMessage($chargeResult));
+                        }
                     } else {
-                        return new \WP_Error('PaymentUpdate_Error', 'Something went wrong updating your subscription payments.');
+                        // tresponse is null and has messages  (Fail)
+                        return new \WP_Error('ChargePayment_Error', $this->GetErrorMessage($chargeResult));
                     }
                 } else {
-                    return new \WP_Error('ChargeFailed_Error', $chargeResult->getMessages()); //TODO: Get the proper message for this
+                    //Fail
+                    return new \WP_Error('ChargePayment_Error', $chargeResult->getTransactionResponse()->getErrors()[0]->getErrorText()); //TODO: Get the proper message for this
                 }
-
             } catch (Exception $e) {
-                return new \WP_Error('CharedPaymentProfile_Error', $e->getMessage());
+                return new \WP_Error('ChargePayment_Error', $e->getMessage());
             }
             // Get the response
             return true;
@@ -401,22 +418,22 @@ namespace GHES\VLP {
                     }
                 }
             }
-                    $this->User_id = get_current_user_id();
-                    $this->Status = $chargeStatus;
-                    $this->ResponseCode = $tresponse->getResponseCode();
-                    $this->authCode = $tresponse->getAuthCode();
-                    $this->avsResultCode = $tresponse->getAvsResultCode();
-                    $this->CvvResultCode = $tresponse->getCvvResultCode();
-                    $this->CavvResultCode = $tresponse->getCavvResultCode();
-                    $this->transId = $tresponse->getTransId();
-                    $this->accountNumber = $tresponse->getAccountNumber();
-                    $this->accountType = $tresponse->getAccountType();
-                    $this->prePaidCard = $tresponse->getPrePaidCard();
-                    $this->errors = $paymentErrors;
+            $this->User_id = get_current_user_id();
+            $this->Status = $chargeStatus;
+            $this->ResponseCode = $tresponse->getResponseCode();
+            $this->authCode = $tresponse->getAuthCode();
+            $this->avsResultCode = $tresponse->getAvsResultCode();
+            $this->CvvResultCode = $tresponse->getCvvResultCode();
+            $this->CavvResultCode = $tresponse->getCavvResultCode();
+            $this->transId = $tresponse->getTransId();
+            $this->accountNumber = $tresponse->getAccountNumber();
+            $this->accountType = $tresponse->getAccountType();
+            $this->prePaidCard = $tresponse->getPrePaidCard();
+            $this->errors = $paymentErrors;
 
-                    $this->Create();
-                    return $this;
-            }
+            $this->Create();
+            return $this;
+        }
 
         public function Create()
         {

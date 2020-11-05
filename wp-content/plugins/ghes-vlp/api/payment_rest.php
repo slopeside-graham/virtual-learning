@@ -256,15 +256,17 @@ namespace GHES\VLP {
 
             if (!is_wp_error($paymentsuccess)) {
                 if (\GHES\ghes_base::UserIsVLPParent()) {
-                    return rest_ensure_response($payment);
                 } else {
                     $UserId = get_current_user_id();
                     Utils::AddVLPRole($UserId);
-                    return rest_ensure_response($payment);
                 }
+                //Update Subscription
+                return rest_ensure_response($payment);
             } else {
-                $error_string = $paymentsuccess->get_error_message();
-                return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                $error_string = $paymentsuccess->get_error_codes();
+                $errorMessage = $paymentsuccess->get_error_message();
+                return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $errorMessage, array('status' => 400)); //TODO: there is something wong with this error message.
+                //return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $errorMessage);
             }
         }
 

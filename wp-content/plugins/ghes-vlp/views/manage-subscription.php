@@ -4,6 +4,7 @@ use Awf\Date\Date;
 use GHES\Parents;
 use GHES\VLP;
 use GHES\VLP\SubscriptionDefinition;
+use GHES\VLP\Utils;
 
 
 
@@ -18,6 +19,7 @@ function enqueue_manage_scripts()
 
 function vlp_manage_subscription($atts, $content = null)
 {
+    GHES\VLP\Utils::CheckLoggedInParent();
     enqueue_manage_scripts();
 
     $output = '';

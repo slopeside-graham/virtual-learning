@@ -20,3 +20,8 @@
 .purchase-vll-billing .flex-area {
     display: flex;
 }
+.successful-payment {
+    margin-bottom: 40px;
+    font-weight: 700;
+    display: none;
+}

@@ -20,6 +20,8 @@ function enqueue_browse_lessons_scripts()
 
 function vlp_browse_lessons($atts, $content = null)
 {
+    GHES\VLP\Utils::CheckLoggedInVLPParent();
+
     enqueue_browse_lessons_scripts();
 
     $output = '';

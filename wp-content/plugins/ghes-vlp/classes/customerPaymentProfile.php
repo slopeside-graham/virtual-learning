@@ -9,8 +9,6 @@ namespace GHES\VLP {
 
     class customerPaymentProfile extends ghes_vlp_base implements \JsonSerializable
     {
-        //const ENVIRONMENT = \net\authorize\api\constants\ANetEnvironment::SANDBOX;
-        //const ENVIRONMENT = \net\authorize\api\constants\ANetEnvironment::PRODUCTION;
 
         private $APILoginId;
         private $APIKey;
@@ -337,9 +335,9 @@ namespace GHES\VLP {
                 $request->setPaymentProfile($paymentprofile);
 
                 $controller = new AnetController\UpdateCustomerPaymentProfileController($request);
-                $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+                $response = $controller->executeWithApiResponse($this->getEnvironment());
                 if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
-                    return true;
+                    return $response;
                 } else if ($response != null) {
                     $errorMessages = $response->getMessages()->getMessage();
                     echo "Failed to Update Customer Payment Profile :  " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
@@ -350,7 +348,7 @@ namespace GHES\VLP {
                 echo "Failed to Get Customer Payment Profile :  " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
             }
 
-            return true;
+            return $response;
         }
 
         /**

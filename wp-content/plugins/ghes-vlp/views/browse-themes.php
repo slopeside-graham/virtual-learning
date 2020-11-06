@@ -20,6 +20,7 @@ function enqueue_browse_themes_scripts()
 
 function vlp_browse_themes($atts, $content = null)
 {
+    GHES\VLP\Utils::CheckLoggedInVLPParent();
     enqueue_browse_themes_scripts();
 
     $output = '';

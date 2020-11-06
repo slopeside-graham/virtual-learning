@@ -20,6 +20,7 @@ function enqueue_gameboard_archive_scripts()
 
 function vlp_gameboard_archive($atts, $content = null)
 {
+    GHES\VLP\Utils::CheckLoggedInVLPParent();
     enqueue_gameboard_archive_scripts();
 
     $output = '';

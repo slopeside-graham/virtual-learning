@@ -1,7 +1,10 @@
 <?php
 
 namespace GHES\VLP {
-    class Utils
+
+    use GHES\VLP\ghes_vlp_base as VLPBase;
+
+    class Utils extends ghes_vlp_base
     {
         public static $db;
 
@@ -22,12 +25,20 @@ namespace GHES\VLP {
             }
         }
 
-        public static function CheckLoggedInParent() {
+        public static function CheckLoggedInParent()
+        {
             $user = wp_get_current_user();
-            if ( !in_array( 'Parent', (array) $user->roles ) ) {
+            if (!ghes_vlp_base::UserIsParent()) {
                 $registrationpage = get_permalink(esc_attr(get_option('registration_welcome_url')));
-               header("Location: $registrationpage");
-            } 
+                header("Location: $registrationpage");
+            }
+        }
+        public static function CheckLoggedInVLPParent()
+        {
+            if (!ghes_vlp_base::UserIsVLPParent()) {
+                $profilepage = get_permalink(esc_attr(get_option('parent_profile_url')));
+                header("Location: $profilepage");
+            }
         }
     }
 }

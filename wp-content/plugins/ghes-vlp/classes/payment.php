@@ -7,6 +7,7 @@ namespace GHES\VLP {
     use GHES\VLP\customerProfile;
     use GHES\VLP\customerPaymentProfile;
     use GHES\VLP\SubscriptionPayment;
+    use GHES\VLP\Subscription;
 
     /**
      * Class Payment
@@ -327,14 +328,13 @@ namespace GHES\VLP {
                     $anCustomerPaymentProfile = $customerPaymentProfile->getanCustomerPaymentProfile();
                     $result = $customerProfile->createCustomerProfile($anCustomerPaymentProfile, $Parent_id);
                     if ($result == TRUE) {
-                        $customerPaymentProfileId = $customerProfile->id;
-                        $customerPaymentProfileId = $anCustomerPaymentProfile->id;
+                        $Parent = \GHES\Parents::GetByUserID($User_id); // This is refreshuing the parent to get the new anet profile ids'.
                     } else {
                         return $result;
                     }
                 }
             } catch (Exception $e) {
-                return new \WP_Error('Payment_Create_Error', $e->getMessage());
+                return new \WP_Error('ChargePayment_Error', $e->getMessage());
             }
             // Charge customerProfile
             try {
@@ -345,14 +345,16 @@ namespace GHES\VLP {
                         $backendAmount += $pendingPayment->Amount;
                     }
                 } else {
-                    return new \WP_Error('CalculateTotal_Error', $pendingPayments->getMessage());
+                    return new \WP_Error('ChargePayment_Error', $pendingPayments->getMessage());
                 }
                 if ($this->Amount == $backendAmount) {
                     $Amount = $backendAmount;
                 } else {
-                    return new \WP_Error('CalculateTotal_Error', 'Something went wrong with your total. Please refresh the page and try again.');
+                    return new \WP_Error('ChargePayment_Error', 'Something went wrong with your total. Please refresh the page and try again.');
                 }
-                $chargeResult = $customerProfile->chargeCustomerProfile($customerProfile->id, $customerPaymentProfileId, $Amount);
+                $customerProfile = new customerProfile();
+                //TODO: Populate this object with customer info first, rather than passing variables directly
+                $chargeResult = $customerProfile->chargeCustomerProfile($Parent->customerProfileId, $Parent->customerPaymentProfileId, $Amount);
 
                 // Create the payment record from the response.
                 $paymentResult = $this->CreatePaymentFromResponse($chargeResult);
@@ -374,7 +376,7 @@ namespace GHES\VLP {
                         // if successful update Pending Payments
                         $pendingPaymentResult = SubscriptionPayment::UpdateAllPendingByParentId($Parent_id, $paymentResultid);
                         if (!is_wp_error($pendingPaymentResult)) {
-                            //TODO:  Update the subscription
+                            Subscription::ActivateSubscriptionByParentId($Parent->id);
                             return true;
                         } else {
                             // response is ok, but tresponse is failed (Fail)
@@ -403,7 +405,7 @@ namespace GHES\VLP {
             $response = $chargeResult;
             $tresponse = $chargeResult->getTransactionResponse();
 
-            if ($response->getMessages()->getResultCode() == "Ok") {  // Transaction response was OK.
+            if ($response->getMessages()->getResultCode() == "Ok" && $tresponse->getErrors() == null) {  // Transaction response was OK.
                 $chargeStatus = "Successful";
                 $paymentErrors = null;
             } else {

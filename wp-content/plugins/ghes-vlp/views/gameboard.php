@@ -14,6 +14,7 @@ function enqueue_gameboard_scripts()
 
 function vlp_gameboard($atts, $content = null)
 {
+    GHES\VLP\Utils::CheckLoggedInVLPParent();
     enqueue_gameboard_scripts();
 
     // Get All Cookies

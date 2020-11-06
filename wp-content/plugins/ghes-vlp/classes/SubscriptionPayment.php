@@ -16,6 +16,7 @@ namespace GHES\VLP {
         private $_StartDate;
         private $_EndDate;
         private $_Payment_id;
+        private $_PaymentDate;
         private $_DateCreated;
         private $_DateModified;
 
@@ -101,6 +102,17 @@ namespace GHES\VLP {
                 return $this->_Payment_id;
             }
         }
+        protected function PaymentDate($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_PaymentDate = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_PaymentDate;
+            }
+        }
         protected function DateCreated($value = null)
         {
             // If value was provided, set the value
@@ -135,6 +147,7 @@ namespace GHES\VLP {
                 'StartDate' => $this->StartDate,
                 'EndDate' => $this->EndDate,
                 'Payment_id' => $this->Payment_id,
+                'PaymentDate' => $this->PaymentDate,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
@@ -307,7 +320,14 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from SubscriptionPayment where Subscription_id = %i and Status = 'Paid'", $subscriptionId);
+                    $results = VLPUtils::$db->query("select *, 
+                                                        p.DateCreated as PaymentDate
+                                                    from SubscriptionPayment sp
+                                                        Left Join Payment p on sp.Payment_id = p.id
+                                                    where 
+                                                    sp.Subscription_id = %i 
+                                                        and 
+                                                    sp.Status = 'Paid'", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -438,6 +458,7 @@ namespace GHES\VLP {
             $SubscriptionPayment->StartDate = $row['StartDate'];
             $SubscriptionPayment->EndDate = $row['EndDate'];
             $SubscriptionPayment->Payment_id = $row['Payment_id'];
+            $SubscriptionPayment->PaymentDate = $row['PaymentDate'];
             return $SubscriptionPayment;
         }
     }

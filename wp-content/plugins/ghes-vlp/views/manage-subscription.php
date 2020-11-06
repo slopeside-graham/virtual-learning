@@ -26,21 +26,15 @@ function vlp_manage_subscription($atts, $content = null)
     $parentid = GHES\Parents::GetByUserID(get_current_user_id())->id;
 
     // Get All Subscriptions by PArent, not necessary as we are going to get them in a more specific way.
-    /*
     $subscriptions = GHES\VLP\Subscription::GetAllByParentId($parentid);
-    if ($subscriptions->jsonSerialize()) {
-        $output .= '<h3>My Active Subscriptions</h3>';
-        $output .= '<ul>';
-        foreach ($subscriptions->jsonSerialize() as $k => $subscription) {
-            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($subscription->SubscriptionDefinition_id);
-            $output .= '<li>' . $subscriptionDefinition->Name . ' - ' . $subscription->Status . '</li>';
-        }
-        $output .= '</ul>';
+    if (!$subscriptions->jsonSerialize()) {
+        $selectSubscriptionPage = get_permalink(esc_attr(get_option('vlp-purchase')));
+        $output .= '<a href="' . $selectSubscriptionPage . '">You have no current subscriptions, Please select a subscription first -></a>';
     }
-    */
 
     $activeSubscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
     if ($activeSubscriptions->jsonSerialize()) {
+        $output .= '<h3 class="successful-payment">Thank you for your payment, please see your subscription details below.</h3>';
         $output .= '<h3>My Active Subscriptions</h3>';
         $output .= '<ul>';
         foreach ($activeSubscriptions->jsonSerialize() as $k => $activeSubscription) {
@@ -138,7 +132,8 @@ function vlp_manage_subscription($atts, $content = null)
                 $output .= '<ul>';
                 $paidPayments = GHES\VLP\SubscriptionPayment::GetAllPaidBySubscriptionId($activeSubscription->id);
                 foreach ($paidPayments->jsonSerialize() as $k => $paidPayment) {
-                    $output .= '<li>Paid - Amount: $' . $paidPayment->Amount . ' - ' . date('m/d/Y', strtotime($paidPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($paidPayment->EndDate)) . '</li>';
+                    $output .= '<li>Paid - Amount: $' . $paidPayment->Amount . ' - ' . date('m/d/Y', strtotime($paidPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($paidPayment->EndDate)) . '<br/>';
+                    $output .= 'Payment Date: ' .  date('m/d/Y', strtotime($paidPayment->PaymentDate)) . '</li>';
                 }
                 $output .= '</ul>';
             }

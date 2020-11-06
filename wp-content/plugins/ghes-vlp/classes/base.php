@@ -3,13 +3,14 @@
 namespace GHES\VLP {
 
   /**
-   * Base Class for GHES Registration Objects
+   * Base Class for GHES VLP Objects
    */
   class ghes_vlp_base
   {
 
     protected static $_User;  // WP User
     protected static $_UserIsParent;
+    protected static $_UserIsVLPParent;
     protected static $_UserIsDirector;
     protected static $_UserEmail;
     protected static $_UserID;
@@ -27,6 +28,12 @@ namespace GHES\VLP {
     {
       ghes_vlp_base::init();
       return ghes_vlp_base::$_UserIsParent;
+    }
+
+    public static function UserIsVLPParent()
+    {
+      ghes_vlp_base::init();
+      return ghes_vlp_base::$_UserIsVLPParent;
     }
 
     public static function UserIsDirector()
@@ -57,6 +64,7 @@ namespace GHES\VLP {
         // Is Parent
         ghes_vlp_base::$_UserIsParent = \current_user_can('Parent');
         ghes_vlp_base::$_UserIsDirector = \current_user_can('Director');
+        ghes_vlp_base::$_UserIsVLPParent = \current_user_can('VLP Parent');
         ghes_vlp_base::$_UserEmail = ghes_vlp_base::$_User->user_email;
         ghes_vlp_base::$_UserID = ghes_vlp_base::$_User->ID;
       }

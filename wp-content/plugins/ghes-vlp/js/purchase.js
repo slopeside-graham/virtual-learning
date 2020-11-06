@@ -62,14 +62,20 @@ $(document).ready(function () {
             $(".k-invalid:first").click();
         }
     });
+
+    var payment = getCookie("payment");
+    if (payment == "true") {
+        $(".successful-payment").show();
+        document.cookie = "payment=false";
+    }
 });
 
 window.onload = function () {
     calculateTotal();
 
-    var idselector = function() { return this.dataset.id; };
+    var idselector = function () { return this.dataset.id; };
     var paymentsChecked = $(".subscription-payment:checked").map(idselector).get();
-    paymentsChecked.forEach(function(paymentChecked) {
+    paymentsChecked.forEach(function (paymentChecked) {
         pendingPayment(paymentChecked);
     })
 };
@@ -161,11 +167,6 @@ function createSubscription() {
         success: function (result) {
             console.log("Success:" + result);
             //Success!
-            window.dataLayer = window.dataLayer || [];
-            dataLayer.push({
-                conversionValue: $("#subscription-total").val(),
-                event: "new_vll_subscription"
-            });
             window.location.replace(manageSubscriptionPage);
         },
         error: function (result) {
@@ -220,10 +221,16 @@ function purchaseSubscription() {
         success: function (result) {
             console.log("Success:" + result);
             //Success!
-            hideLoading('.purchase-vll-billing');
+            window.dataLayer = window.dataLayer || [];
+            dataLayer.push({
+                conversionValue: calculateTotal(),
+                event: "new_vll_subscription"
+            });
+            document.cookie = "payment=true";
+            location.reload();
         },
         error: function (result) {
-            console.log("Purchase Subscription Failed"); //TODO: there is something wrong here. It is not actually failing, but is returning a failed result.
+            console.log("Purchase Subscription Failed");
 
             if (typeof result.responseJSON !== "undefined") {
                 alert(result.responseJSON.message);

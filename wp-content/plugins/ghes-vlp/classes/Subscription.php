@@ -267,7 +267,36 @@ namespace GHES\VLP {
             }
             return $Subscription;
         }
+        public static function ActivateSubscriptionByParentId($ParentId) {
+            
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
 
+            try {
+
+                VLPUtils::$db->query(
+                    "UPDATE Subscription s
+                        Left Join SubscriptionPayment sp on s.id = sp.Subscription_id
+                    SET
+                    s.Status='Active'
+                WHERE 
+                    ParentID=%i
+                        and
+                    sp.Status = 'Paid'
+                        and
+                    Date(now()) between sp.StartDate and sp.EndDate",
+                    $ParentId
+                );
+
+                $counter = VLPUtils::$db->affectedRows();
+
+                // $Subscription = Subscription::Get($id);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Subscription_Update_Error', $e->getMessage());
+            }
+            return true;
+
+        }
         public static function updateStatus($id)
         {
 
@@ -289,7 +318,7 @@ namespace GHES\VLP {
 
                 $Subscription = Subscription::Get($id);
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('SubscriptionDefinition_Update_Error', $e->getMessage());
+                return new \WP_Error('Subscription_Update_Error', $e->getMessage());
             }
             return $Subscription;
         }

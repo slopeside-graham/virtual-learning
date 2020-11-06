@@ -18,6 +18,7 @@ function enqueue_purchase_scripts()
 
 function vlp_purchase($atts, $content = null)
 {
+    GHES\VLP\Utils::CheckLoggedInParent();
     enqueue_purchase_scripts();
 
     $output = '';

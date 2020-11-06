@@ -265,8 +265,7 @@ namespace GHES\VLP {
             } else {
                 $error_string = $paymentsuccess->get_error_codes();
                 $errorMessage = $paymentsuccess->get_error_message();
-                return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $errorMessage, array('status' => 400)); //TODO: there is something wong with this error message.
-                //return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $errorMessage);
+                return new \WP_Error('Payment_Create_Error', 'An error occured: ' . $errorMessage, array('status' => 400));
             }
         }
 

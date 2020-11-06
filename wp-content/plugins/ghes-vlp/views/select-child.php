@@ -15,6 +15,7 @@ function enqueue_select_child_scripts()
 
 function vlp_select_child($atts, $content = null)
 {
+    GHES\VLP\Utils::CheckLoggedInVLPParent();
     enqueue_select_child_scripts();
 
     $output = '';

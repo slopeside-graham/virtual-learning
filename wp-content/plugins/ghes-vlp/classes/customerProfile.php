@@ -12,8 +12,6 @@ namespace GHES\VLP {
 
     class customerProfile extends ghes_vlp_base implements \JsonSerializable
     {
-        //const ENVIRONMENT = \net\authorize\api\constants\ANetEnvironment::SANDBOX;
-        //const ENVIRONMENT = \net\authorize\api\constants\ANetEnvironment::PRODUCTION;
 
         private $APILoginId;
         private $APIKey;
@@ -181,6 +179,8 @@ namespace GHES\VLP {
          */
         public function chargeCustomerProfile($profileid, $paymentprofileid, $amount)
         {
+
+
             /* Create a merchantAuthenticationType object with authentication details */
             $merchantAuthentication = $this->setMerchantAuthentication();
 
@@ -203,7 +203,7 @@ namespace GHES\VLP {
             $request->setRefId($refId);
             $request->setTransactionRequest($transactionRequestType);
             $controller = new AnetController\CreateTransactionController($request);
-            $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
 
             if ($response != null) {
                 return $response;

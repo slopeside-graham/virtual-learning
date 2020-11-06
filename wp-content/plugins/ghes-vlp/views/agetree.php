@@ -6,6 +6,7 @@ use GHES\VLP\Theme;
 use GHES\VLP\AgeGroup;
 use GHES\VLP\Resource;
 use GHES\Children;
+use GHES\VLP\Utils;
 
 
 
@@ -20,6 +21,9 @@ function enqueue_agetree_scripts()
 
 function vlp_agetree($atts, $content = null)
 {
+
+    GHES\VLP\Utils::CheckLoggedInVLPParent();
+
     enqueue_agetree_scripts();
 
     //Uset all  Cookies

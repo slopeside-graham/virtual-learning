@@ -4,6 +4,7 @@ use Awf\Date\Date;
 use GHES\Parents;
 use GHES\VLP;
 use GHES\VLP\SubscriptionDefinition;
+use GHES\VLP\Subscription;
 
 
 
@@ -19,14 +20,20 @@ function enqueue_purchase_scripts()
 function vlp_purchase($atts, $content = null)
 {
     GHES\VLP\Utils::CheckLoggedInParent();
+    $parentid = GHES\Parents::UserID();
+
+    $allSubscriptions = Subscription::GetAllByParentId($parentid);
+
+    if ($allSubscriptions->jsonSerialize()) {
+
     enqueue_purchase_scripts();
 
     $output = '';
-    ?>
+?>
     <script>
-        var manageSubscriptionPage = "<?php echo(get_permalink(get_option('vlp-manage'))); ?>";
+        var manageSubscriptionPage = "<?php echo (get_permalink(get_option('vlp-manage'))); ?>";
     </script>
-    <?php
+<?php
 
     $output .= '<form id="select-subscription-vll">';
     $output .= '<h3>Select Subscription Level:</h3>';
@@ -57,4 +64,8 @@ function vlp_purchase($atts, $content = null)
     $output .= '</form>';
     // $output .= $billinginfo;
     return $output;
+} else {
+    $managesubscription = get_permalink(esc_attr(get_option('vlp-manage')));
+    header("Location: $managesubscription");
+}
 }

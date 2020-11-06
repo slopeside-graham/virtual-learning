@@ -51,7 +51,7 @@ function vlp_manage_subscription($atts, $content = null)
     }
 */
 
-    $unpaidSubscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
+    $unpaidSubscriptions = GHES\VLP\Subscription::GetAllByParentId($parentid);
     if ($unpaidSubscriptions->jsonSerialize()) {
 
         $output .= '<h3>My Subscriptions</h3>';

@@ -1,27 +1,33 @@
 .checkbox-list {
     list-style: none;
 }
-.address-section {
 
-}
-.credit-card-section {
+.address-section {}
 
-}
+.credit-card-section {}
+
 .purchase-vll-billing div {
     margin-bottom: 5px;
 }
+
 .purchase-vll-billing {
     display: none;
 }
+
 .purchase-vll-billing .three-column {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
 }
+
 .purchase-vll-billing .flex-area {
     display: flex;
 }
+
 .successful-payment {
     margin-bottom: 40px;
     font-weight: 700;
     display: none;
+}
+.k-window {
+    overflow-y: initial;
 }

@@ -311,3 +311,40 @@ function unpendingPayment(paymentId) {
         }
     })
 }
+var selectedSubscriptionId
+function openCancelDialog(selectedSubscription) {
+    selectedSubscriptionId = selectedSubscription.parentElement.dataset.subscriptionid;
+    selectedSubscriptionType = selectedSubscription.parentElement.dataset.subscriptiontype;
+
+    var cancelContent
+
+    if (selectedSubscriptionType == "monthly") {
+        cancelContent = "/wp-content/plugins/ghes-vlp/views/admin/templates/monthly-cancel-message.html";
+    } else if (selectedSubscriptionType == "yearly") {
+        cancelContent = "/wp-content/plugins/ghes-vlp/views/admin/templates/yearly-cancel-message.html";
+    }
+    $("#cancel-subscription").kendoWindow({
+        visible: false,
+        modal: true,
+        pinned: true,
+        width: "600px",
+        title: "Confirm Subscription Cancel",
+        visible: false,
+        actions: [
+            "Close"
+        ],
+        size: "medium",
+        scrollable: false,
+        content: cancelContent
+    });
+    $("#cancel-subscription").data("kendoWindow").center().open();
+}
+function closeCancelDialog() {
+    $("#cancel-subscription").data("kendoWindow").close();
+}
+function aproveCancelSubscription(selectedSubscriptionId) {
+    cancelSubscription(selectedSubscriptionId);
+}
+function cancelSubscription() {
+    console.log("Confirm Cancel Subscription " + selectedSubscriptionId);
+}

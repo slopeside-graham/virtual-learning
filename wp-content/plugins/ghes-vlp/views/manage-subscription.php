@@ -64,7 +64,7 @@ function vlp_manage_subscription($atts, $content = null)
             } else if ($currentUnpaidSubscription->PaymentFrequency == "monthly") {
                 $paymentFrequency = "Monthly";
             }
-            $output .= '<li>' . $subscriptionDefinition->Name . ' - ' . $currentUnpaidSubscription->StartDate . ' - ' . $currentUnpaidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments.</li>';
+            $output .= '<li data-subscriptionId="' . $currentUnpaidSubscription->id . '" data-subscriptionType="' . $currentUnpaidSubscription->PaymentFrequency . '">' . $subscriptionDefinition->Name . ' - ' . $currentUnpaidSubscription->StartDate . ' - ' . $currentUnpaidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments. <button class="cancel-button" onclick="openCancelDialog(this)">Cancel Subscription</button></li>';
             $output .= '<ul class="checkbox-list">';
             if ($subscriptionPayments->jsonSerialize()) {
                 foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
@@ -142,8 +142,8 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '</ul>';
             $output .= '</div>';
         }
+        $output .= '<div id="cancel-subscription"></div>';
     }
-
 
     return $output;
 }

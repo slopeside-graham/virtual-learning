@@ -4,6 +4,7 @@ namespace GHES\VLP {
 
     use GHES\VLP\Utils as VLPUtils;
     use GHES\VLP\Subscription as VLPSubscription;
+
     /**
      * Class SubscriptionPayment
      */
@@ -135,7 +136,7 @@ namespace GHES\VLP {
                 return $this->_DateModified;
             }
         }
-        
+
 
         public function jsonSerialize()
         {
@@ -171,7 +172,6 @@ namespace GHES\VLP {
                     'Payment_id' => $this->Payment_id
                 ));
                 $this->id = VLPUtils::$db->insertId();
-
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('SubscriptionPayment_Create_Error', $e->getMessage());
             }
@@ -199,12 +199,100 @@ namespace GHES\VLP {
                 $counter = VLPUtils::$db->affectedRows();
 
                 $SubscriptionPayment = SubscriptionPayment::Get($this->id);
-
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('SubscriptionPayment_Update_Error', $e->getMessage());
             }
             return $SubscriptionPayment;
         }
+
+        public static function cancelMonthlyPayments($subscriptionId)
+        {
+            // No refund needed on Monthly Cancellation.
+
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "UPDATE SubscriptionPayment 
+                        SET
+                        Status='Cancelled'
+                    WHERE 
+                        Subscription_id=%i
+                            and
+                        Status<>'Paid'",
+                    $subscriptionId
+                );
+                $counter = VLPUtils::$db->affectedRows();
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+        public static function cancelYearlyPayments($subscriptionId)
+        {
+            $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
+            if ($subscriptionPayments->jsonSerialize()) {
+                foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
+                    if ($subscriptionPayment->Status == "Paid") {
+                        $subscription = Subscription::Get($subscriptionId);
+                        // Refund the reamining time
+                        //Calculate reamining days
+                        $refundDays = Subscription::calculateRemainingtime($subscription);
+                        //Divide by 365
+                        $refundPercent = $refundDays / 365;
+                        //Multiply that number by the amount paid
+                        $refundAmount = round($refundPercent * $subscription->Total, 2);
+
+                        $paymentResult = Payment::refund($refundAmount, $subscriptionPayment);
+
+                        if (!is_wp_error($paymentResult)) {
+                            SubscriptionPayment::cancelSubscriptionPayment($subscriptionId);
+                            return $paymentResult;
+                        } else {
+                            return $paymentResult;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static function cancelSubscriptionPayment($subscriptionId)
+        {
+            // Cancel the SubscriptionPayment
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "UPDATE SubscriptionPayment 
+                        SET
+                        Status='Cancelled'
+                    WHERE 
+                        Subscription_id=%i
+                            and
+                        Status<>'Paid'",
+                    $subscriptionId
+                );
+                $counter = VLPUtils::$db->affectedRows();
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
 
         public static function UpdateAllPendingByParentId($Parent_id, $paymentResultid)
         {
@@ -224,13 +312,13 @@ namespace GHES\VLP {
                     sp.Status='Pending'
                         and
                     s.ParentId=%i",
-                    $paymentResultid, $Parent_id
+                    $paymentResultid,
+                    $Parent_id
                 );
 
                 $counter = VLPUtils::$db->affectedRows();
 
                 $SubscriptionPayment = SubscriptionPayment::GetAllByPaymentId($paymentResultid);
-
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('SubscriptionPayment_Update_Error', $e->getMessage());
             }
@@ -267,8 +355,8 @@ namespace GHES\VLP {
                 return new \WP_Error('SubscriptionPayment_Get_Error', $e->getMessage());
             }
             return $SubscriptionPayment;
-        }        
-        
+        }
+
 
         public static function GetAll()
         {
@@ -278,7 +366,7 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from SubscriptionPayment");
+                $results = VLPUtils::$db->query("select * from SubscriptionPayment");
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -299,7 +387,7 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from SubscriptionPayment where Subscription_id = %i", $subscriptionId);
+                $results = VLPUtils::$db->query("select * from SubscriptionPayment where Subscription_id = %i", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -320,7 +408,7 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select *, 
+                $results = VLPUtils::$db->query("select *, 
                                                         p.DateCreated as PaymentDate
                                                     from SubscriptionPayment sp
                                                         Left Join Payment p on sp.Payment_id = p.id
@@ -348,11 +436,11 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from SubscriptionPayment 
+                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
                                                         where 
                                                             Subscription_id = %i 
                                                             and Date(StartDate) <= Date(Now())
-                                                            and Status <> 'Paid'", $subscriptionId);
+                                                            and Status Not In ('Paid', 'Cancelled')", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -372,7 +460,7 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from SubscriptionPayment where Payment_id = %i", $paymentResultid);
+                $results = VLPUtils::$db->query("select * from SubscriptionPayment where Payment_id = %i", $paymentResultid);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -400,7 +488,7 @@ namespace GHES\VLP {
             $PendingPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select sp.*,
+                $results = VLPUtils::$db->query("select sp.*,
                                                         s.ParentID as ParentId 
                                                     from SubscriptionPayment sp
                                                         Left Join Subscription s on sp.Subscription_id = s.id
@@ -427,11 +515,11 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                    $results = VLPUtils::$db->query("select * from SubscriptionPayment 
+                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
                                                         where 
                                                             Subscription_id = %i
                                                             and Date(StartDate) > Date(Now())
-                                                            and Status <> 'Paid'", $subscriptionId);
+                                                            and Status Not In ('Paid', 'Cancelled')", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -448,8 +536,8 @@ namespace GHES\VLP {
         public static function populatefromRow($row): ?SubscriptionPayment
         {
             if ($row == null)
-            return null;
-            
+                return null;
+
             $SubscriptionPayment = new SubscriptionPayment();
             $SubscriptionPayment->id = $row['id'];
             $SubscriptionPayment->Status = $row['Status'];

@@ -1,6 +1,7 @@
 <?php
 
 use GHES\ghes_base;
+
 namespace GHES\VLP {
 
     /**
@@ -137,7 +138,7 @@ namespace GHES\VLP {
          */
         public function update_item_permissions_check($request)
         {
-            if (is_user_logged_in() && current_user_can('vlp_manage_entries')) {
+            if (is_user_logged_in() && \GHES\ghes_base::UserIsParent()) {
                 return true;
             } else
                 return new \WP_Error('rest_forbidden', esc_html__('You cannot update this Subscription resource.'), array('status' => $this->authorization_status_code()));
@@ -208,15 +209,13 @@ namespace GHES\VLP {
         public function update_item($request)
         {
             $subscription = Subscription::populatefromRow($request);
-            $success = $subscription->Update();
 
-            $subscription = Subscription::Get($subscription->id);
+            $response = $subscription->updateStatus($subscription->id);
 
-            if (!is_wp_error($success))
+            if (!is_wp_error($response)) {
                 return rest_ensure_response($subscription);
-            else {
-                $error_string = $success->get_error_message();
-                return new \WP_Error('Subscription_Update_Error', 'An error occured: ' . $error_string, array('status' => 400));
+            } else {
+                return $response;
             }
         }
 

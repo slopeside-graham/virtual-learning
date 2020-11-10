@@ -62,9 +62,9 @@ namespace GHES\VLP {
         public static function CheckSubscriptionStatus() {
             $userid = \GHES\Parents::UserID();
             $parentid = \GHES\Parents::GetByUserID(get_current_user_id())->id;
-            $activeSubscriptions = Subscription::GetAllActiveByParentId($parentid);
+            $currentSubscriptions = Subscription::GetAllCurrentByParentId($parentid);
 
-            if($activeSubscriptions->jsonSerialize()) {
+            if($currentSubscriptions->jsonSerialize()) {
                 Utils::AddVLPRole($userid);
             } else {
                 Utils::RemoveVLPRole($userid);

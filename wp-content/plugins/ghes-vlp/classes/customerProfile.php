@@ -179,8 +179,6 @@ namespace GHES\VLP {
          */
         public function chargeCustomerProfile($profileid, $paymentprofileid, $amount)
         {
-
-
             /* Create a merchantAuthenticationType object with authentication details */
             $merchantAuthentication = $this->setMerchantAuthentication();
 
@@ -205,12 +203,113 @@ namespace GHES\VLP {
             $controller = new AnetController\CreateTransactionController($request);
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
-            if ($response != null) {
-                return $response;
-            } else {
-                return new \WP_Error('AN_ChargePaymentProfile_Error', "No response returned \n");
-            }
             return $response;
+        }
+
+        public function refundCustomerProfile($profileid, $paymentprofileid, $refundAmount, $originalPayment)
+        {
+            $refTransId = $originalPayment->transId;
+            /* Create a merchantAuthenticationType object with authentication details */
+            $merchantAuthentication = $this->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            // set payment profile for customer
+
+            $paymentProfile = new AnetAPI\PaymentProfileType();
+            $paymentProfile->setpaymentProfileId($paymentprofileid);
+
+            // set customer profile
+            $customerProfile = new AnetAPI\CustomerProfilePaymentType();
+            $customerProfile->setCustomerProfileId($profileid);
+            $customerProfile->setPaymentProfile($paymentProfile);
+
+            //create a transaction
+            $transactionRequest = new AnetAPI\TransactionRequestType();
+            $transactionRequest->setTransactionType("refundTransaction");
+            $transactionRequest->setAmount($refundAmount);
+            $transactionRequest->setRefTransId($refTransId);
+            $transactionRequest->setProfile($customerProfile);
+
+
+            $request = new AnetAPI\CreateTransactionRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setTransactionRequest($transactionRequest);
+            $controller = new AnetController\CreateTransactionController($request);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
+
+            $tresponse =  $response->getTransactionResponse();
+            $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
+            if ($tresponseError = 54) {
+                $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
+                return $voidResponse;
+            } else {
+                return $response;
+            }
+        }
+
+        public function voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount)
+        {
+            /* Create a merchantAuthenticationType object with authentication details */
+            $merchantAuthentication = $this->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            // Void Trasaction because it is unsettled
+            //create a transaction
+            $transactionRequest = new AnetAPI\TransactionRequestType();
+            $transactionRequest->setTransactionType("voidTransaction");
+            $transactionRequest->setAmount($refundAmount);
+            $transactionRequest->setRefTransId($refTransId);
+            $transactionRequest->setProfile($customerProfile);
+
+
+            $request = new AnetAPI\CreateTransactionRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setTransactionRequest($transactionRequest);
+            $controller = new AnetController\CreateTransactionController($request);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
+
+            return $response;
+        }
+
+        public static function analyzeANresponse($response)
+        {
+            if ($response != null) {
+                if ($response->getMessages()->getResultCode() == "Ok") {
+                    $tresponse = $response->getTransactionResponse();
+
+                    if ($tresponse != null && $tresponse->getMessages() != null) {
+                        // Request Success and Transaction Success
+                        return $response;
+                    } else {
+                        // Request Success and Transaction Failed
+                        if ($tresponse->getErrors() != null) {
+                            $terrorcode = $tresponse->getErrors()[0]->getErrorCode();
+                            $terrormessage = $tresponse->getErrors()[0]->getErrorText();
+                        }
+                        $response = "Error: " . $terrorcode . ", Error Message: " . $terrormessage;
+                        return new \WP_Error('AN_analyzeANresponse_Error', "Error: " . $terrorcode . ", Error Message: " . $terrormessage);
+                    }
+                } else {
+                    // Request Failed and Transaction Failed
+                    $tresponse = $response->getTransactionResponse();
+                    if ($tresponse != null && $tresponse->getErrors() != null) {
+                        $terrorcode = $tresponse->getErrors()[0]->getErrorCode();
+                        $terrormessage = $tresponse->getErrors()[0]->getErrorText();
+                    } else {
+                        $terrorcode = $response->getMessages()->getMessage()[0]->getCode();
+                        $terrormessage = $response->getMessages()->getMessage()[0]->getText();
+                    }
+                    return new \WP_Error('AN_ResponseCustomerProfile_Error', "Error: " . $terrorcode . ", Error Message: " . $terrormessage);
+                }
+            } else {
+                return new \WP_Error('AN_ResponseCustomerProfile_Error', "No response returned");
+            }
         }
 
         // Helper function to populate a lesson from a MeekroDB Row

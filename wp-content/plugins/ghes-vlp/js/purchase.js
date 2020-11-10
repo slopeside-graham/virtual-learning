@@ -74,18 +74,18 @@ window.onload = function () {
     calculateTotal();
 
     var idselector = function () { return this.dataset.id; };
-    var paymentsChecked = $(".subscription-payment:checked").map(idselector).get();
-    paymentsChecked.forEach(function (paymentChecked) {
-        pendingPayment(paymentChecked);
+    var payments = $(".subscription-payment:checked").get();
+    payments.forEach(function (payments) {
+        pendingPayment(payments.dataset);
     })
 };
 
 $(".subscription-payment").click(function (e) {
-    paymentId = e.currentTarget.dataset.id;
-    if ($(event.target).prop("checked")) {
-        pendingPayment(paymentId);
+    payment = e.currentTarget.dataset;
+    if ($(e.target).prop("checked")) {
+        pendingPayment(payment);
     } else {
-        unpendingPayment(paymentId);
+        unpendingPayment(payment);
     }
     calculateTotal();
 });
@@ -136,7 +136,7 @@ $("input[name='subscription-select'").click(function (e) {
 
     if ($("input[name='payment-frequency']:checked").length > 0) {
         $price = $("input[name='payment-frequency']:checked").attr("data-price");
-        $("#subscription-total-area").html("Total: $<span id='subscription-total'>" + $price + '</span>');
+        $("#subscription-total-area").html("Total Due Today: $<span id='subscription-total'>" + $price + '</span>');
         console.log("Selected Price: " + $price);
     };
 
@@ -145,7 +145,7 @@ $("input[name='subscription-select'").click(function (e) {
 $("input[name='payment-frequency']").click(function (e) {
     $price = e.currentTarget.dataset.price;
     console.log("Selected Price: " + $price);
-    $("#subscription-total-area").html("Total: $<span id='subscription-total'>" + $price + '</span>');
+    $("#subscription-total-area").html("Total Due Today: $<span id='subscription-total'>" + $price + '</span>');
 });
 
 
@@ -246,70 +246,74 @@ function purchaseSubscription() {
 
 }
 
-function pendingPayment(paymentId) {
-    $.ajax({
-        url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
-        method: "PUT",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
-        },
-        timeout: 60000,
-        data: {
-            id: paymentId,
-            Status: "Pending"
-        },
-        success: function (result) {
-            console.log("Success:" + result);
-            //Success!
-            window.dataLayer = window.dataLayer || [];
-        },
-        error: function (result) {
-            console.log("Update Payment Status to Pending Failed");
+function pendingPayment(payment) {
+    if (payment.status == 'Unpaid') {
+        $.ajax({
+            url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
+            method: "PUT",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+            },
+            timeout: 60000,
+            data: {
+                id: payment.id,
+                Status: "Pending"
+            },
+            success: function (result) {
+                console.log("Success:" + result);
+                //Success!
+                window.dataLayer = window.dataLayer || [];
+            },
+            error: function (result) {
+                console.log("Update Payment Status to Pending Failed");
 
-            if (typeof result.responseJSON !== "undefined") {
-                alert(result.responseJSON.message);
-            } else {
-                alert(
-                    "An unexpected error occured.  Please review your submission and try again."
-                );
+                if (typeof result.responseJSON !== "undefined") {
+                    alert(result.responseJSON.message);
+                } else {
+                    alert(
+                        "An unexpected error occured.  Please review your submission and try again."
+                    );
+                }
+                hideLoading('.purchase-vll-billing');
+                console.log(result.responseText);
             }
-            hideLoading('.purchase-vll-billing');
-            console.log(result.responseText);
-        }
-    })
+        })
+    }
 }
 
-function unpendingPayment(paymentId) {
-    $.ajax({
-        url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
-        method: "PUT",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
-        },
-        timeout: 60000,
-        data: {
-            id: paymentId,
-            Status: "Unpaid"
-        },
-        success: function (result) {
-            console.log("Success:" + result);
-            //Success!
-            window.dataLayer = window.dataLayer || [];
-        },
-        error: function (result) {
-            console.log("Update Status to Unpaid Failed");
+function unpendingPayment(payment) {
+    if (payment.status == "Pending") {
+        $.ajax({
+            url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
+            method: "PUT",
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+            },
+            timeout: 60000,
+            data: {
+                id: payment.id,
+                Status: "Unpaid"
+            },
+            success: function (result) {
+                console.log("Success:" + result);
+                //Success!
+                window.dataLayer = window.dataLayer || [];
+            },
+            error: function (result) {
+                console.log("Update Status to Unpaid Failed");
 
-            if (typeof result.responseJSON !== "undefined") {
-                alert(result.responseJSON.message);
-            } else {
-                alert(
-                    "An unexpected error occured.  Please review your submission and try again."
-                );
+                if (typeof result.responseJSON !== "undefined") {
+                    alert(result.responseJSON.message);
+                } else {
+                    alert(
+                        "An unexpected error occured.  Please review your submission and try again."
+                    );
+                }
+                hideLoading('.purchase-vll-billing');
+                console.log(result.responseText);
             }
-            hideLoading('.purchase-vll-billing');
-            console.log(result.responseText);
-        }
-    })
+        })
+    }
 }
 var selectedSubscriptionId
 function openCancelDialog(selectedSubscription) {
@@ -343,8 +347,42 @@ function closeCancelDialog() {
     $("#cancel-subscription").data("kendoWindow").close();
 }
 function aproveCancelSubscription(selectedSubscriptionId) {
+    showLoading('.k-window');
     cancelSubscription(selectedSubscriptionId);
 }
 function cancelSubscription() {
     console.log("Confirm Cancel Subscription " + selectedSubscriptionId);
+
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/subscription",
+        method: "PUT",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        timeout: 60000,
+        data: {
+            id: selectedSubscriptionId,
+            Status: "Cancelled"
+        },
+        success: function (result) {
+            console.log("Success:" + result);
+            hideLoading('.k-window');
+            $("#cancel-subscription").data("kendoWindow").close();
+            location.reload();
+            //Success!
+        },
+        error: function (result) {
+            console.log("Failed to Cancel Subscription");
+            $("#cancel-subscription").data("kendoWindow").close();
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            } else {
+                alert(
+                    "An unexpected error occured.  Please review your submission and try again."
+                );
+            }
+            hideLoading('.k-window');
+            console.log(result.responseText);
+        }
+    })
 }

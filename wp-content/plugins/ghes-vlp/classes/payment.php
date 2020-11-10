@@ -308,7 +308,7 @@ namespace GHES\VLP {
             return $errorMessages;
         }
 
-        public function ChargePayment($request)
+        public function charge($request)
         {
             // Get the User ID
             $User_id = get_current_user_id();
@@ -365,19 +365,14 @@ namespace GHES\VLP {
 
                     if ($tresponse != null && $tresponse->getMessages() != null) {
                         // Everything worked.. 
-                        /* 
-                        echo " Transaction Response code : " . $tresponse->getResponseCode() . "\n";
-                        echo  "Charge Customer Profile APPROVED  :" . "\n";
-                        echo " Charge Customer Profile AUTH CODE : " . $tresponse->getAuthCode() . "\n";
-                        echo " Charge Customer Profile TRANS ID  : " . $tresponse->getTransId() . "\n";
-                        echo " Code : " . $tresponse->getMessages()[0]->getCode() . "\n";
-                        echo " Description : " . $tresponse->getMessages()[0]->getDescription() . "\n";
-                        */
-                        // if successful update Pending Payments
                         $pendingPaymentResult = SubscriptionPayment::UpdateAllPendingByParentId($Parent_id, $paymentResultid);
                         if (!is_wp_error($pendingPaymentResult)) {
-                            Subscription::ActivateSubscriptionByParentId($Parent->id);
-                            return true;
+                            $subscriptionresult = Subscription::ActivateSubscriptionByParentId($Parent->id);
+                            if (!is_wp_error($subscriptionresult)) {
+                                return true;
+                            } else {
+                                return $subscriptionresult;
+                            }
                         } else {
                             // response is ok, but tresponse is failed (Fail)
                             return new \WP_Error('ChargePayment_Error', $this->GetErrorMessage($chargeResult));
@@ -395,6 +390,33 @@ namespace GHES\VLP {
             }
             // Get the response
             return true;
+        }
+
+        public static function refund($refundAmount, $subscriptionPayment)
+        {
+            $refundPayment = new Payment;
+            // Get the User ID
+            $User_id = get_current_user_id();
+            // Get the Parent Objuct
+            $Parent = \GHES\Parents::GetByUserID($User_id);
+            // Get the Parent ID
+            $Parent_id = $Parent->id;
+
+            $originalPayment = Payment::Get($subscriptionPayment->Payment_id);
+
+            $customerProfile = new customerProfile();
+            $chargeResult = $customerProfile->refundCustomerProfile($Parent->customerProfileId, $Parent->customerPaymentProfileId, $refundAmount, $originalPayment);
+            // Create the payment record from the response.
+            $refundPaymentResult = $refundPayment->CreateRefundFromResponse($chargeResult, $refundAmount);
+
+            $result = customerProfile::analyzeANresponse($chargeResult);
+
+            if(!is_wp_error($result)) {
+                return $refundPaymentResult;
+            } else {
+                $error_string = $result->get_error_message();
+                return new \WP_Error('Refund_Error', 'An error occured: ' . $error_string, array('status' => 400));
+            }
         }
 
         public function CreatePaymentFromResponse($chargeResult)
@@ -420,8 +442,53 @@ namespace GHES\VLP {
                     }
                 }
             }
+            $this->Type = 'Charge';
             $this->User_id = get_current_user_id();
             $this->Status = $chargeStatus;
+            $this->Description = 'VLL Subscription';
+            $this->ResponseCode = $tresponse->getResponseCode();
+            $this->authCode = $tresponse->getAuthCode();
+            $this->avsResultCode = $tresponse->getAvsResultCode();
+            $this->CvvResultCode = $tresponse->getCvvResultCode();
+            $this->CavvResultCode = $tresponse->getCavvResultCode();
+            $this->transId = $tresponse->getTransId();
+            $this->accountNumber = $tresponse->getAccountNumber();
+            $this->accountType = $tresponse->getAccountType();
+            $this->prePaidCard = $tresponse->getPrePaidCard();
+            $this->errors = $paymentErrors;
+
+            $this->Create();
+            return $this;
+        }
+
+        public function CreateRefundFromResponse($chargeResult, $refundAmount)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $response = $chargeResult;
+            $tresponse = $chargeResult->getTransactionResponse();
+
+            if ($response->getMessages()->getResultCode() == "Ok" && $tresponse->getErrors() == null) {  // Transaction response was OK.
+                $chargeStatus = "Successful";
+                $paymentErrors = null;
+            } else {
+                $chargeStatus = "Failed";
+                if ($tresponse != null && $tresponse->getErrors() != null) {
+                    $paymentErrors = "Error Code  : " . $tresponse->getErrors()[0]->getErrorCode() . "\n";
+                    $paymentErrors .= "Error Message : " . $tresponse->getErrors()[0]->getErrorText() . "\n";
+                } else {
+                    if ($response != null && $response->getMessages() != null) {
+                        $paymentErrors = "Error Code  : " . $response->getMessages()->getMessage()[0]->getCode() . "\n";
+                        $paymentErrors .= "Error Message : " . $response->getMessages()->getMessage()[0]->getText() . "\n";
+                    }
+                }
+            }
+            $this->Type = 'Refund';
+            $this->User_id = get_current_user_id();
+            $this->Amount = $refundAmount;
+            $this->Status = $chargeStatus;
+            $this->Description = 'VLL Subscription';
             $this->ResponseCode = $tresponse->getResponseCode();
             $this->authCode = $tresponse->getAuthCode();
             $this->avsResultCode = $tresponse->getAvsResultCode();
@@ -446,6 +513,7 @@ namespace GHES\VLP {
             try {
 
                 VLPUtils::$db->insert('Payment', array(
+                    'Type' => $this->Type,
                     'User_id' => $this->User_id,
                     'Amount' => $this->Amount,
                     'Status' => $this->Status,

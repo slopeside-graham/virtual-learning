@@ -22,9 +22,9 @@ function vlp_purchase($atts, $content = null)
     GHES\VLP\Utils::CheckLoggedInParent();
     $parentid = GHES\Parents::UserID();
 
-    $allSubscriptions = Subscription::GetAllByParentId($parentid);
+    $allSubscriptions = Subscription::GetAllActiveByParentId($parentid);
 
-    if ($allSubscriptions->jsonSerialize()) {
+    if (!$allSubscriptions->jsonSerialize()) {
 
     enqueue_purchase_scripts();
 
@@ -57,7 +57,7 @@ function vlp_purchase($atts, $content = null)
     $oneyear = date("m/d/Y", strtotime('+1 years, -1 days'));
     $output .= '<h3>Subscription Start Date: <span id="sub-start-date">' . $today . '</span><h3>';
     $output .= '<h3>Subscription End Date: <span id="sub-end-date">' . $oneyear . '</span><h3>';
-    $output .= '<h3 id="subscription-total-area">Total: </h3>';
+    $output .= '<h3 id="subscription-total-area">Total Due Today: </h3>';
 
     $output .= '<button name="continue-payment-vlp" id="continue-payment-vlp" class="ghes-save" type="submit">Continue to Payment</button>';
     $output .= '<div id="window"></div>';

@@ -251,7 +251,7 @@ namespace GHES\VLP {
         public function create_item($request)
         {
             $payment = Payment::populatefromRow($request);
-            $paymentsuccess = $payment->ChargePayment($request);
+            $paymentsuccess = $payment->charge($request);
             $payment = Payment::Get($payment->id);
 
             if (!is_wp_error($paymentsuccess)) {

@@ -3,6 +3,7 @@
 namespace GHES\VLP {
 
     use GHES\VLP\Utils as VLPUtils;
+    use GHES\VLP\customerProfile;
 
     /**
      * Class Subscription
@@ -256,7 +257,8 @@ namespace GHES\VLP {
                     $this->Status,
                     $this->PaymentFrequency,
                     $this->SubscriptionDefinition_id,
-                    $this->Total
+                    $this->Total,
+                    $this->id
                 );
 
                 $counter = VLPUtils::$db->affectedRows();
@@ -267,8 +269,9 @@ namespace GHES\VLP {
             }
             return $Subscription;
         }
-        public static function ActivateSubscriptionByParentId($ParentId) {
-            
+        public static function ActivateSubscriptionByParentId($ParentId)
+        {
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -280,11 +283,13 @@ namespace GHES\VLP {
                     SET
                     s.Status='Active'
                 WHERE 
-                    ParentID=%i
+                    s.ParentID=%i
                         and
                     sp.Status = 'Paid'
                         and
-                    Date(now()) between sp.StartDate and sp.EndDate",
+                    Date(now()) between sp.StartDate and sp.EndDate
+                        and
+                    s.Status <> 'Cancelled'",
                     $ParentId
                 );
 
@@ -295,32 +300,43 @@ namespace GHES\VLP {
                 return new \WP_Error('Subscription_Update_Error', $e->getMessage());
             }
             return true;
-
         }
-        public static function updateStatus($id)
+        public function updateStatus($id)
         {
 
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
-            try {
+            $Subscription = Subscription::Get($id);
 
-                VLPUtils::$db->query(
-                    "UPDATE Subscription
+            if ($this->Status == 'Cancelled' && $Subscription->PaymentFrequency == 'monthly') {
+                $response = SubscriptionPayment::cancelMonthlyPayments($this->id);
+            } else if ($this->Status == 'Cancelled' && $Subscription->PaymentFrequency == 'yearly') {
+                $response = SubscriptionPayment::cancelYearlyPayments($this->id);
+            }
+
+            if (!is_wp_error($response)) {
+                try {
+                    VLPUtils::$db->query(
+                        "UPDATE Subscription
                     SET
-                    Status='Active'
+                    Status=%s
                 WHERE 
                     id=%i",
-                    $id
-                );
+                        $this->Status,
+                        $id
+                    );
 
-                $counter = VLPUtils::$db->affectedRows();
+                    $counter = VLPUtils::$db->affectedRows();
 
-                $Subscription = Subscription::Get($id);
-            } catch (\MeekroDBException $e) {
-                return new \WP_Error('Subscription_Update_Error', $e->getMessage());
+                    $Subscription = Subscription::Get($id);
+                } catch (\MeekroDBException $e) {
+                    return new \WP_Error('Subscription_Update_Error', $e->getMessage());
+                }
+                return $Subscription;
+            } else {
+                return $response;
             }
-            return $Subscription;
         }
 
         public function Delete()
@@ -396,8 +412,8 @@ namespace GHES\VLP {
             }
             return $Subscriptions;
         }
-
-        public static function GetAllActiveByParentId($parentid)
+        public static function GetAllCurrentByParentId($parentid)
+        // This is to get all subsctriptions with current payments, including cancelled subscriptions since they have their remaining payment time to use it.
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
@@ -405,16 +421,17 @@ namespace GHES\VLP {
             $Subscriptions = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select distinct S.* from Subscription S
+                $results = VLPUtils::$db->query(
+                    "select distinct S.* from Subscription S
                                                     Inner Join SubscriptionPayment SP
                                                         on S.id = SP.Subscription_id
                                                     Where 
                                                         S.ParentID = %i
                                                         and
-                                                        SP.Status = 'Paid'
-                                                        and
-                                                        Date(Now()) between Date(SP.StartDate) and Date(SP.EndDate)",
-                                                        $parentid);
+                                                        Date(Now()) between Date(SP.StartDate) and Date(SP.EndDate)
+                                                        and SP.Status = 'Paid'",
+                    $parentid
+                );
                 foreach ($results as $row) {
                     $Subscription = Subscription::populatefromRow($row);
                     $Subscriptions->add_item($Subscription);  // Add the lesson to the collection
@@ -424,6 +441,47 @@ namespace GHES\VLP {
                 return new \WP_Error('Subscription_GetAll_Error', $e->getMessage());
             }
             return $Subscriptions;
+        }
+
+        public static function GetAllActiveByParentId($parentid)
+        // This is to get all active (current and not cancelled) subscriptions
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $Subscriptions = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "select distinct S.* from Subscription S
+                                                    Inner Join SubscriptionPayment SP
+                                                        on S.id = SP.Subscription_id
+                                                    Where 
+                                                        S.ParentID = %i
+                                                        and
+                                                        Date(Now()) between Date(SP.StartDate) and Date(SP.EndDate)
+                                                        and 
+                                                        S.Status <> 'Cancelled'",
+                    $parentid
+                );
+                foreach ($results as $row) {
+                    $Subscription = Subscription::populatefromRow($row);
+                    $Subscriptions->add_item($Subscription);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Subscription_GetAll_Error', $e->getMessage());
+            }
+            return $Subscriptions;
+        }
+
+        public static function calculateRemainingtime($subscription)
+        {
+            $now = time(); // or your date as well
+            $subscriptionEndDate = strtotime($subscription->EndDate);
+            $datediff = $subscriptionEndDate - $now;
+            $daysDiffernece = ceil($datediff / (60 * 60 * 24));
+            return $daysDiffernece;
         }
 
         // Helper function to populate a lesson from a MeekroDB Row

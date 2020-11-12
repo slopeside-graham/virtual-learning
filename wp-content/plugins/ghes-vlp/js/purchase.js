@@ -68,6 +68,12 @@ $(document).ready(function () {
         $(".successful-payment").show();
         document.cookie = "payment=false";
     }
+
+    var refund = getCookie("refund");
+    if (refund == "true") {
+        $(".successful-refund").show();
+        document.cookie = "refund=false";
+    }
 });
 
 window.onload = function () {
@@ -323,9 +329,9 @@ function openCancelDialog(selectedSubscription) {
     var cancelContent
 
     if (selectedSubscriptionType == "monthly") {
-        cancelContent = "/wp-content/plugins/ghes-vlp/views/admin/templates/monthly-cancel-message.html";
+        cancelContent = "/wp-content/plugins/ghes-vlp/views/templates/monthly-cancel-message.html";
     } else if (selectedSubscriptionType == "yearly") {
-        cancelContent = "/wp-content/plugins/ghes-vlp/views/admin/templates/yearly-cancel-message.html";
+        cancelContent = "/wp-content/plugins/ghes-vlp/views/templates/yearly-cancel-message.html";
     }
     $("#cancel-subscription").kendoWindow({
         visible: false,
@@ -347,7 +353,7 @@ function closeCancelDialog() {
     $("#cancel-subscription").data("kendoWindow").close();
 }
 function aproveCancelSubscription(selectedSubscriptionId) {
-    showLoading('.k-window');
+    displayLoading('.k-window');
     cancelSubscription(selectedSubscriptionId);
 }
 function cancelSubscription() {
@@ -365,11 +371,13 @@ function cancelSubscription() {
             Status: "Cancelled"
         },
         success: function (result) {
+            //Success!
             console.log("Success:" + result);
             hideLoading('.k-window');
             $("#cancel-subscription").data("kendoWindow").close();
+
+            document.cookie = "refund=true";
             location.reload();
-            //Success!
         },
         error: function (result) {
             console.log("Failed to Cancel Subscription");

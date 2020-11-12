@@ -25,10 +25,12 @@ function vlp_manage_subscription($atts, $content = null)
     $output = '';
     $parentid = GHES\Parents::GetByUserID(get_current_user_id())->id;
 
+    $output .= '<h3 class="successful-payment">Thank you for your payment, please see your subscription details below.</h3>';
+    $output .= '<h3 class="successful-refund">Your cancellation was successful, please see below details below.</h3>';
+
     // Get All Subscriptions by PArent, not necessary as we are going to get them in a more specific way.
     $subscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
     if ($subscriptions->jsonSerialize()) {
-        $output .= '<h3 class="successful-payment">Thank you for your payment, please see your subscription details below.</h3>';
 
         $unpaidSubscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
         if ($unpaidSubscriptions->jsonSerialize()) {

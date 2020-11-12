@@ -170,9 +170,13 @@ namespace GHES\VLP {
                     $subscriptionTotal = $subscriptionDefenition->YearlyAmount;
                 }
 
+                $UserId = get_current_user_id();
+                $Parent = \GHES\Parents::GetByUserID($UserId);
+                $ParentId = $Parent->id;
+
                 VLPUtils::$db->insert('Subscription', array(
                     'id' => $this->id,
-                    'ParentID' => $this->ParentID,
+                    'ParentID' => $ParentId,
                     'StartDate' => $this->StartDate,
                     'EndDate' => $this->EndDate,
                     'Status' => "Unpaid",

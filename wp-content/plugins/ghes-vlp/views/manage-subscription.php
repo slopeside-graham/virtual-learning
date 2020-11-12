@@ -114,10 +114,10 @@ function vlp_manage_subscription($atts, $content = null)
             }
             $output .= '<li>' . $paidSubscription->Status . ' - ' .  $subscriptionDefinition->Name . ' - ' . $paidSubscription->StartDate . ' - ' . $paidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments.</li>';
             $output .= '<ul>';
-            $paidPayments = GHES\VLP\SubscriptionPayment::GetAllPaidBySubscriptionId($paidSubscription->id);
+            $paidPayments = GHES\VLP\SubscriptionPayment::GetAllExceptUnpaidandCancelledBySubscriptionId($paidSubscription->id);
             if ($paidPayments->jsonSerialize()) {
                 foreach ($paidPayments->jsonSerialize() as $k => $paidPayment) {
-                    $output .= '<li>Paid - Amount: $' . $paidPayment->Amount . ' - ' . date('m/d/Y', strtotime($paidPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($paidPayment->EndDate)) . '<br/>';
+                    $output .= '<li>' . $paidPayment->Status . ' - $' . $paidPayment->Amount . ' - ' . date('m/d/Y', strtotime($paidPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($paidPayment->EndDate)) . '<br/>';
                     $output .= 'Payment Date: ' .  date('m/d/Y', strtotime($paidPayment->PaymentDate)) . '</li>';
                 }
             } else {

@@ -274,7 +274,7 @@ namespace GHES\VLP {
             $controller = new AnetController\CreateTransactionController($request);
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
-            return $response;
+            return array ($response, $void = true);
         }
 
         public static function analyzeANresponse($response)

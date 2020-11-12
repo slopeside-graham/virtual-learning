@@ -409,9 +409,14 @@ namespace GHES\VLP {
             // Create the payment record from the response.
             $refundPaymentResult = $refundPayment->CreateRefundFromResponse($chargeResult, $refundAmount);
 
-            $result = customerProfile::analyzeANresponse($chargeResult);
+            if (!is_array($chargeResult)) {
+                $result = customerProfile::analyzeANresponse($chargeResult);
+            } else {
+                $result = customerProfile::analyzeANresponse($chargeResult[0]);
+            }
 
-            if(!is_wp_error($result)) {
+
+            if (!is_wp_error($result)) {
                 return $refundPaymentResult;
             } else {
                 $error_string = $result->get_error_message();
@@ -466,8 +471,20 @@ namespace GHES\VLP {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
-            $response = $chargeResult;
-            $tresponse = $chargeResult->getTransactionResponse();
+            if (!is_array($chargeResult)) {
+                $type = 'Refund';
+                $response = $chargeResult;
+            } else {
+                $type = 'Void';
+                //If this is a void, we need to void the original amount, so we get the original payment, then get the amount from that.
+                $response = $chargeResult[0];
+                $transId = $chargeResult[0]->getTransactionResponse()->getTransId();
+                $originalPayment = Payment::GetBytransId($transId);
+                $voidedAmount = $originalPayment->Amount;
+
+                $refundAmount = $voidedAmount;
+            }
+            $tresponse = $response->getTransactionResponse();
 
             if ($response->getMessages()->getResultCode() == "Ok" && $tresponse->getErrors() == null) {  // Transaction response was OK.
                 $chargeStatus = "Successful";
@@ -484,7 +501,7 @@ namespace GHES\VLP {
                     }
                 }
             }
-            $this->Type = 'Refund';
+            $this->Type = $type;
             $this->User_id = get_current_user_id();
             $this->Amount = $refundAmount;
             $this->Status = $chargeStatus;
@@ -602,6 +619,21 @@ namespace GHES\VLP {
             try {
 
                 $row = VLPUtils::$db->queryFirstRow("select * from Payment where id = %i", $thisid);
+                $Payment = Payment::populatefromRow($row);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Payment_Get_Error', $e->getMessage());
+            }
+            return $Payment;
+        }
+
+        public static function GetBytransId($transId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            try {
+
+                $row = VLPUtils::$db->queryFirstRow("select * from Payment where transId = %i", $transId);
                 $Payment = Payment::populatefromRow($row);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Payment_Get_Error', $e->getMessage());

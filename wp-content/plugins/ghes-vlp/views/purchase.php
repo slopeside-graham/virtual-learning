@@ -51,8 +51,6 @@ function vlp_purchase($atts, $content = null)
     $output .= '<input type="radio" id="yearly" name="payment-frequency" value="yearly" data-price="0" required validationMessage="Please Select a Payment Frequency">';
     $output .= '<label for="yearly">&nbsp;Yearly</label><br/>';
     $output .= '<span class="k-invalid-msg" data-for="payment-frequency"></span><br/>';
-    $output .= '<h3 id="user-id">User ID: ' . get_current_user_id() . '</h3>';
-    $output .= '<h3>Parent ID: <span id="parent-id">' . GHES\Parents::GetByUserID(get_current_user_id())->id . '</span></h3>';
     $today = date("m/d/Y");
     $oneyear = date("m/d/Y", strtotime('+1 years, -1 days'));
     $output .= '<h3>Subscription Start Date: <span id="sub-start-date">' . $today . '</span><h3>';

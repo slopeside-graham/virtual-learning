@@ -207,8 +207,65 @@ namespace GHES\VLP {
 
         public static function cancelMonthlyPayments($subscriptionId)
         {
-            // No refund needed on Monthly Cancellation.
+            // TODO: Refund all months thar are paid in advance. Do not refund current month.
 
+            $subscriptionPayments = SubscriptionPayment::GetUpcomingPaidBySubscriptionId($subscriptionId);
+            if ($subscriptionPayments->jsonSerialize()) {
+                $monthlyRefundAmount = 0;
+                foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
+                    $monthlyRefundAmount += $subscriptionPayment->Amount;
+                }
+                $paymentResult = Payment::refund($monthlyRefundAmount, $subscriptionPayment);
+                if (!is_wp_error($paymentResult)) {
+                    if ($paymentResult->Type = 'Void') {
+                        SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
+                        SubscriptionPayment::refundPaidMonthlySubscriptionPayment($subscriptionId);
+                    } else {
+                        SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
+                        SubscriptionPayment::refundPaidFutureMonthlySubscriptionPayment($subscriptionId);
+                    }
+                    return $paymentResult;
+                } else {
+                    return $paymentResult;
+                }
+            }
+
+
+            return $subscriptionPayments;
+        }
+
+        public static function cancelYearlyPayments($subscriptionId)
+        {
+            $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
+            if ($subscriptionPayments->jsonSerialize()) {
+                foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
+                    if ($subscriptionPayment->Status == "Paid") {
+                        $subscription = Subscription::Get($subscriptionId);
+                        // Refund the reamining time
+                        //Calculate reamining days
+                        $refundDays = Subscription::calculateRemainingtime($subscription);
+                        //Divide by 365
+                        $refundPercent = $refundDays / 365;
+                        //Multiply that number by the amount paid
+                        $refundAmount = round($refundPercent * $subscription->Total, 2);
+
+                        $paymentResult = Payment::refund($refundAmount, $subscriptionPayment);
+
+                        if (!is_wp_error($paymentResult)) {
+                            SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
+                            SubscriptionPayment::refundPaidYearlySubscriptionPayment($subscriptionId);
+                            return $paymentResult;
+                        } else {
+                            return $paymentResult;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static function cancelUnpaidSubscriptionPayment($subscriptionId)
+        {
+            // Cancel the SubscriptionPayment
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -235,35 +292,8 @@ namespace GHES\VLP {
             }
             return $SubscriptionPayments;
         }
-        public static function cancelYearlyPayments($subscriptionId)
-        {
-            $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
-            if ($subscriptionPayments->jsonSerialize()) {
-                foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                    if ($subscriptionPayment->Status == "Paid") {
-                        $subscription = Subscription::Get($subscriptionId);
-                        // Refund the reamining time
-                        //Calculate reamining days
-                        $refundDays = Subscription::calculateRemainingtime($subscription);
-                        //Divide by 365
-                        $refundPercent = $refundDays / 365;
-                        //Multiply that number by the amount paid
-                        $refundAmount = round($refundPercent * $subscription->Total, 2);
 
-                        $paymentResult = Payment::refund($refundAmount, $subscriptionPayment);
-
-                        if (!is_wp_error($paymentResult)) {
-                            SubscriptionPayment::cancelSubscriptionPayment($subscriptionId);
-                            return $paymentResult;
-                        } else {
-                            return $paymentResult;
-                        }
-                    }
-                }
-            }
-        }
-
-        public static function cancelSubscriptionPayment($subscriptionId)
+        public static function refundPaidYearlySubscriptionPayment($subscriptionId)
         {
             // Cancel the SubscriptionPayment
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -275,11 +305,74 @@ namespace GHES\VLP {
                 $results = VLPUtils::$db->query(
                     "UPDATE SubscriptionPayment 
                         SET
-                        Status='Cancelled'
+                        Status='Refunded'
                     WHERE 
                         Subscription_id=%i
                             and
-                        Status<>'Paid'",
+                        Status = 'Paid'",
+                    $subscriptionId
+                );
+                $counter = VLPUtils::$db->affectedRows();
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
+        public static function refundPaidMonthlySubscriptionPayment($subscriptionId)
+        {
+            // Cancel the SubscriptionPayment
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "UPDATE SubscriptionPayment 
+                        SET
+                        Status='Refunded'
+                    WHERE 
+                        Subscription_id=%i
+                            and
+                        Status = 'Paid'",
+                    $subscriptionId
+                );
+                $counter = VLPUtils::$db->affectedRows();
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
+        public static function refundPaidFutureMonthlySubscriptionPayment($subscriptionId)
+        {
+            // Cancel the SubscriptionPayment
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "UPDATE SubscriptionPayment 
+                        SET
+                        Status='Refunded'
+                    WHERE 
+                        Subscription_id=%i
+                            and
+                        Status = 'Paid'
+                            and 
+                        Date(StartDate) > Date(Now())
+                        ",
                     $subscriptionId
                 );
                 $counter = VLPUtils::$db->affectedRows();
@@ -400,6 +493,34 @@ namespace GHES\VLP {
             return $SubscriptionPayments;
         }
 
+        public static function GetAllExceptUnpaidandCancelledBySubscriptionId($subscriptionId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("select sp.*, 
+                p.DateCreated as PaymentDate
+            from SubscriptionPayment sp
+                Left Join Payment p on sp.Payment_id = p.id
+            where 
+            sp.Subscription_id = %i 
+                and 
+            sp.Status Not In ('Unpaid', 'Cancelled')", $subscriptionId);
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
         public static function GetAllPaidBySubscriptionId($subscriptionId)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -408,7 +529,7 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select *, 
+                $results = VLPUtils::$db->query("select sp.*, 
                                                         p.DateCreated as PaymentDate
                                                     from SubscriptionPayment sp
                                                         Left Join Payment p on sp.Payment_id = p.id
@@ -520,6 +641,31 @@ namespace GHES\VLP {
                                                             Subscription_id = %i
                                                             and Date(StartDate) > Date(Now())
                                                             and Status Not In ('Paid', 'Cancelled')", $subscriptionId);
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
+        public static function GetUpcomingPaidBySubscriptionId($subscriptionId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
+                                                        where 
+                                                            Subscription_id = %i
+                                                            and Date(StartDate) > Date(Now())
+                                                            and Status = 'Paid'", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);

@@ -260,7 +260,6 @@ namespace GHES\VLP {
                     $UserId = get_current_user_id();
                     Utils::AddVLPRole($UserId);
                 }
-                Email::SendChargeEmail($request, $payment);
                 return rest_ensure_response($payment);
             } else {
                 $error_string = $paymentsuccess->get_error_codes();

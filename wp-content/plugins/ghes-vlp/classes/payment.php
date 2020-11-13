@@ -370,6 +370,7 @@ namespace GHES\VLP {
                             $subscriptionresult = Subscription::ActivateSubscriptionByParentId($Parent->id);
                             //
                             if (!is_wp_error($subscriptionresult)) {
+                                $emailresult = Email::SendChargeEmail($paymentResult);
                                 return true;
                             } else {
                                 return $subscriptionresult;
@@ -393,7 +394,7 @@ namespace GHES\VLP {
             return true;
         }
 
-        public static function refund($refundAmount, $subscriptionPayment)
+        public static function refund($refundAmount, $paymentId)
         {
             $refundPayment = new Payment;
             // Get the User ID
@@ -403,7 +404,7 @@ namespace GHES\VLP {
             // Get the Parent ID
             $Parent_id = $Parent->id;
 
-            $originalPayment = Payment::Get($subscriptionPayment->Payment_id);
+            $originalPayment = Payment::Get($paymentId);
 
             $customerProfile = new customerProfile();
             $chargeResult = $customerProfile->refundCustomerProfile($Parent->customerProfileId, $Parent->customerPaymentProfileId, $refundAmount, $originalPayment);

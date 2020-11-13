@@ -207,27 +207,38 @@ namespace GHES\VLP {
 
         public static function cancelMonthlyPayments($subscriptionId)
         {
-            // TODO: Refund all months thar are paid in advance. Do not refund current month.
+            // TODO: Refund all months that are paid in advance. Do not refund current month.
 
             $subscriptionPayments = SubscriptionPayment::GetUpcomingPaidBySubscriptionId($subscriptionId);
             if ($subscriptionPayments->jsonSerialize()) {
                 $monthlyRefundAmount = 0;
+
+                $paymentResults = new NestedSerializable();
+
+                // Need to get unique payments fot this subscription.
+                $paymentIds = array();
                 foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                    $monthlyRefundAmount += $subscriptionPayment->Amount;
+                    $monthlyRefundAmount = $subscriptionPayment->Amount;
+                    $paymentIds[] = $subscriptionPayment->Payment_id;
                 }
-                $paymentResult = Payment::refund($monthlyRefundAmount, $subscriptionPayment);
-                if (!is_wp_error($paymentResult)) {
-                    if ($paymentResult->Type = 'Void') {
-                        SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
-                        SubscriptionPayment::refundPaidMonthlySubscriptionPayment($subscriptionId);
+                $uniquepaymentIds = array_unique($paymentIds);
+                foreach ($uniquepaymentIds as $paymentId) {
+                    $paymentResult = Payment::refund($monthlyRefundAmount, $paymentId);
+                    if (!is_wp_error($paymentResults)) {
+                        if ($paymentResult->Type = 'Void') {
+                            SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
+                            SubscriptionPayment::refundPaidMonthlySubscriptionPayment($subscriptionId);
+                        } else {
+                            SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
+                            SubscriptionPayment::refundPaidFutureMonthlySubscriptionPayment($subscriptionId);
+                        }
                     } else {
-                        SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
-                        SubscriptionPayment::refundPaidFutureMonthlySubscriptionPayment($subscriptionId);
+                        return $paymentResults;
                     }
-                    return $paymentResult;
-                } else {
-                    return $paymentResult;
+                    $paymentResults->add_item($paymentResult);
                 }
+                Email::SendRefundEmail($paymentResults);
+                return $paymentResults;
             }
 
 

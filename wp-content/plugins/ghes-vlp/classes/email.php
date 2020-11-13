@@ -2,6 +2,7 @@
 
 namespace GHES\VLP {
 
+    use GHES\Parents;
     use GHES\VLP\Utils as VLPUtils;
 
     /**
@@ -136,31 +137,105 @@ namespace GHES\VLP {
         }
 
 
-        public static function SendChargeEmail($request, $payment)
+        public static function SendChargeEmail($payment)
         {
-            $billinginfo = Email::populatefromRow($request);
-            //$billinginfo = Email::populatefromRow($payment);
-
+            /*
             $filepath = plugin_dir_path(__FILE__) . '../emails/successfulCharge.html';
             $emailbody = file_get_contents($filepath);
 
+            //Gather All subscription ID's
+            $subscriptionPayments = SubscriptionPayment::GetAllByPaymentId($payment->id);
+            $subscriptionIds = array();
+            foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
+               //TODO: this is not how to do it: $subscriptionIds[] = $subscriptionPayment['Subscription_id'];
+            }
+            $uniquesubscriptionIds = array_unique($subscriptionIds);
+
+            //Build a grid of Subscriptions Information
+            $subscriptionlist = Email::BuildSubscriptionList($uniquesubscriptionIds);
+
+            $parent = Parents::GetByUserID(get_current_user_id());
+            $billinginfo = Email::populatefromRow($parent);
+
             $billinginfo->ProcessReplacements($emailbody, $billinginfo);
+            Email::ProcessSubscriptionListReplacement($emailbody, $subscriptionlist);
 
             $sendtoemail = $billinginfo->Email;
 
             wp_mail($sendtoemail, 'Thank you for your Virtual Learning Purchase', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
+            */
+            return true;
         }
-        public static function ProcessReplacements($emailbody, $billinginfo)
+
+        public static function SendRefundEmail($payment)
         {
-            $emailbody = str_replace('~Amount~', $billinginfo->Amount, $emailbody);
-            $emailbody = str_replace('~FirstName~', $billinginfo->FirstName, $emailbody);
-            $emailbody = str_replace('~LastName~', $billinginfo->LastName, $emailbody);
-            $emailbody = str_replace('~Address~', $billinginfo->Address, $emailbody);
-            $emailbody = str_replace('~City~', $billinginfo->City, $emailbody);
-            $emailbody = str_replace('~State~', $billinginfo->State, $emailbody);
-            $emailbody = str_replace('~Zip~', $billinginfo->Zip, $emailbody);
-            $emailbody = str_replace('~PhoneNumber~', $billinginfo->PhoneNumber, $emailbody);
-            $emailbody = str_replace('~Email~', $billinginfo->Email, $emailbody);
+            /*
+            $subscriptionlist = '';
+            //Gather All subscription ID's
+            $subscriptionPayments = SubscriptionPayment::GetAllByPaymentId($payment->id);
+            $subscriptionIds = array();
+            foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
+                $subscriptionIds[] = $subscriptionPayment['Subscription_id'];
+            }
+            $uniquesubscriptionIds = array_unique($subscriptionIds);
+
+            //Build a grid of Subscriptions Information
+            $subscriptionlist = Email::BuildSubscriptionList($uniquesubscriptionIds);
+
+            $parent = Parents::GetByUserID(get_current_user_id());
+           // $billinginfo = Email::populatefromRow($parent);
+
+            $filepath = plugin_dir_path(__FILE__) . '../emails/successfulCharge.html';
+            $emailbody = file_get_contents($filepath);
+
+            //$billinginfo->ProcessReplacements($emailbody, $billinginfo);
+            //Email::ProcessReplacements($emailbody, $subscriptionlist);
+
+            //$sendtoemail = $billinginfo->Email;
+
+           // wp_mail($sendtoemail, 'Your Virtual Learning Subscription has been cancelled.', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
+           */
+
+           return true;
+        }
+
+        public static function BuildSubscriptionList($uniquesubscriptionIds)
+        {
+            $subscriptionlist = '';
+            $subscriptionlist .= '<ul>';
+            foreach ($uniquesubscriptionIds as $subscriptionId) {
+                $subscription = Subscription::Get($subscriptionId);
+                $subscriptiondefenition = SubscriptionDefinition::Get($subscription->SubscriptionDefenition_id);
+                    $subscriptionlist .=  '<li>' . $subscriptiondefenition->Name . ' - ' . date('m/d/Y', strtotime($subscription->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscription->EndDate)) . '</li>';
+                        $subscriptionlist .= '<ul>';
+                $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
+                foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
+                            $subscriptionlist .= '<li>' . $subscriptionPayment->Status . ' - $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</li>';
+                }
+                        $subscriptionlist .= '<ul>';
+            }
+            $subscriptionlist .= '</ul>';
+            return $subscriptionlist;
+        }
+
+        public static function ProcessReplacements($emailbody, $replacements)
+        {
+            $emailbody = str_replace('~Amount~', $replacements->Amount, $emailbody);
+            $emailbody = str_replace('~FirstName~', $replacements->FirstName, $emailbody);
+            $emailbody = str_replace('~LastName~', $replacements->LastName, $emailbody);
+            $emailbody = str_replace('~Address~', $replacements->Address, $emailbody);
+            $emailbody = str_replace('~City~', $replacements->City, $emailbody);
+            $emailbody = str_replace('~State~', $replacements->State, $emailbody);
+            $emailbody = str_replace('~Zip~', $replacements->Zip, $emailbody);
+            $emailbody = str_replace('~PhoneNumber~', $replacements->PhoneNumber, $emailbody);
+            $emailbody = str_replace('~Email~', $replacements->Email, $emailbody);
+
+            return $emailbody;
+        }
+
+        public static function ProcessSubscriptionListReplacement($emailbody, $replacements)
+        {
+            $emailbody = str_replace('~SubscriptionList~', $replacements, $emailbody);
 
             return $emailbody;
         }

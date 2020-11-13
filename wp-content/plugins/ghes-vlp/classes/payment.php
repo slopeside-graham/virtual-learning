@@ -368,6 +368,7 @@ namespace GHES\VLP {
                         $pendingPaymentResult = SubscriptionPayment::UpdateAllPendingByParentId($Parent_id, $paymentResultid);
                         if (!is_wp_error($pendingPaymentResult)) {
                             $subscriptionresult = Subscription::ActivateSubscriptionByParentId($Parent->id);
+                            //
                             if (!is_wp_error($subscriptionresult)) {
                                 return true;
                             } else {

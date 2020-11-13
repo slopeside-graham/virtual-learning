@@ -59,6 +59,9 @@ include_once(plugin_dir_path(__FILE__) . '/../classes/customerProfile.php');
 include_once(plugin_dir_path(__FILE__) . '/../classes/payment.php');
 include_once(plugin_dir_path(__FILE__) . '/payment_rest.php');    // SubscriptionPayment REST controller
 
+// Include Email class
+include_once(plugin_dir_path(__FILE__) . '/../classes/email.php');
+
 
 
 

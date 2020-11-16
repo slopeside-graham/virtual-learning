@@ -152,6 +152,13 @@ $("input[name='payment-frequency']").click(function (e) {
     $price = e.currentTarget.dataset.price;
     console.log("Selected Price: " + $price);
     $("#subscription-total-area").html("Total Due Today: $<span id='subscription-total'>" + $price + '</span>');
+
+    if ($("#monthly").is(':checked')) {
+        $(".recurring-billing").show();
+    } else {
+        $(".recurring-billing").hide();
+        $("#recurring").prop("checked", false);
+    }
 });
 
 
@@ -168,7 +175,8 @@ function createSubscription() {
             StartDate: $("#sub-start-date").text(),
             EndDate: $("#sub-end-date").text(),
             PaymentFrequency: $("input[name='payment-frequency']:checked").val(),
-            SubscriptionDefinition_id: $("input[name='subscription-select']:checked").val()
+            SubscriptionDefinition_id: $("input[name='subscription-select']:checked").val(),
+            RecurringBilling: $("#recurring").prop("checked")
         },
         success: function (result) {
             console.log("Success:" + result);

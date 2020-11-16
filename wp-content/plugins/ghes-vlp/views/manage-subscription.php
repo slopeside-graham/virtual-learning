@@ -28,7 +28,6 @@ function vlp_manage_subscription($atts, $content = null)
     $output .= '<h3 class="successful-payment">Thank you for your payment, please see your subscription details below.</h3>';
     $output .= '<h3 class="successful-refund">Your cancellation was successful, please see below details below.</h3>';
 
-    // Get All Subscriptions by PArent, not necessary as we are going to get them in a more specific way.
     $subscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
     if ($subscriptions->jsonSerialize()) {
 

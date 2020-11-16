@@ -34,3 +34,7 @@
 .k-window .cancel {
     float: right;
 }
+.recurring-billing {
+    margin-bottom: 40px;
+    display: none;
+}

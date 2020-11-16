@@ -246,14 +246,18 @@ namespace GHES\VLP {
             //  5. Validate Profile ID returned
 
             // Set credit card information for payment profile
-            $paymentCreditCard = new AnetAPI\PaymentType();
-            $paymentCreditCard->setCreditCard($this->_ancreditCard);
+            $paymentMethod = new AnetAPI\PaymentType();
+            if ($checkccfields) {
+                $paymentMethod->setCreditCard($this->_ancreditCard);
+            } else {
+                $paymentMethod->setBankAccount($this->_anbankAccount);
+            }
 
             // Create a new Customer Payment Profile object
             $paymentprofile = new AnetAPI\CustomerPaymentProfileType();
             $paymentprofile->setCustomerType('individual');
             $paymentprofile->setBillTo($this->_anBillTo);
-            $paymentprofile->setPayment($paymentCreditCard);
+            $paymentprofile->setPayment($paymentMethod);
             $paymentprofile->setDefaultPaymentProfile(true);
 
             $paymentprofiles[] = $paymentprofile;
@@ -313,13 +317,17 @@ namespace GHES\VLP {
             $response = $controller->executeWithApiResponse($this->getEnvironment());
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
 
-                $paymentCreditCard = new AnetAPI\PaymentType();
-                $paymentCreditCard->setCreditCard($this->_ancreditCard);
+                $paymentMethod = new AnetAPI\PaymentType();
+                if ($checkccfields) {
+                    $paymentMethod->setCreditCard($this->_ancreditCard);
+                } else {
+                    $paymentMethod->setBankAccount($this->_anbankAccount);
+                }
 
                 $paymentprofile = new AnetAPI\CustomerPaymentProfileExType();
                 $paymentprofile->setBillTo($this->_anBillTo);
                 $paymentprofile->setCustomerPaymentProfileId($customerPaymentProfileId);
-                $paymentprofile->setPayment($paymentCreditCard);
+                $paymentprofile->setPayment($paymentMethod);
 
                 // We're updating the billing address but everything has to be passed in an update
                 // For card information you can pass exactly what comes back from an GetCustomerPaymentProfile

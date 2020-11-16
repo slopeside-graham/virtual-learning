@@ -18,6 +18,7 @@ namespace GHES\VLP {
         private $_PaymentFrequency;
         private $_SubscriptionDefinition_id;
         private $_Total;
+        private $_RecurringBilling;
         private $_DateCreated;
         private $_DateModified;
 
@@ -112,6 +113,17 @@ namespace GHES\VLP {
                 return $this->_Total;
             }
         }
+        protected function RecurringBilling($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_RecurringBilling = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_RecurringBilling;
+            }
+        }
 
         protected function DateCreated($value = null)
         {
@@ -148,6 +160,7 @@ namespace GHES\VLP {
                 'PaymentFrequency' => $this->PaymentFrequency,
                 'SubscriptionDefinition_id' => $this->SubscriptionDefinition_id,
                 'Total' => $this->Total,
+                'RecurringBilling' => $this->RecurringBilling,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
@@ -182,7 +195,8 @@ namespace GHES\VLP {
                     'Status' => "Unpaid",
                     'PaymentFrequency' => $this->PaymentFrequency,
                     'SubscriptionDefinition_id' => $this->SubscriptionDefinition_id,
-                    'Total' => $subscriptionDefenition->YearlyAmount
+                    'Total' => $subscriptionDefenition->YearlyAmount,
+                    'RecurringBilling' => $this->RecurringBilling
                 ));
                 $this->id = VLPUtils::$db->insertId();
                 // Create Subsciption Payments
@@ -503,6 +517,8 @@ namespace GHES\VLP {
             $Subscription->PaymentFrequency = $row['PaymentFrequency'];
             $Subscription->SubscriptionDefinition_id = $row['SubscriptionDefinition_id'];
             $Subscription->Total = $row['Total'];
+            $Subscription->RecurringBilling = $row['RecurringBilling'];
+
             return $Subscription;
         }
     }

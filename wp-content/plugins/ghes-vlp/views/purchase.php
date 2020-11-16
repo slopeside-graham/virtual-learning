@@ -51,6 +51,7 @@ function vlp_purchase($atts, $content = null)
     $output .= '<input type="radio" id="yearly" name="payment-frequency" value="yearly" data-price="0" required validationMessage="Please Select a Payment Frequency">';
     $output .= '<label for="yearly">&nbsp;Yearly</label><br/>';
     $output .= '<span class="k-invalid-msg" data-for="payment-frequency"></span><br/>';
+    $output .= '<div class="recurring-billing"><label for="recurring"><input type="checkbox" name="recurring" id="recurring">&nbsp;Enable Recurring Billing</label></div>';
     $today = date("m/d/Y");
     $oneyear = date("m/d/Y", strtotime('+1 years, -1 days'));
     $output .= '<h3>Subscription Start Date: <span id="sub-start-date">' . $today . '</span><h3>';

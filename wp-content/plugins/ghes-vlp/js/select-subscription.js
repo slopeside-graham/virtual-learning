@@ -1,15 +1,14 @@
 $ = jQuery;
 
-var selectvalidator = $("#select-subscription-vll").kendoValidator({
-    rules: {
-        radio: function (input) {
-            if (input.filter("[type=radio]") && input.attr("required")) {
-                return $("#select-subscription-vll").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
-            }
-            return true;
-        }
+$(document).ready(function () {
+    $("#continue-payment-vlp").on("click", function () {
+    if (validator.validate()) {
+        // If the form is valid, the Validator will return true
+        createSubscription();
     }
-}).data("kendoValidator");
+});
+});
+
 
 $("input[name='subscription-select'").click(function (e) {
 
@@ -43,13 +42,6 @@ $("input[name='payment-frequency']").click(function (e) {
     } else {
         $(".recurring-billing").hide();
         $("#recurring").prop("checked", false);
-    }
-});
-
-$("#continue-payment-vlp").on("click", function () {
-    if (selectvalidator.validate()) {
-        // If the form is valid, the Validator will return true
-        createSubscription();
     }
 });
 

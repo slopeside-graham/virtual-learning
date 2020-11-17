@@ -1,19 +1,12 @@
 $ = jQuery;
 
-
-
-var purchasevalidator = $(".purchase-vll-billing").kendoValidator({
-    rules: {
-        radio: function (input) {
-            if (input.filter("[type=radio]") && input.attr("required")) {
-                return $(".purchase-vll-billing").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
-            }
-            return true;
-        }
-    }
-}).data("kendoValidator");
-
 $(document).ready(function () {
+    $("#purchasesubscription").on("click", function () {
+        if (validator.validate()) {
+            // If the form is valid, the Validator will return true
+            purchaseSubscription();
+        }
+    });
 
     var payment = getCookie("payment");
     if (payment == "true") {
@@ -26,6 +19,8 @@ $(document).ready(function () {
         $(".successful-refund").show();
         document.cookie = "refund=false";
     }
+
+
 });
 
 window.onload = function () {
@@ -91,29 +86,12 @@ function calculateTotal() {
 
     return totalDue;
 };
-var purchasevalidator = $(".purchase-vll-billing").kendoValidator({
-    rules: {
-        radio: function (input) {
-            if (input.filter("[type=radio]") && input.attr("required")) {
-                return $(".purchase-vll-billing").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
-            }
-            return true;
-        }
-    }
-}).data("kendoValidator");
 
 function showPurchase() {
     $("#showpaymentbtn").hide();
     $(".purchase-vll-billing").show();
 
 }
-
-$("#purchasesubscription").on("click", function () {
-    if (purchasevalidator.validate()) {
-        // If the form is valid, the Validator will return true
-        purchaseSubscription();
-    }
-});
 
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');

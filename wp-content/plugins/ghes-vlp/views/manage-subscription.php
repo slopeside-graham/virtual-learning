@@ -57,7 +57,12 @@ function vlp_manage_subscription($atts, $content = null)
             }
             $output .= '</ul>';
 
-            $output .= '<h3>My Upcoming Payments</h3>';
+            $pastpaymentslink = get_permalink(esc_attr(get_option('vlp-past-payments')));
+            $output .= '<div><a href="' . $pastpaymentslink . '">View Past Payments &#8594;</a></div><hr>';
+
+            $output .= '<h3>Upcoming Payments</h3>';
+            $output .= '<p>The below items are due in the future. You are welcome to pay for them early if you like. If you are enrolled in automatic billing the payments will be automatically paid.</p>';
+            $output .= '<p>If you would like to pay now, please select the items to pay for and click the "Pay Now" button.</p>';
             $output .= '<ul>';
             foreach ($unpaidSubscriptions->jsonSerialize() as $k => $futureUnpaidSubscription) {
                 $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($futureUnpaidSubscription->SubscriptionDefinition_id);
@@ -100,36 +105,5 @@ function vlp_manage_subscription($atts, $content = null)
         $selectSubscriptionPage = get_permalink(esc_attr(get_option('vlp-purchase')));
         $output .= '<a href="' . $selectSubscriptionPage . '">You have no active subscriptions, Please select a subscription first -></a>';
     }
-    $paidSubscriptions = GHES\VLP\Subscription::GetAllByParentId($parentid);
-    if ($paidSubscriptions->jsonSerialize()) {
-        $output .= '<hr>';
-        $output .= '<div class="paid-payments">';
-        $output .= '<h3>My Past Payments</h3>';
-        $output .= '<ul>';
-        foreach ($paidSubscriptions->jsonSerialize() as $k => $paidSubscription) {
-            $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($paidSubscription->SubscriptionDefinition_id);
-            if ($paidSubscription->PaymentFrequency == "yearly") {
-                $paymentFrequency = "Yearly";
-            } else if ($paidSubscription->PaymentFrequency == "monthly") {
-                $paymentFrequency = "Monthly";
-            }
-            $output .= '<li>' . $paidSubscription->Status . ' - ' .  $subscriptionDefinition->Name . ' - ' . $paidSubscription->StartDate . ' - ' . $paidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments.</li>';
-            $output .= '<ul>';
-            $paidPayments = GHES\VLP\SubscriptionPayment::GetAllExceptUnpaidandCancelledBySubscriptionId($paidSubscription->id);
-            if ($paidPayments->jsonSerialize()) {
-                foreach ($paidPayments->jsonSerialize() as $k => $paidPayment) {
-                    $output .= '<li>' . $paidPayment->Status . ' - $' . $paidPayment->Amount . ' - ' . date('m/d/Y', strtotime($paidPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($paidPayment->EndDate)) . '<br/>';
-                    $output .= 'Payment Date: ' .  date('m/d/Y', strtotime($paidPayment->PaymentDate)) . '</li>';
-                }
-            } else {
-                $output .= '<li>There are no past payments for this subscription.</li>';
-            }
-            $output .= '</ul>';
-        }
-
-        $output .= '</ul>';
-        $output .= '</div>';
-    }
-
     return $output;
 }

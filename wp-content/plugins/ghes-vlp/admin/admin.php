@@ -16,6 +16,9 @@ function register_vlp_admin_settings()
     register_setting('vlp-pages-admin-group', 'vlp-select-child');
     register_setting('vlp-pages-admin-group', 'vlp-purchase');
     register_setting('vlp-pages-admin-group', 'vlp-manage');
+    register_setting('vlp-pages-admin-group', 'vlp-past-payments');
+    register_setting('vlp-pages-admin-group', 'vlp-payment-confirmation');
+    register_setting('vlp-pages-admin-group', 'vlp-cancel-confirmation');
 }
 add_action('admin_init', 'register_vlp_admin_settings');
 
@@ -205,6 +208,66 @@ function vlp_page_admin()
                         <select required name="vlp-manage" value="<?php echo esc_attr(get_option('vlp-manage')); ?>">
                             <option value="<?php echo esc_attr(get_option('vlp-manage')); ?>">
                                 <?php echo get_the_title(esc_attr(get_option('vlp-manage'))) ?></option>
+                            <?php
+                            $pages = get_pages();
+                            foreach ($pages as $page) {
+                                $option = '<option value="' . $page->ID . '">';
+                                $option .= $page->post_title;
+                                $option .= '</option>';
+                                echo $option;
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th class="table-header" scope="row">
+                        Select VLP Subscription Past Payments:
+                    </th>
+                    <td class="page-select">
+                        <select required name="vlp-past-payments" value="<?php echo esc_attr(get_option('vlp-past-payments')); ?>">
+                            <option value="<?php echo esc_attr(get_option('vlp-past-payments')); ?>">
+                                <?php echo get_the_title(esc_attr(get_option('vlp-past-payments'))) ?></option>
+                            <?php
+                            $pages = get_pages();
+                            foreach ($pages as $page) {
+                                $option = '<option value="' . $page->ID . '">';
+                                $option .= $page->post_title;
+                                $option .= '</option>';
+                                echo $option;
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th class="table-header" scope="row">
+                        Select VLP Subscription Payment Confirmation Page:
+                    </th>
+                    <td class="page-select">
+                        <select required name="vlp-payment-confirmation" value="<?php echo esc_attr(get_option('vlp-payment-confirmation')); ?>">
+                            <option value="<?php echo esc_attr(get_option('vlp-payment-confirmation')); ?>">
+                                <?php echo get_the_title(esc_attr(get_option('vlp-payment-confirmation'))) ?></option>
+                            <?php
+                            $pages = get_pages();
+                            foreach ($pages as $page) {
+                                $option = '<option value="' . $page->ID . '">';
+                                $option .= $page->post_title;
+                                $option .= '</option>';
+                                echo $option;
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th class="table-header" scope="row">
+                        Select VLP Subscription Cancellation Confirmation Page:
+                    </th>
+                    <td class="page-select">
+                        <select required name="vlp-cancel-confirmation" value="<?php echo esc_attr(get_option('vlp-cancel-confirmation')); ?>">
+                            <option value="<?php echo esc_attr(get_option('vlp-cancel-confirmation')); ?>">
+                                <?php echo get_the_title(esc_attr(get_option('vlp-cancel-confirmation'))) ?></option>
                             <?php
                             $pages = get_pages();
                             foreach ($pages as $page) {

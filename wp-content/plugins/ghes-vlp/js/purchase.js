@@ -1,7 +1,12 @@
 $ = jQuery;
 
 $(document).ready(function () {
-    $("#purchasesubscription").on("click", function () {
+
+    // This is important because it cancels a standard form submit event, and lets us do it via ajax.
+
+
+    $("#purchasesubscription").on("click", function (event) {
+        event.preventDefault();
         if (validator.validate()) {
             // If the form is valid, the Validator will return true
             purchaseSubscription();
@@ -95,7 +100,7 @@ function showPurchase() {
 
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
-
+    event.preventDefault();
     var idSelector = function () { return this.dataset.id; };
     var selectedPayments = $(".subscription-payment:checked").map(idSelector).get();
 
@@ -138,7 +143,7 @@ function purchaseSubscription() {
                 event: "new_vll_subscription"
             });
             document.cookie = "payment=true";
-            location.reload();
+            window.location.replace(paymentconfirmationlink);
         },
         error: function (result) {
             console.log("Purchase Subscription Failed");
@@ -281,7 +286,7 @@ function cancelSubscription() {
             $("#cancel-subscription").data("kendoWindow").close();
 
             document.cookie = "refund=true";
-            location.reload();
+            window.location.replace(cancelconfirmationlink);
         },
         error: function (result) {
             console.log("Failed to Cancel Subscription");

@@ -25,6 +25,14 @@ function vlp_manage_subscription($atts, $content = null)
     $output = '';
     $parentid = GHES\Parents::GetByUserID(get_current_user_id())->id;
 
+    // Page Links
+    $pastpaymentslink = get_permalink(esc_attr(get_option('vlp-past-payments')));
+    $paymentconfirmationlink = get_permalink(esc_attr(get_option('vlp-payment-confirmation')));
+    $cancelconfirmationlink = get_permalink(esc_attr(get_option('vlp-cancel-confirmation')));
+
+    $output .= '<script>var paymentconfirmationlink = "' . $paymentconfirmationlink . '"</script>';
+    $output .= '<script>var cancelconfirmationlink = "' . $cancelconfirmationlink . '"</script>';
+
     $output .= '<h3 class="successful-payment">Thank you for your payment, please see your subscription details below.</h3>';
     $output .= '<h3 class="successful-refund">Your cancellation was successful, please see below details below.</h3>';
 
@@ -57,7 +65,7 @@ function vlp_manage_subscription($atts, $content = null)
             }
             $output .= '</ul>';
 
-            $pastpaymentslink = get_permalink(esc_attr(get_option('vlp-past-payments')));
+            
             $output .= '<div><a href="' . $pastpaymentslink . '">View Past Payments &#8594;</a></div><hr>';
 
             $output .= '<h3>Upcoming Payments</h3>';

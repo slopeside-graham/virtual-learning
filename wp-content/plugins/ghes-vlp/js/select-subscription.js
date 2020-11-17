@@ -1,12 +1,17 @@
 $ = jQuery;
 
 $(document).ready(function () {
-    $("#continue-payment-vlp").on("click", function () {
-    if (validator.validate()) {
-        // If the form is valid, the Validator will return true
-        createSubscription();
-    }
-});
+
+    // This is important because it cancels a standard form submit event, and lets us do it via ajax.
+    
+
+    $("#continue-payment-vlp").on("click", function (event) {
+        event.preventDefault();
+        if (validator.validate()) {
+            // If the form is valid, the Validator will return true
+            createSubscription();
+        }
+    });
 });
 
 

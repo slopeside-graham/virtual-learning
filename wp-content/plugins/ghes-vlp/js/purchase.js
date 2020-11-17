@@ -1,67 +1,19 @@
 $ = jQuery;
 
-$(function () {
-    var container = $(".purchase-vll-billing");
-    kendo.init(container);
-    container.kendoValidator({
-        rules: {
-            validmask: function (input) {
-                console.log(input);
-                if (input.is("[data-validmask-msg]") && input.val() != "") {
-                    var maskedtextbox = input.data("kendoMaskedTextBox");
-                    return maskedtextbox.value().indexOf(maskedtextbox.options.promptChar) === -1;
-                }
-                return true;
+
+
+var purchasevalidator = $(".purchase-vll-billing").kendoValidator({
+    rules: {
+        radio: function (input) {
+            if (input.filter("[type=radio]") && input.attr("required")) {
+                return $(".purchase-vll-billing").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
             }
+            return true;
         }
-    });
-});
+    }
+}).data("kendoValidator");
 
 $(document).ready(function () {
-
-    $("#select-subscription-vll").submit(function (event) {
-        var validator = $("#select-subscription-vll").kendoValidator({
-            rules: {
-                radio: function (input) {
-                    if (input.filter("[type=radio]") && input.attr("required")) {
-                        return $("#select-subscription-vll").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
-                    }
-                    return true;
-                }
-            },
-            messages: {
-                radio: "This is a required field"
-            }
-        }).getKendoValidator();
-
-        event.preventDefault();
-
-        if (validator.validate()) {
-            displayLoading('form');
-            createSubscription();
-        } else {
-            alert("invalid data");
-            $(".k-invalid:first").scrollToMe();
-            $(".k-invalid:first").focus();
-            $(".k-invalid:first").click();
-        }
-    });
-
-
-    $(".purchase-vll-billing").submit(function (event) {
-        var validator = $(".purchase-vll-billing").kendoValidator().getKendoValidator();
-        event.preventDefault();
-
-        if (validator.validate()) {
-            displayLoading('form');
-            purchaseSubscription();
-        } else {
-            alert("invalid data");
-            $(".k-invalid:first").scrollToMe();
-            $(".k-invalid:first").focus();
-            $(".k-invalid:first").click();
-        }
-    });
 
     var payment = getCookie("payment");
     if (payment == "true") {
@@ -96,6 +48,22 @@ $(".subscription-payment").click(function (e) {
     calculateTotal();
 });
 
+$(".payment-type").click(function (e) {
+    if ($("#credit-card-select").prop("checked")) {
+        $(".credit-card-section input").prop("disabled", false);
+        $(".ach-section input").prop("disabled", true);
+
+        $(".credit-card-section").show();
+        $(".ach-section").hide();
+    } else if ($("#ach-select").prop("checked")) {
+        $(".ach-section input").prop("disabled", false);
+        $(".credit-card-section input").prop("disabled", true);
+
+        $(".ach-section").show();
+        $(".credit-card-section").hide();
+    }
+});
+
 function calculateTotal() {
     var currentDue = 0;
     var futureDue = 0;
@@ -123,88 +91,31 @@ function calculateTotal() {
 
     return totalDue;
 };
-
-
-
-$("input[name='subscription-select'").click(function (e) {
-
-    $monthlyPrice = e.currentTarget.dataset.monthlyPrice;
-    $yearlyPrice = e.currentTarget.dataset.yearlyPrice;
-
-    console.log("Monthly Price: " + $monthlyPrice);
-    console.log("Yearly Price: " + $yearlyPrice);
-
-    $("#monthly").attr("data-price", $monthlyPrice);
-    $("#yearly").attr("data-price", $yearlyPrice);
-
-    $("label[for='monthly']").html('&nbsp;Monthly - $' + $monthlyPrice + ' per month');
-    $("label[for='yearly']").html('&nbsp;Yearly - $' + $yearlyPrice + ' per year');
-
-    if ($("input[name='payment-frequency']:checked").length > 0) {
-        $price = $("input[name='payment-frequency']:checked").attr("data-price");
-        $("#subscription-total-area").html("Total Due Today: $<span id='subscription-total'>" + $price + '</span>');
-        console.log("Selected Price: " + $price);
-    };
-
-});
-
-$("input[name='payment-frequency']").click(function (e) {
-    $price = e.currentTarget.dataset.price;
-    console.log("Selected Price: " + $price);
-    $("#subscription-total-area").html("Total Due Today: $<span id='subscription-total'>" + $price + '</span>');
-
-    if ($("#monthly").is(':checked')) {
-        $(".recurring-billing").show();
-    } else {
-        $(".recurring-billing").hide();
-        $("#recurring").prop("checked", false);
-    }
-});
-
-
-function createSubscription() {
-    $.ajax({
-        url: wpApiSettings.root + "ghes-vlp/v1/subscription",
-        method: "POST",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
-        },
-        timeout: 60000,
-        data: {
-            ParentID: $("#parent-id").text(),
-            StartDate: $("#sub-start-date").text(),
-            EndDate: $("#sub-end-date").text(),
-            PaymentFrequency: $("input[name='payment-frequency']:checked").val(),
-            SubscriptionDefinition_id: $("input[name='subscription-select']:checked").val(),
-            RecurringBilling: $("#recurring").prop("checked")
-        },
-        success: function (result) {
-            console.log("Success:" + result);
-            //Success!
-            window.location.replace(manageSubscriptionPage);
-        },
-        error: function (result) {
-            hideLoading('form');
-            console.log("Failed");
-
-            if (typeof result.responseJSON !== "undefined") {
-                alert(result.responseJSON.message);
-            } else {
-                alert(
-                    "An unexpected error occured.  Please review your submission and try again."
-                );
+var purchasevalidator = $(".purchase-vll-billing").kendoValidator({
+    rules: {
+        radio: function (input) {
+            if (input.filter("[type=radio]") && input.attr("required")) {
+                return $(".purchase-vll-billing").find("[type=radio][name=" + input.attr("name") + "]").is(":checked");
             }
-            console.log(result.responseText);
+            return true;
         }
-    })
-};
+    }
+}).data("kendoValidator");
+
 function showPurchase() {
     $("#showpaymentbtn").hide();
     $(".purchase-vll-billing").show();
+
 }
 
-function purchaseSubscription() {
+$("#purchasesubscription").on("click", function () {
+    if (purchasevalidator.validate()) {
+        // If the form is valid, the Validator will return true
+        purchaseSubscription();
+    }
+});
 
+function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
 
     var idSelector = function () { return this.dataset.id; };
@@ -222,6 +133,14 @@ function purchaseSubscription() {
             CardNumber: $("#vlp-bill-CardNumber").val().replace(/\s/g, ''),
             ExpirationDate: $("#vlp-bill-ExpirationYear").val() + "-" + $("#vlp-bill-ExpirationMonth").val(),
             CardCode: $("#vlp-bill-CardCode").val(),
+
+            AccountType: $("input[name=AccountType]:checked").val(),
+            EcheckType: 'WEB',
+            RoutingNumber: $("#vlp-bill-RoutingNumber").val(),
+            AccountNumber: $("#vlp-bill-AccountNumber").val(),
+            NameOnAccount: $("#vlp-bill-NameOnAccount").val(),
+            BankName: $("#vlp-bill-BankName").val(),
+
             FirstName: $("#vlp-bill-FirstName").val(),
             LastName: $("#vlp-bill-LastName").val(),
             Address: $("#vlp-bill-Address").val(),
@@ -257,7 +176,6 @@ function purchaseSubscription() {
             console.log(result.responseText);
         }
     })
-
 }
 
 function pendingPayment(payment) {
@@ -402,3 +320,4 @@ function cancelSubscription() {
         }
     })
 }
+

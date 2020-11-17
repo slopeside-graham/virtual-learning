@@ -38,3 +38,6 @@
     margin-bottom: 40px;
     display: none;
 }
+.purchase-vll-billing .ach-section, .purchase-vll-billing .credit-card-section {
+    display: none;
+}

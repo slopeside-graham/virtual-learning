@@ -12,12 +12,12 @@ use GHES\VLP\Subscription;
      Cookies Authentication
  *****************************************/
 
-function enqueue_purchase_scripts()
+function enqueue_select_subscription_scripts()
 {
-    wp_enqueue_script('wp-api-purchase');
+    wp_enqueue_script('wp-api-select-subscription');
 }
 
-function vlp_purchase($atts, $content = null)
+function vlp_select_subscription($atts, $content = null)
 {
     GHES\VLP\Utils::CheckLoggedInParent();
     $parentid = GHES\Parents::UserID();
@@ -26,7 +26,7 @@ function vlp_purchase($atts, $content = null)
 
     if (!$allSubscriptions->jsonSerialize()) {
 
-    enqueue_purchase_scripts();
+        enqueue_select_subscription_scripts();
 
     $output = '';
 ?>
@@ -40,7 +40,7 @@ function vlp_purchase($atts, $content = null)
     $subscriptiondefinitions = SubscriptionDefinition::GetAll();
 
     foreach ($subscriptiondefinitions->jsonSerialize() as $k => $subscriptiondefinition) {
-        $output .= '<input type="radio" id="subscription-' . $subscriptiondefinition->id . '" name="subscription-select" value="' . $subscriptiondefinition->id . '" data-monthly-price="' . $subscriptiondefinition->MonthlyAmount . '" data-yearly-price="' . $subscriptiondefinition->YearlyAmount . '" required>';
+        $output .= '<input type="radio" id="subscription-' . $subscriptiondefinition->id . '" name="subscription-select" value="' . $subscriptiondefinition->id . '" data-monthly-price="' . $subscriptiondefinition->MonthlyAmount . '" data-yearly-price="' . $subscriptiondefinition->YearlyAmount . '" required validationMessage="Please Select a Subscription Level">';
         $output .= '<label for="subscription-' . $subscriptiondefinition->id . '">&nbsp;' . $subscriptiondefinition->Name . '</label><br/>';
     }
     $output .= '<span class="k-invalid-msg" data-for="subscription-select"></span><br/>';

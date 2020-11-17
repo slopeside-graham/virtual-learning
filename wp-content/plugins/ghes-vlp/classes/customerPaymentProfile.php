@@ -18,9 +18,17 @@ namespace GHES\VLP {
         public $responseText;
 
         private $_id;
+
         private $_CardNumber;
         private $_ExpirationDate;
         private $_CardCode;
+
+        private $_AccountType;
+        private $_EcheckType;
+        private $_RoutingNumber;
+        private $_AccountNumber;
+        private $_NameOnAccount;
+        private $_BankName;
 
         private $_FirstName;
         private $_LastName;
@@ -32,6 +40,7 @@ namespace GHES\VLP {
         private $_PhoneNumber;
 
         private $_ancreditCard;
+        private $_anbankAccount;
 
         private $_anBillTo;
 
@@ -49,6 +58,7 @@ namespace GHES\VLP {
 
             // Set credit card information for payment profile
             $this->_ancreditCard = new AnetAPI\CreditCardType();
+            $this->_anbankAccount = new AnetAPI\BankAccountType();
 
             // Create the Bill To info for new payment type
             $this->_anBillTo = new AnetAPI\CustomerAddressType();
@@ -101,6 +111,79 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_CardCode;
+            }
+        }
+
+        protected function AccountType($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anbankAccount->setAccountType($value);
+                $this->_AccountType = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_AccountType;
+            }
+        }
+        protected function EcheckType($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anbankAccount->setEcheckType($value);
+                $this->_EcheckType = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_EcheckType;
+            }
+        }
+        protected function RoutingNumber($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anbankAccount->setRoutingNumber($value);
+                $this->_RoutingNumber = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_RoutingNumber;
+            }
+        }
+        protected function AccountNumber($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anbankAccount->setAccountNumber($value);
+                $this->_AccountNumber = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_AccountNumber;
+            }
+        }
+        protected function NameOnAccount($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anbankAccount->setNameOnAccount($value);
+                $this->_NameOnAccount = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_NameOnAccount;
+            }
+        }
+        protected function BankName($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_anbankAccount->setBankName($value);
+                $this->_BankName = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_BankName;
             }
         }
 
@@ -247,10 +330,13 @@ namespace GHES\VLP {
 
             // Set credit card information for payment profile
             $paymentMethod = new AnetAPI\PaymentType();
-            if ($checkccfields) {
+
+            if (!is_null($this->_ancreditCard)) {
                 $paymentMethod->setCreditCard($this->_ancreditCard);
-            } else {
+            } else if (!is_null($this->_anbankAccount)) {
                 $paymentMethod->setBankAccount($this->_anbankAccount);
+            } else {
+                return new \Exception('Something is wrong with your payment method. Please double check and try again.');
             }
 
             // Create a new Customer Payment Profile object
@@ -318,10 +404,13 @@ namespace GHES\VLP {
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
 
                 $paymentMethod = new AnetAPI\PaymentType();
-                if ($checkccfields) {
+
+                if (!is_null($this->_ancreditCard->getcardCode()) && !is_null($this->_ancreditCard->getcardNumber()) && !is_null($this->_ancreditCard->getexpirationDate())) {
                     $paymentMethod->setCreditCard($this->_ancreditCard);
-                } else {
+                } else if (!is_null($this->_anbankAccount->getaccountType() && !is_null($this->_anbankAccount->getroutingNumber()) && !is_null($this->_anbankAccount->getAccountNumber()) && !is_null($this->_anbankAccount->getNameOnAccount()) && !is_null($this->_anbankAccount->getEcheckType()) && !is_null($this->_anbankAccount->getBankName()))) {
                     $paymentMethod->setBankAccount($this->_anbankAccount);
+                } else {
+                    return new \Exception('Something is wrong with your payment method. Please double check and try again.');
                 }
 
                 $paymentprofile = new AnetAPI\CustomerPaymentProfileExType();
@@ -392,6 +481,12 @@ namespace GHES\VLP {
             $customerPaymentProfile->CardNumber = $row['CardNumber'];
             $customerPaymentProfile->ExpirationDate = $row['ExpirationDate'];
             $customerPaymentProfile->CardCode = $row['CardCode'];
+            $customerPaymentProfile->AccountType = $row['AccountType'];
+            $customerPaymentProfile->EcheckType = $row['EcheckType'];
+            $customerPaymentProfile->RoutingNumber = $row['RoutingNumber'];
+            $customerPaymentProfile->AccountNumber = $row['AccountNumber'];
+            $customerPaymentProfile->NameOnAccount = $row['NameOnAccount'];
+            $customerPaymentProfile->BankName = $row['BankName'];
             $customerPaymentProfile->FirstName = $row['FirstName'];
             $customerPaymentProfile->LastName = $row['LastName'];
             $customerPaymentProfile->Address = $row['Address'];

@@ -410,6 +410,38 @@ namespace GHES\VLP {
             }
             return $Subscriptions;
         }
+
+        public static function GetAllByPaymentId($paymentid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $Subscriptions = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "SELECT DISTINCT s.*,
+                        sp.Payment_id
+                    FROM 
+                        Subscription s 
+                    INNER JOIN
+                        SubscriptionPayment sp on s.id = sp.Subscription_id
+                    WHERE
+                        Payment_id = %i",
+                    $paymentid
+                );
+
+                foreach ($results as $row) {
+                    $Subscription = Subscription::populatefromRow($row);
+                    $Subscriptions->add_item($Subscription);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Subscription_GetAll_Error', $e->getMessage());
+            }
+            return $Subscriptions;
+        }
+
         public static function GetAllByParentId($parentid)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -430,6 +462,7 @@ namespace GHES\VLP {
             }
             return $Subscriptions;
         }
+
         public static function GetAllCurrentByParentId($parentid)
         // This is to get all subsctriptions with current payments, including cancelled subscriptions since they have their remaining payment time to use it.
         {

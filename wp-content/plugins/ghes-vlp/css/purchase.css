@@ -28,16 +28,31 @@
     font-weight: 700;
     display: none;
 }
+
 .k-window {
     overflow-y: initial;
 }
+
 .k-window .cancel {
     float: right;
 }
+
 .recurring-billing {
     margin-bottom: 40px;
     display: none;
 }
+
 .purchase-vll-billing .ach-section, .purchase-vll-billing .credit-card-section {
     display: none;
+}
+
+.vll-links {
+    display: flex;
+    justify-content: space-around;
+}
+
+.vll-links a {
+    font-weight: 700;
+    color: #1fa99d;
+    text-decoration: underline;
 }

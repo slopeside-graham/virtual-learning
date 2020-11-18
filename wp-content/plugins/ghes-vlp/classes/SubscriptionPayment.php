@@ -560,6 +560,38 @@ namespace GHES\VLP {
             return $SubscriptionPayments;
         }
 
+        public static function GetAllPaidBySubscriptionIdandPaymentId($subscriptionId, $paymentid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                                                    "SELECT sp.*, 
+                                                        p.DateCreated as PaymentDate
+                                                    from SubscriptionPayment sp
+                                                        Left Join Payment p on sp.Payment_id = p.id
+                                                    where 
+                                                    sp.Subscription_id = %i 
+                                                        and 
+                                                    sp.Status = 'Paid' and sp.Payment_id =%i",
+                    $subscriptionId,
+                    $paymentid
+                );
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
         public static function GetCurrentDueBySubscriptionId($subscriptionId)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler

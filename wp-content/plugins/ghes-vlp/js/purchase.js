@@ -100,7 +100,6 @@ function showPurchase() {
 
 function purchaseSubscription() {
     displayLoading('.purchase-vll-billing');
-    event.preventDefault();
     var idSelector = function () { return this.dataset.id; };
     var selectedPayments = $(".subscription-payment:checked").map(idSelector).get();
 
@@ -142,7 +141,7 @@ function purchaseSubscription() {
                 conversionValue: calculateTotal(),
                 event: "new_vll_subscription"
             });
-            document.cookie = "payment=true";
+            document.cookie = "paymentid=" + result.id + "; path=/";
             window.location.replace(paymentconfirmationlink);
         },
         error: function (result) {
@@ -262,10 +261,11 @@ function closeCancelDialog() {
     $("#cancel-subscription").data("kendoWindow").close();
 }
 function aproveCancelSubscription(selectedSubscriptionId) {
-    displayLoading('.k-window');
+    displayLoading($("#cancel-subscription"));
     cancelSubscription(selectedSubscriptionId);
 }
 function cancelSubscription() {
+    displayLoading($("#cancel-subscription"));
     console.log("Confirm Cancel Subscription " + selectedSubscriptionId);
 
     $.ajax({
@@ -282,10 +282,8 @@ function cancelSubscription() {
         success: function (result) {
             //Success!
             console.log("Success:" + result);
-            hideLoading('.k-window');
-            $("#cancel-subscription").data("kendoWindow").close();
-
-            document.cookie = "refund=true";
+            
+            document.cookie = "subscriptioncancelid=" + result.id + "; path=/";
             window.location.replace(cancelconfirmationlink);
         },
         error: function (result) {

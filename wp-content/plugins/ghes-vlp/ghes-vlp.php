@@ -128,6 +128,9 @@ function register_vlp_script_style_frontend()
   wp_register_script('wp-api-manage', plugins_url('ghes-vlp/js/purchase.js', dirname(__FILE__)), 'wp-api-frontend-utils', scriptver, true);
   wp_localize_script('wp-api-manage', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
+  wp_register_script('wp-api-payment-confirmation', plugins_url('ghes-vlp/js/payment-confirmation.js', dirname(__FILE__)), 'wp-api-frontend-utils', scriptver, true);
+  wp_localize_script('wp-api-payment-confirmation', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
   wp_enqueue_script('wp-api-frontend-utils');
 
   // Include Vimeo's Player API Library

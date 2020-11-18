@@ -123,7 +123,7 @@ namespace GHES\VLP {
          */
         public function get_item_permissions_check($request)
         {
-            if (current_user_can('administrator')) {
+            if (is_user_logged_in() && \GHES\ghes_base::UserIsParent()) {
                 return true;
             } else
                 return new \WP_Error('rest_forbidden', esc_html__('You cannot get this Payment resource.'), array('status' => $this->authorization_status_code()));

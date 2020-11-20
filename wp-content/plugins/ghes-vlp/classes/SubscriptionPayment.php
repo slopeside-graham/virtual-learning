@@ -299,6 +299,7 @@ namespace GHES\VLP {
 
                         if (!is_wp_error($paymentResult)) {
                             SubscriptionPayment::refundPaidYearlySubscriptionPayment($subscriptionId, $paymentResult->id);
+                            Email::SendRefundEmail($paymentResult, $subscriptionId);
                             return $paymentResult;
                         } else {
                             return $paymentResult;

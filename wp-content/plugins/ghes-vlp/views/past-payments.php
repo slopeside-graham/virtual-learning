@@ -25,7 +25,7 @@ function vlp_past_payments($atts, $content = null)
     $output = '';
     $parentid = GHES\Parents::GetByUserID(get_current_user_id())->id;
 
-    $paidSubscriptions = GHES\VLP\Subscription::GetAllByParentId($parentid);
+    $paidSubscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
     if ($paidSubscriptions->jsonSerialize()) {
         $output .= '<hr>';
         $output .= '<div class="paid-payments">';

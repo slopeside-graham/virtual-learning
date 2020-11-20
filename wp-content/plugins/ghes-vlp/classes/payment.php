@@ -385,7 +385,7 @@ namespace GHES\VLP {
                             $subscriptionresult = Subscription::ActivateSubscriptionByParentId($Parent->id);
                             //
                             if (!is_wp_error($subscriptionresult)) {
-                                $emailresult = Email::SendChargeEmail($chargepayment); //This has no created date
+                                $emailresult = Email::SendChargeEmail($chargepayment); 
                                 return true;
                             } else {
                                 return $subscriptionresult;

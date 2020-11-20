@@ -65,7 +65,7 @@ function vlp_manage_subscription($atts, $content = null)
             }
             $output .= '</ul>';
 
-            
+
             $output .= '<div><a href="' . $pastpaymentslink . '">View Past Payments &#8594;</a></div><hr>';
 
             $output .= '<h3>Upcoming Payments</h3>';
@@ -102,6 +102,17 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '<h3 class="total-due">Total Due: $0.00</h3><br/>';
 
             $output .= '<button id="showpaymentbtn" onclick="showPurchase()">Pay Now</button>';
+            // Use this in the future
+            /*
+            $output .= '<h3>Select Existing Payment Method</h3>';
+            $output .= '<div id="customer-payment-methods"></div>';
+
+            $output .= '<script type="text/x-kendo-template" id="customer-payment-methods-list-template">';
+            $output .= '<div class="payment-method">';
+            $output .= '<h3>#:AccountType#</h3>';
+            $output .= '</div>';
+            $output .= '</script>';
+            */
 
             $billinginfofilepath = plugin_dir_path(__FILE__) . '/templates/purchase-billing.html';
             $billinginfo = file_get_contents($billinginfofilepath);

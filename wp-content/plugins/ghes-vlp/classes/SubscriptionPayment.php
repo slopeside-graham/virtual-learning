@@ -17,6 +17,7 @@ namespace GHES\VLP {
         private $_StartDate;
         private $_EndDate;
         private $_Payment_id;
+        private $_CancelledPayment_id;
         private $_PaymentDate;
         private $_DateCreated;
         private $_DateModified;
@@ -103,6 +104,17 @@ namespace GHES\VLP {
                 return $this->_Payment_id;
             }
         }
+        protected function CancelledPayment_id($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_CancelledPayment_id = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_CancelledPayment_id;
+            }
+        }
         protected function PaymentDate($value = null)
         {
             // If value was provided, set the value
@@ -148,6 +160,7 @@ namespace GHES\VLP {
                 'StartDate' => $this->StartDate,
                 'EndDate' => $this->EndDate,
                 'Payment_id' => $this->Payment_id,
+                'Payment_id' => $this->CancelledPayment_id,
                 'PaymentDate' => $this->PaymentDate,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
@@ -209,36 +222,58 @@ namespace GHES\VLP {
         {
             // TODO: Refund all months that are paid in advance. Do not refund current month.
 
-            $subscriptionPayments = SubscriptionPayment::GetUpcomingPaidBySubscriptionId($subscriptionId);
+            $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
             if ($subscriptionPayments->jsonSerialize()) {
-                $monthlyRefundAmount = 0;
 
-                $paymentResults = new NestedSerializable();
-
-                // Need to get unique payments fot this subscription.
-                $paymentIds = array();
-                foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                    $monthlyRefundAmount = $subscriptionPayment->Amount;
-                    $paymentIds[] = $subscriptionPayment->Payment_id;
-                }
-                $uniquepaymentIds = array_unique($paymentIds);
-                foreach ($uniquepaymentIds as $paymentId) {
-                    $paymentResult = Payment::refund($monthlyRefundAmount, $paymentId);
-                    if (!is_wp_error($paymentResults)) {
-                        if ($paymentResult->Type = 'Void') {
-                            SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
-                            SubscriptionPayment::refundPaidMonthlySubscriptionPayment($subscriptionId);
-                        } else {
-                            SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
-                            SubscriptionPayment::refundPaidFutureMonthlySubscriptionPayment($subscriptionId);
-                        }
-                    } else {
-                        return $paymentResults;
+                // First cancel anything that is unpaid for this subscription
+                $UnpaidSubscriptionPayments = SubscriptionPayment::GetAllUnpaidBySubscriptionId($subscriptionId);
+                if ($UnpaidSubscriptionPayments->jsonSerialize()) {
+                    foreach ($UnpaidSubscriptionPayments->jsonSerialize() as $k => $UnpaidSubscriptionPayment) {
+                        SubscriptionPayment::cancelUnpaidSubscriptionPaymentbyId($UnpaidSubscriptionPayment->id);
                     }
-                    $paymentResults->add_item($paymentResult);
                 }
-                Email::SendRefundEmail($paymentResults);
-                return $paymentResults;
+
+                //Then refund/void anything that is paid for this subscription
+                $PaidSubscriptionPayments = SubscriptionPayment::GetAllPaidBySubscriptionId($subscriptionId);
+
+                $chargepaymentIds = array();  //Create the variable for the chargepaymentids as an array.
+
+                foreach ($PaidSubscriptionPayments->jsonSerialize() as $k => $PaidSubscriptionPayment) {
+                    $chargepaymentIds[] = $PaidSubscriptionPayment->Payment_id;
+                }
+                $uniquechargepaymentIds = array_unique($chargepaymentIds);
+
+                $cancelledpaymentResults = new NestedSerializable();
+
+                //Run the refund 1 time per chargepaymentid, that why we need the unique array first. Otherwise it would refund the same payment as many time as there are SubscriptionPayments with that payment id.
+                foreach ($uniquechargepaymentIds as $chargepaymentId) {
+                    if ($chargepaymentId != null) {
+                        $chargePayment = Payment::Get($chargepaymentId);
+                        // Run the cancellation for each charge payment
+                        $cancelledpaymentResult = Payment::refund($chargePayment->Amount, $chargePayment);
+
+                        // Get all SubscriptionPayments for charge payment id
+                        $cancelledSubscriptionPayments = SubscriptionPayment::GetAllByPaymentId($chargepaymentId);
+
+                        // Update each $cancelledSubscriptionPayments to Refunded, and insert the $cancelledpaymentResult->id
+                        if (!is_wp_error($cancelledpaymentResult)) {
+                            foreach ($cancelledSubscriptionPayments->jsonSerialize() as $k => $cancelledSubscriptionPayment) {
+                                if ($cancelledpaymentResult->Type = 'Void') {
+                                    SubscriptionPayment::refundPaidMonthlySubscriptionPaymentbyId($cancelledSubscriptionPayment->id, $cancelledpaymentResult->id);
+                                } else {
+                                    SubscriptionPayment::refundPaidFutureMonthlySubscriptionPaymentbyId($cancelledSubscriptionPayment->id, $cancelledpaymentResult->id);
+                                }
+                            }
+                        } else {
+                            return $cancelledpaymentResults;
+                        }
+                        $cancelledpaymentResults->add_item($cancelledpaymentResult);
+                    }
+                }
+                Email::SendRefundEmail($cancelledpaymentResults);
+                return $cancelledpaymentResults;
+            } else {
+                return new \Exception("Nothig was cancelled, something went wrong.");
             }
 
 
@@ -263,8 +298,7 @@ namespace GHES\VLP {
                         $paymentResult = Payment::refund($refundAmount, $subscriptionPayment);
 
                         if (!is_wp_error($paymentResult)) {
-                            SubscriptionPayment::cancelUnpaidSubscriptionPayment($subscriptionId);
-                            SubscriptionPayment::refundPaidYearlySubscriptionPayment($subscriptionId);
+                            SubscriptionPayment::refundPaidYearlySubscriptionPayment($subscriptionId, $paymentResult->id);
                             return $paymentResult;
                         } else {
                             return $paymentResult;
@@ -274,7 +308,7 @@ namespace GHES\VLP {
             }
         }
 
-        public static function cancelUnpaidSubscriptionPayment($subscriptionId)
+        public static function cancelUnpaidSubscriptionPaymentbyId($id)
         {
             // Cancel the SubscriptionPayment
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -288,10 +322,10 @@ namespace GHES\VLP {
                         SET
                         Status='Cancelled'
                     WHERE 
-                        Subscription_id=%i
+                        id=%i
                             and
-                        Status<>'Paid'",
-                    $subscriptionId
+                        Status = 'Unpaid'",
+                    $id
                 );
                 $counter = VLPUtils::$db->affectedRows();
                 foreach ($results as $row) {
@@ -304,7 +338,7 @@ namespace GHES\VLP {
             return $SubscriptionPayments;
         }
 
-        public static function refundPaidYearlySubscriptionPayment($subscriptionId)
+        public static function refundPaidYearlySubscriptionPayment($subscriptionId, $paymentId)
         {
             // Cancel the SubscriptionPayment
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -316,12 +350,14 @@ namespace GHES\VLP {
                 $results = VLPUtils::$db->query(
                     "UPDATE SubscriptionPayment 
                         SET
-                        Status='Refunded'
+                        Status='Refunded',
+                        CancelledPayment_id = %i
                     WHERE 
                         Subscription_id=%i
                             and
                         Status = 'Paid'",
-                    $subscriptionId
+                    $subscriptionId,
+                    $paymentId
                 );
                 $counter = VLPUtils::$db->affectedRows();
                 foreach ($results as $row) {
@@ -334,7 +370,7 @@ namespace GHES\VLP {
             return $SubscriptionPayments;
         }
 
-        public static function refundPaidMonthlySubscriptionPayment($subscriptionId)
+        public static function refundPaidMonthlySubscriptionPaymentbyId($id, $cancelledpaymentId)
         {
             // Cancel the SubscriptionPayment
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -346,12 +382,14 @@ namespace GHES\VLP {
                 $results = VLPUtils::$db->query(
                     "UPDATE SubscriptionPayment 
                         SET
-                        Status='Refunded'
+                        Status='Refunded',
+                        CancelledPayment_id = %i
                     WHERE 
-                        Subscription_id=%i
+                        id=%i
                             and
                         Status = 'Paid'",
-                    $subscriptionId
+                    $cancelledpaymentId,
+                    $id
                 );
                 $counter = VLPUtils::$db->affectedRows();
                 foreach ($results as $row) {
@@ -364,7 +402,7 @@ namespace GHES\VLP {
             return $SubscriptionPayments;
         }
 
-        public static function refundPaidFutureMonthlySubscriptionPayment($subscriptionId)
+        public static function refundPaidFutureMonthlySubscriptionPaymentbyId($id, $cancelledpaymentId)
         {
             // Cancel the SubscriptionPayment
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -376,15 +414,17 @@ namespace GHES\VLP {
                 $results = VLPUtils::$db->query(
                     "UPDATE SubscriptionPayment 
                         SET
-                        Status='Refunded'
+                        Status='Refunded',
+                        CancelledPayment_id = %i
                     WHERE 
-                        Subscription_id=%i
+                        id=%i
                             and
                         Status = 'Paid'
                             and 
                         Date(StartDate) > Date(Now())
                         ",
-                    $subscriptionId
+                    $cancelledpaymentId,
+                    $id
                 );
                 $counter = VLPUtils::$db->affectedRows();
                 foreach ($results as $row) {
@@ -560,6 +600,34 @@ namespace GHES\VLP {
             return $SubscriptionPayments;
         }
 
+        public static function GetAllUnpaidBySubscriptionId($subscriptionId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("select sp.*, 
+                                                        p.DateCreated as PaymentDate
+                                                    from SubscriptionPayment sp
+                                                        Left Join Payment p on sp.Payment_id = p.id
+                                                    where 
+                                                    sp.Subscription_id = %i 
+                                                        and 
+                                                    sp.Status = 'Unpaid'", $subscriptionId);
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
         public static function GetAllPaidBySubscriptionIdandPaymentId($subscriptionId, $paymentid)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
@@ -569,7 +637,7 @@ namespace GHES\VLP {
 
             try {
                 $results = VLPUtils::$db->query(
-                                                    "SELECT sp.*, 
+                    "SELECT sp.*, 
                                                         p.DateCreated as PaymentDate
                                                     from SubscriptionPayment sp
                                                         Left Join Payment p on sp.Payment_id = p.id

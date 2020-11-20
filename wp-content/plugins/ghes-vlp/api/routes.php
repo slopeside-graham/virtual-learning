@@ -49,8 +49,9 @@ include_once(plugin_dir_path(__FILE__) . '/Subscription_rest.php');    // AgeGro
 include_once(plugin_dir_path(__FILE__) . '/../classes/SubscriptionPayment.php');
 include_once(plugin_dir_path(__FILE__) . '/SubscriptionPayment_rest.php');    // SubscriptionPayment REST controller
 
-// Include SubscriptionPayment class
+// Include customerPaymentProfile class
 include_once(plugin_dir_path(__FILE__) . '/../classes/customerPaymentProfile.php');
+include_once(plugin_dir_path(__FILE__) . '/customerPaymentProfile_rest.php');    // customerPaymentProfile REST controller
 
 // Include SubscriptionPayment class
 include_once(plugin_dir_path(__FILE__) . '/../classes/customerProfile.php');
@@ -118,9 +119,12 @@ function register_vlp_controllers()
     $controller = new GHES\VLP\SubscriptionPayment_Rest();
     $controller->register_routes();
 
-
     // Resource Controller
     $controller = new GHES\VLP\Payment_Rest();
+    $controller->register_routes();
+
+    // Resource Controller
+    $controller = new GHES\VLP\customerPaymentProfile_rest();
     $controller->register_routes();
 }
 

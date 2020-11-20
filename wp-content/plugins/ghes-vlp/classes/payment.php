@@ -27,6 +27,7 @@ namespace GHES\VLP {
         private $_CvvResultCode;
         private $_CavvResultCode;
         private $_transId;
+        private $_refTransId;
         private $_accountNumber;
         private $_accountType;
         private $_prePaidCard;
@@ -202,6 +203,18 @@ namespace GHES\VLP {
             }
         }
 
+        protected function refTransId($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_refTransId = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_refTransId;
+            }
+        }
+
         protected function accountNumber($value = null)
         {
             // If value was provided, set the value
@@ -289,6 +302,7 @@ namespace GHES\VLP {
                 'CvvResultCode' => $this->CvvResultCode,
                 'CavvResultCode' => $this->CavvResultCode,
                 'transId' => $this->transId,
+                'refTransId' => $this->refTransId,
                 'accountNumber' => $this->accountNumber,
                 'accountType' => $this->accountType,
                 'prePaidCard' => $this->prePaidCard,
@@ -359,6 +373,7 @@ namespace GHES\VLP {
                 // Create the payment record from the response.
                 $paymentResult = $this->CreatePaymentFromResponse($chargeResult);
                 $paymentResultid = $paymentResult->id;
+                $chargepayment = Payment::Get($paymentResultid);
 
                 if ($chargeResult->getMessages()->getResultCode() == "Ok") {
                     $tresponse = $chargeResult->getTransactionResponse();
@@ -370,7 +385,7 @@ namespace GHES\VLP {
                             $subscriptionresult = Subscription::ActivateSubscriptionByParentId($Parent->id);
                             //
                             if (!is_wp_error($subscriptionresult)) {
-                                $emailresult = Email::SendChargeEmail($paymentResult);
+                                $emailresult = Email::SendChargeEmail($chargepayment); //This has no created date
                                 return true;
                             } else {
                                 return $subscriptionresult;
@@ -394,7 +409,7 @@ namespace GHES\VLP {
             return true;
         }
 
-        public static function refund($refundAmount, $paymentId)
+        public static function refund($refundAmount, $chargepayment)
         {
             $refundPayment = new Payment;
             // Get the User ID
@@ -404,10 +419,8 @@ namespace GHES\VLP {
             // Get the Parent ID
             $Parent_id = $Parent->id;
 
-            $originalPayment = Payment::Get($paymentId);
-
             $customerProfile = new customerProfile();
-            $chargeResult = $customerProfile->refundCustomerProfile($Parent->customerProfileId, $Parent->customerPaymentProfileId, $refundAmount, $originalPayment);
+            $chargeResult = $customerProfile->refundCustomerProfile($Parent->customerProfileId, $Parent->customerPaymentProfileId, $refundAmount, $chargepayment);
             // Create the payment record from the response.
             $refundPaymentResult = $refundPayment->CreateRefundFromResponse($chargeResult, $refundAmount);
 
@@ -459,6 +472,7 @@ namespace GHES\VLP {
             $this->CvvResultCode = $tresponse->getCvvResultCode();
             $this->CavvResultCode = $tresponse->getCavvResultCode();
             $this->transId = $tresponse->getTransId();
+            $this->refTransId = $tresponse->getRefTransId();
             $this->accountNumber = $tresponse->getAccountNumber();
             $this->accountType = $tresponse->getAccountType();
             $this->prePaidCard = $tresponse->getPrePaidCard();
@@ -514,7 +528,9 @@ namespace GHES\VLP {
             $this->CvvResultCode = $tresponse->getCvvResultCode();
             $this->CavvResultCode = $tresponse->getCavvResultCode();
             $this->transId = $tresponse->getTransId();
-            $this->accountNumber = $tresponse->getAccountNumber();
+            $this->refTransId = $tresponse->getRefTransId();
+            $this->accountNumber = $tresponse->getAccountNumber(); //TODO: is this ok? It only returns one or the other depending on CC or ACH
+            $this->accountNumber = $tresponse->getBankAccount();
             $this->accountType = $tresponse->getAccountType();
             $this->prePaidCard = $tresponse->getPrePaidCard();
             $this->errors = $paymentErrors;
@@ -543,6 +559,7 @@ namespace GHES\VLP {
                     'CvvResultCode' => $this->CvvResultCode,
                     'CavvResultCode' => $this->CavvResultCode,
                     'transId' => $this->transId,
+                    'refTransId' => $this->refTransId,
                     'accountNumber' => $this->accountNumber,
                     'accountType' => $this->accountType,
                     'prePaidCard' => $this->prePaidCard,
@@ -664,6 +681,63 @@ namespace GHES\VLP {
             }
             return $Payments;
         }
+
+        public static function GetAllBySubscriptionId($subscriptionid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $Payments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "SELECT DISTINCT p.* 
+                        FROM Payment p
+                        Inner Join SubscriptionPayment sp on sp.Payment_id = p.id
+                        Where sp.Subscription_id= %i
+                        ",
+                    $subscriptionid
+                );
+
+                foreach ($results as $row) {
+                    $Payment = Payment::populatefromRow($row);
+                    $Payments->add_item($Payment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Payment_GetAll_Error', $e->getMessage());
+            }
+            return $Payments;
+        }
+
+        public static function GetAllCancelledBySubscriptionId($subscriptionid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $Payments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                    "SELECT DISTINCT p.* 
+                        FROM Payment p
+                        Inner Join SubscriptionPayment sp on sp.CancelledPayment_id = p.id
+                        Where sp.Subscription_id= %i
+                        ",
+                    $subscriptionid
+                );
+
+                foreach ($results as $row) {
+                    $Payment = Payment::populatefromRow($row);
+                    $Payments->add_item($Payment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Payment_GetAll_Error', $e->getMessage());
+            }
+            return $Payments;
+        }
+
         // Helper function to populate a lesson from a MeekroDB Row
         public static function populatefromRow($row): ?Payment
         {
@@ -684,6 +758,7 @@ namespace GHES\VLP {
             $Payment->CvvResultCode = $row['CvvResultCode'];
             $Payment->CavvResultCode = $row['CavvResultCode'];
             $Payment->transId = $row['transId'];
+            $Payment->refTransId = $row['refTransId'];
             $Payment->accountNumber = $row['accountNumber'];
             $Payment->accountType = $row['accountType'];
             $Payment->prePaidCard = $row['prePaidCard'];

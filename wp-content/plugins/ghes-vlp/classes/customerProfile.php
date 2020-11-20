@@ -171,6 +171,39 @@ namespace GHES\VLP {
             return true;
         }
         /**
+         * Get Customer Profile
+         *
+         * @param WP_REST_Request $request get data from request.
+         *
+         * @return mixed|WP_Error|Object
+         */
+        public static function Get($customerProfileId)
+        {
+            $customerProfile = new customerProfile;
+
+            $profileIdRequested = $customerProfileId;
+            /* Create a merchantAuthenticationType object with authentication details */
+            $merchantAuthentication = $customerProfile->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            // Retrieve an existing customer profile along with all the associated payment profiles and shipping addresses
+
+            $request = new AnetAPI\GetCustomerProfileRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setCustomerProfileId($profileIdRequested);
+            $controller = new AnetController\GetCustomerProfileController($request);
+            $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+            if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+                return $response;
+            } else {
+                $response = $response->getMessages()->getMessage();
+            }
+            return $response;
+        }
+
+        /**
          * Charge Customer Profile
          *
          * @param WP_REST_Request $request get data from request.
@@ -207,6 +240,61 @@ namespace GHES\VLP {
         }
 
         public function refundCustomerProfile($profileid, $paymentprofileid, $refundAmount, $originalPayment)
+        {
+
+            if ($originalPayment->accountType != "eCheck") {
+                $response = $this->refundCustomerProfileCreditCard($profileid, $paymentprofileid, $refundAmount, $originalPayment);
+            } else if ($originalPayment->accountType == "eCheck") {
+                $response = $this->refundCustomerProfileBankAccount($profileid, $paymentprofileid, $refundAmount, $originalPayment);
+            }
+            return $response;
+        }
+
+        public function refundCustomerProfileCreditCard($profileid, $paymentprofileid, $refundAmount, $originalPayment)
+        {
+            $refTransId = $originalPayment->transId;
+            /* Create a merchantAuthenticationType object with authentication details */
+            $merchantAuthentication = $this->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            // set payment profile for customer
+
+            $paymentProfile = new AnetAPI\PaymentProfileType();
+            $paymentProfile->setpaymentProfileId($paymentprofileid);
+
+            // set customer profile
+            $customerProfile = new AnetAPI\CustomerProfilePaymentType();
+            $customerProfile->setCustomerProfileId($profileid);
+            $customerProfile->setPaymentProfile($paymentProfile);
+
+            //create a transaction
+            $transactionRequest = new AnetAPI\TransactionRequestType();
+            $transactionRequest->setTransactionType("refundTransaction");
+            $transactionRequest->setAmount($refundAmount);
+            $transactionRequest->setRefTransId($refTransId);
+            $transactionRequest->setProfile($customerProfile);
+
+
+            $request = new AnetAPI\CreateTransactionRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setTransactionRequest($transactionRequest);
+            $controller = new AnetController\CreateTransactionController($request);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
+
+            $tresponse =  $response->getTransactionResponse();
+            $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
+            if ($tresponseError = 54) {
+                $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
+                return $voidResponse;
+            } else {
+                return $response;
+            }
+        }
+
+        public function refundCustomerProfileBankAccount($profileid, $paymentprofileid, $refundAmount, $originalPayment)
         {
             $refTransId = $originalPayment->transId;
             /* Create a merchantAuthenticationType object with authentication details */
@@ -274,7 +362,7 @@ namespace GHES\VLP {
             $controller = new AnetController\CreateTransactionController($request);
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
-            return array ($response, $void = true);
+            return array($response, $void = true);
         }
 
         public static function analyzeANresponse($response)

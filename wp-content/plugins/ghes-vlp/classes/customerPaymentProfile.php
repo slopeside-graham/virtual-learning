@@ -471,6 +471,58 @@ namespace GHES\VLP {
             return $paymentProfiles;
         }
 
+        /**
+         * Get Customer Payment Profiles
+         *
+         * @param WP_REST_Request $request get data from request.
+         *
+         * @return mixed|Object
+         */
+        public static function GetAll()
+        {
+            $parent = \GHES\Parents::GetByUserID(get_current_user_id());
+
+            $customerProfileId = $parent->customerProfileId;
+            $customerProfile = customerProfile::Get($customerProfileId);
+
+            $paymentProfiles = new NestedSerializable();
+            $results = $customerProfile->getProfile()->getPaymentProfiles();
+
+            foreach ($results as $row) {
+                $paymentProfile = customerPaymentProfile::populatefromANobject($row);
+                $paymentProfiles->add_item($paymentProfile);  // Add the paymentprofile to the collection
+            }
+
+            return $paymentProfiles;
+        }
+
+        public static function populatefromANobject($row): ?customerPaymentProfile
+        {
+            if ($row == null)
+                return null;
+
+            $customerPaymentProfile = new customerPaymentProfile();
+            $customerPaymentProfile->id = $row->getanCustomerPaymentProfileId();
+            $customerPaymentProfile->CardNumber = $row->getPayment()->getCreditCard();
+            $customerPaymentProfile->ExpirationDate = $row->getPayment()->getCreditCard();
+            $customerPaymentProfile->CardCode = $row->getPayment()->getCreditCard();
+            $customerPaymentProfile->AccountType = $row->getPayment()->getBankAccount()->getAccountType();
+            $customerPaymentProfile->EcheckType = $row->getPayment()->getBankAccount()->getECheckType();
+            $customerPaymentProfile->RoutingNumber = $row->getPayment()->getBankAccount()->getRoutingNumber();
+            $customerPaymentProfile->AccountNumber = $row->getPayment()->getBankAccount()->getAccountNumber();
+            $customerPaymentProfile->NameOnAccount = $row->getPayment()->getBankAccount()->getNameOnAccount();
+            $customerPaymentProfile->BankName = $row->getPayment()->getBankAccount()->getBankName();
+            $customerPaymentProfile->FirstName = $row->getBillto()->getFirstName();
+            $customerPaymentProfile->LastName = $row->getBillto()->getLastName();
+            $customerPaymentProfile->Address = $row->getBillto()->getAddress();
+            $customerPaymentProfile->City = $row->getBillto()->getCity();
+            $customerPaymentProfile->State = $row->getBillto()->getState();
+            $customerPaymentProfile->Zip = $row->getBillto()->getZip();
+            $customerPaymentProfile->Country = 'USA';
+            $customerPaymentProfile->PhoneNumber = $row->getBillto()->getPhoneNumber();
+            return $customerPaymentProfile;
+        }
+
         public static function populatefromRow($row): ?customerPaymentProfile
         {
             if ($row == null)

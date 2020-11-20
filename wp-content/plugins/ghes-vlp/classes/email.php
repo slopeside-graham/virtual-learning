@@ -139,31 +139,58 @@ namespace GHES\VLP {
 
         public static function SendChargeEmail($payment)
         {
-            /*
             $filepath = plugin_dir_path(__FILE__) . '../emails/successfulCharge.html';
             $emailbody = file_get_contents($filepath);
 
-            //Gather All subscription ID's
-            $subscriptionPayments = SubscriptionPayment::GetAllByPaymentId($payment->id);
-            $subscriptionIds = array();
-            foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-               //TODO: this is not how to do it: $subscriptionIds[] = $subscriptionPayment['Subscription_id'];
-            }
-            $uniquesubscriptionIds = array_unique($subscriptionIds);
+            $formatter = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
 
-            //Build a grid of Subscriptions Information
-            $subscriptionlist = Email::BuildSubscriptionList($uniquesubscriptionIds);
-
+            $output = '';
             $parent = Parents::GetByUserID(get_current_user_id());
-            $billinginfo = Email::populatefromRow($parent);
+            $sendtoemail = $parent->Email;
+            $FirstName = $parent->FirstName;
+            $paymentid = $payment->id;
 
-            $billinginfo->ProcessReplacements($emailbody, $billinginfo);
-            Email::ProcessSubscriptionListReplacement($emailbody, $subscriptionlist);
+            if ($payment->jsonSerialize()) {
+                $PaymentAmount = $formatter->formatCurrency($payment->Amount, 'USD');
+                $PaymentDate = date('m/d/Y', strtotime($payment->DateCreated)); // This is null
+                $PaymentAccount = $payment->accountNumber;
+                $PaymentAccountType = $payment->accountType;
+            }
 
-            $sendtoemail = $billinginfo->Email;
+            $subscriptions = Subscription::GetAllByPaymentId($paymentid);
+            $SubscriptionPaymentsList = '';
+            if ($subscriptions->jsonSerialize()) {
+                $SubscriptionPaymentsList .= '<ul>';
+                foreach ($subscriptions->jsonSerialize() as $k => $subscription) {
+                    $subscriptiondefenition = SubscriptionDefinition::Get($subscription->SubscriptionDefinition_id);
+                    $subscriptionpayments = SubscriptionPayment::GetAllPaidBySubscriptionIdandPaymentId($subscription->id, $paymentid);
+                    $SubscriptionPaymentsList .= '<li>Subscription Type: ' . $subscriptiondefenition->Name . ' - ' . $subscription->Status . '</li>';
+                    $SubscriptionPaymentsList .= '<ul>';
+                    if ($subscriptionpayments->jsonSerialize()) {
+                        foreach ($subscriptionpayments->jsonSerialize() as $k => $subscriptionpayment) {
+                            $SubscriptionPaymentsList .= '<li>Paid for: ' . date('m/d/Y', strtotime($subscriptionpayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionpayment->EndDate)) . ' - ' . $formatter->formatCurrency($subscriptionpayment->Amount, 'USD') .  '</li>';
+                        }
+                    }
+                    $SubscriptionPaymentsList .= '</ul>';
+                }
+                $SubscriptionPaymentsList .= '</ul>';
+            }
 
-            wp_mail($sendtoemail, 'Thank you for your Virtual Learning Purchase', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
-            */
+            $ManageSubscriptionLink = get_permalink(esc_attr(get_option('vlp-manage')));
+            $LaunchGameboardLink = get_permalink(esc_attr(get_option('vlp-agetree'))) . '?destination=Gameboard';
+            $MyProfileLink = get_permalink(esc_attr(get_option('registration_welcome_url')));
+
+            $emailbody = str_replace('~FirstName~', $FirstName, $emailbody);
+            $emailbody = str_replace('~PaymentAmount~', $PaymentAmount, $emailbody);
+            $emailbody = str_replace('~PaymentDate~', $PaymentDate, $emailbody);
+            $emailbody = str_replace('~PaymentAccountType~', $PaymentAccountType, $emailbody);
+            $emailbody = str_replace('~PaymentAccount~', $PaymentAccount, $emailbody);
+            $emailbody = str_replace('~SubscriptionPaymentsList~', $SubscriptionPaymentsList, $emailbody);
+            $emailbody = str_replace('~ManageSubscriptionLink~', $ManageSubscriptionLink, $emailbody);
+            $emailbody = str_replace('~LaunchGameboardLink~', $LaunchGameboardLink, $emailbody);
+            $emailbody = str_replace('~MyProfileLink~', $MyProfileLink, $emailbody);
+
+            wp_mail($sendtoemail, 'GHES Virtual Learning Payment Succesful', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
             return true;
         }
 
@@ -196,7 +223,7 @@ namespace GHES\VLP {
            // wp_mail($sendtoemail, 'Your Virtual Learning Subscription has been cancelled.', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
            */
 
-           return true;
+            return true;
         }
 
         public static function BuildSubscriptionList($uniquesubscriptionIds)
@@ -206,13 +233,13 @@ namespace GHES\VLP {
             foreach ($uniquesubscriptionIds as $subscriptionId) {
                 $subscription = Subscription::Get($subscriptionId);
                 $subscriptiondefenition = SubscriptionDefinition::Get($subscription->SubscriptionDefenition_id);
-                    $subscriptionlist .=  '<li>' . $subscriptiondefenition->Name . ' - ' . date('m/d/Y', strtotime($subscription->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscription->EndDate)) . '</li>';
-                        $subscriptionlist .= '<ul>';
+                $subscriptionlist .=  '<li>' . $subscriptiondefenition->Name . ' - ' . date('m/d/Y', strtotime($subscription->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscription->EndDate)) . '</li>';
+                $subscriptionlist .= '<ul>';
                 $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
                 foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                            $subscriptionlist .= '<li>' . $subscriptionPayment->Status . ' - $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</li>';
+                    $subscriptionlist .= '<li>' . $subscriptionPayment->Status . ' - $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</li>';
                 }
-                        $subscriptionlist .= '<ul>';
+                $subscriptionlist .= '<ul>';
             }
             $subscriptionlist .= '</ul>';
             return $subscriptionlist;

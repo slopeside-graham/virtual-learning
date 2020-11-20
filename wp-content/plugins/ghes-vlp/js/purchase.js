@@ -302,3 +302,34 @@ function cancelSubscription() {
     })
 }
 
+// Get Customer Payment Profiles
+// Use this for futere 
+/*
+$(function () {
+    var dataSource = new kendo.data.DataSource({
+        transport: {
+            read: {
+                url: wpApiSettings.root + "ghes-vlp/v1/customerpaymentprofile",
+                dataType: "json",
+                method: "GET",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+                },
+                success: function (result) {
+                    options.success(result);
+                    console.log(result);
+                },
+                error: function (result) {
+                    options.error(result);
+                    console.log(result);
+                }
+            }
+        }
+    });
+
+    $("#customer-payment-methods").kendoListView({
+        dataSource: dataSource,
+        template: kendo.template($("#customer-payment-methods-list-template").html())
+    });
+});
+*/

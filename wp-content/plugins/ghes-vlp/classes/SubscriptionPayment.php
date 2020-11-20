@@ -270,7 +270,7 @@ namespace GHES\VLP {
                         $cancelledpaymentResults->add_item($cancelledpaymentResult);
                     }
                 }
-                Email::SendRefundEmail($cancelledpaymentResults);
+                Email::SendRefundEmail($cancelledpaymentResults, $subscriptionId);
                 return $cancelledpaymentResults;
             } else {
                 return new \Exception("Nothig was cancelled, something went wrong.");

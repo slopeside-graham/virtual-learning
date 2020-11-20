@@ -194,35 +194,61 @@ namespace GHES\VLP {
             return true;
         }
 
-        public static function SendRefundEmail($payment)
+        public static function SendRefundEmail($payment, $subscriptionId)
         {
-            /*
-            $subscriptionlist = '';
-            //Gather All subscription ID's
-            $subscriptionPayments = SubscriptionPayment::GetAllByPaymentId($payment->id);
-            $subscriptionIds = array();
-            foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
-                $subscriptionIds[] = $subscriptionPayment['Subscription_id'];
-            }
-            $uniquesubscriptionIds = array_unique($subscriptionIds);
-
-            //Build a grid of Subscriptions Information
-            $subscriptionlist = Email::BuildSubscriptionList($uniquesubscriptionIds);
-
-            $parent = Parents::GetByUserID(get_current_user_id());
-           // $billinginfo = Email::populatefromRow($parent);
-
-            $filepath = plugin_dir_path(__FILE__) . '../emails/successfulCharge.html';
+            $filepath = plugin_dir_path(__FILE__) . '../emails/successfulCancel.html';
             $emailbody = file_get_contents($filepath);
 
-            //$billinginfo->ProcessReplacements($emailbody, $billinginfo);
-            //Email::ProcessReplacements($emailbody, $subscriptionlist);
+            $formatter = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
 
-            //$sendtoemail = $billinginfo->Email;
+            $parent = Parents::GetByUserID(get_current_user_id());
+            $sendtoemail = $parent->Email;
+            $FirstName = $parent->FirstName;
+            $paymentid = $payment->id;
 
-           // wp_mail($sendtoemail, 'Your Virtual Learning Subscription has been cancelled.', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
-           */
+            $RefundAmount = 0;
+            $payments = Payment::GetAllCancelledBySubscriptionId($subscriptionId);
+            foreach ($payments->jsonSerialize() as $k => $payment) {
+                $RefundAmount = +$payment->Amount;
+            }
 
+
+            $cancelledSubscription = Subscription::Get($subscriptionId);
+            $subscriptionDefinition = SubscriptionDefinition::Get($cancelledSubscription->SubscriptionDefinition_id);
+            $SubscriptionName = $subscriptionDefinition->Name;
+            $SubscriptionStartDate = date('m/d/Y', strtotime($cancelledSubscription->StartDate));
+            $SubscriptionEndDate = date('m/d/Y', strtotime($cancelledSubscription->EndDate));
+
+            $payments = Payment::GetAllCancelledBySubscriptionId($subscriptionId);
+            $SubscriptionRefundsList = '';
+            $SubscriptionRefundsList .= '<ul>';
+            foreach ($payments->jsonSerialize() as $k => $payment) {
+                $SubscriptionRefundsList .= '<li>Payment Type: ' . $payment->Type . '</li>';
+                $SubscriptionRefundsList .= '<ul>';
+                $SubscriptionRefundsList .= '<li>' . $formatter->formatCurrency($payment->Amount, 'USD') . '</li>';
+                $SubscriptionRefundsList .= '<li>' . $payment->accountType . ': ' . $payment->accountNumber . '</li>';
+                $SubscriptionRefundsList .= '</ul>';
+            }
+            $SubscriptionRefundsList .= '</ul>';
+
+            $SubscriptionPaymentsList = '';
+            $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
+
+            $SubscriptionPaymentsList .= '<ul>';
+            foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
+                $SubscriptionPaymentsList .= '<li>' . $subscriptionPayment->Status . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</li>';
+            }
+            $SubscriptionPaymentsList .= '</ul>';
+
+            $emailbody = str_replace('~FirstName~', $FirstName, $emailbody);
+            $emailbody = str_replace('~RefundAmount~', $formatter->formatCurrency($RefundAmount, 'USD'), $emailbody);
+            $emailbody = str_replace('~SubscriptionName~', $SubscriptionName, $emailbody);
+            $emailbody = str_replace('~SubscriptionStartDate~', $SubscriptionStartDate, $emailbody);
+            $emailbody = str_replace('~SubscriptionEndDate~', $SubscriptionEndDate, $emailbody);
+            $emailbody = str_replace('~SubscriptionRefundsList~', $SubscriptionRefundsList, $emailbody);
+            $emailbody = str_replace('~SubscriptionPaymentsList~', $SubscriptionPaymentsList, $emailbody);
+
+            wp_mail($sendtoemail, 'GHES Virtual Learning Cancelled', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
             return true;
         }
 

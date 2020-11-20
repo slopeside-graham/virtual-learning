@@ -517,6 +517,13 @@ namespace GHES\VLP {
                     }
                 }
             }
+
+            if ($tresponse->getAccountType() == 'eCheck') {
+                $accountNumber = $tresponse->getBankAccount();
+            } else {
+                $accountNumber = $tresponse->getAccountNumber();
+            }
+
             $this->Type = $type;
             $this->User_id = get_current_user_id();
             $this->Amount = $refundAmount;
@@ -529,8 +536,7 @@ namespace GHES\VLP {
             $this->CavvResultCode = $tresponse->getCavvResultCode();
             $this->transId = $tresponse->getTransId();
             $this->refTransId = $tresponse->getRefTransId();
-            $this->accountNumber = $tresponse->getAccountNumber(); //TODO: is this ok? It only returns one or the other depending on CC or ACH
-            $this->accountNumber = $tresponse->getBankAccount();
+            $this->accountNumber = $accountNumber;
             $this->accountType = $tresponse->getAccountType();
             $this->prePaidCard = $tresponse->getPrePaidCard();
             $this->errors = $paymentErrors;

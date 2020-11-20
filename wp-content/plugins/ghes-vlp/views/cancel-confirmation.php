@@ -30,17 +30,25 @@ function vlp_cancel_confirmation($atts, $content = null)
     $output .= '<h3>See cancellation details below</h3>';
 
     $subscriptioncancelid = $_COOKIE['subscriptioncancelid'];
+    $totalPayment = 0;
+    $payments = Payment::GetAllCancelledBySubscriptionId($subscriptioncancelid);
+    foreach ($payments->jsonSerialize() as $k => $payment) {
+        $totalPayment = +$payment->Amount;
+    }
+
+    $output .= '<h3>Refund Amount: ' . $formatter->formatCurrency($totalPayment, 'USD') . '</h3>';
+
     $cancelledSubscription = Subscription::Get($subscriptioncancelid);
     $subscriptionDefinition = SubscriptionDefinition::Get($cancelledSubscription->SubscriptionDefinition_id);
     $output .= 'Cancelled Subscription: ' . $subscriptionDefinition->Name . ' - ' . date('m/d/Y', strtotime($cancelledSubscription->StartDate)) . ' - ' . date('m/d/Y', strtotime($cancelledSubscription->EndDate));
 
-    $payments = Payment::GetAllCancelledBySubscriptionId($subscriptioncancelid);
+
 
     $output .= '<ul>';
     foreach ($payments->jsonSerialize() as $k => $payment) {
         $output .= '<li>Payment Type: ' . $payment->Type . '</li>';
         $output .= '<ul>';
-        $output .= '<li>' . $formatter->formatCurrency($payment->Amount, 'USD') . '</li>';
+        $output .= '<li>Paid: ' . date('m/d/Y', strtotime($payment->DateCreated)) . ' - ' . $formatter->formatCurrency($payment->Amount, 'USD') . '</li>';
         $output .= '<li>' . $payment->accountType . ': ' . $payment->accountNumber . '</li>';
         $output .= '</ul>';
     }
@@ -54,7 +62,7 @@ function vlp_cancel_confirmation($atts, $content = null)
     }
     $output .= '</ul>';
 
-    
+
 
 
 

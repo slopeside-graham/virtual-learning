@@ -253,10 +253,11 @@ namespace GHES\VLP {
                         $cancelledpaymentResult = Payment::refund($chargePayment->Amount, $chargePayment);
 
                         // Get all SubscriptionPayments for charge payment id
-                        $cancelledSubscriptionPayments = SubscriptionPayment::GetAllByPaymentId($chargepaymentId);
+
 
                         // Update each $cancelledSubscriptionPayments to Refunded, and insert the $cancelledpaymentResult->id
                         if (!is_wp_error($cancelledpaymentResult)) {
+                            $cancelledSubscriptionPayments = SubscriptionPayment::GetAllByPaymentId($chargepaymentId);
                             foreach ($cancelledSubscriptionPayments->jsonSerialize() as $k => $cancelledSubscriptionPayment) {
                                 if ($cancelledpaymentResult->Type = 'Void') {
                                     SubscriptionPayment::refundPaidMonthlySubscriptionPaymentbyId($cancelledSubscriptionPayment->id, $cancelledpaymentResult->id);
@@ -265,7 +266,8 @@ namespace GHES\VLP {
                                 }
                             }
                         } else {
-                            return $cancelledpaymentResults;
+                            $errormessage = $cancelledpaymentResult->get_error_message();
+                            return new \WP_Error($errormessage, array('status' => 400));
                         }
                         $cancelledpaymentResults->add_item($cancelledpaymentResult);
                     }
@@ -273,7 +275,7 @@ namespace GHES\VLP {
                 Email::SendRefundEmail($cancelledpaymentResults, $subscriptionId);
                 return $cancelledpaymentResults;
             } else {
-                return new \Exception("Nothig was cancelled, something went wrong.");
+                return new \WP_Error("Nothing was cancelled, something went wrong.");
             }
 
 
@@ -315,7 +317,7 @@ namespace GHES\VLP {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
-            $SubscriptionPayments = new NestedSerializable();
+            $SubscriptionPayment = new NestedSerializable();
 
             try {
                 $results = VLPUtils::$db->query(
@@ -329,14 +331,10 @@ namespace GHES\VLP {
                     $id
                 );
                 $counter = VLPUtils::$db->affectedRows();
-                foreach ($results as $row) {
-                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
-                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
-                }
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
             }
-            return $SubscriptionPayments;
+            return $SubscriptionPayment;
         }
 
         public static function refundPaidYearlySubscriptionPayment($subscriptionId, $paymentId)

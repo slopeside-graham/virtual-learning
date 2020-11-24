@@ -70,7 +70,7 @@ function vlp_manage_subscription($atts, $content = null)
 
             $output .= '<h3>Upcoming Payments</h3>';
             $output .= '<p>The below items are due in the future. You are welcome to pay for them early if you like. If you are enrolled in automatic billing the payments will be automatically paid.</p>';
-            $output .= '<p>If you would like to pay now, please select the items to pay for and click the "Pay Now" button.</p>';
+            $output .= '<p>If you would like to pay fo future months, please select the items to pay for and click the "Pay Now" button.</p>';
             $output .= '<ul>';
             foreach ($unpaidSubscriptions->jsonSerialize() as $k => $futureUnpaidSubscription) {
                 $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($futureUnpaidSubscription->SubscriptionDefinition_id);

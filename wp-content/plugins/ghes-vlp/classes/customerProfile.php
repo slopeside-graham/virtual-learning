@@ -285,13 +285,16 @@ namespace GHES\VLP {
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
             $tresponse =  $response->getTransactionResponse();
-            $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
-            if ($tresponseError = 54) {
-                $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
-                return $voidResponse;
-            } else {
-                return $response;
+            if ($tresponse->getErrors() != null) {
+                $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
+                if ($tresponseError == 54) {
+                    $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
+                    return $voidResponse;
+                } else {
+                    return $response;
+                }
             }
+            return $response;
         }
 
         public function refundCustomerProfileBankAccount($profileid, $paymentprofileid, $refundAmount, $originalPayment)
@@ -329,13 +332,16 @@ namespace GHES\VLP {
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
             $tresponse =  $response->getTransactionResponse();
-            $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
-            if ($tresponseError = 54) {
-                $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
-                return $voidResponse;
-            } else {
-                return $response;
+            if ($tresponse->getErrors() != null) {
+                $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
+                if ($tresponseError == 54) {
+                    $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
+                    return $voidResponse;
+                } else {
+                    return $response;
+                }
             }
+            return $response;
         }
 
         public function voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount)

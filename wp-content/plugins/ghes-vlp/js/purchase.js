@@ -290,7 +290,7 @@ function cancelSubscription() {
             console.log("Failed to Cancel Subscription");
             $("#cancel-subscription").data("kendoWindow").close();
             if (typeof result.responseJSON !== "undefined") {
-                alert(result.responseJSON.message);
+                alert(result.responseJSON.code);
             } else {
                 alert(
                     "An unexpected error occured.  Please review your submission and try again."

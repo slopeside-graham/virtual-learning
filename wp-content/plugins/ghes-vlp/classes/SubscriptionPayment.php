@@ -233,14 +233,18 @@ namespace GHES\VLP {
                     }
                 }
 
-                //Then refund/void anything that is paid for this subscription
-                $PaidSubscriptionPayments = SubscriptionPayment::GetAllPaidBySubscriptionId($subscriptionId);
-
+                //Then refund/void anything that is paid inthe future for this subscription
+                $PaidSubscriptionPayments = SubscriptionPayment::GetAllFuturePaidBySubscriptionId($subscriptionId);
+                
+                // Get original Payment ID's and calculate amount to be refunded.
+                $refundAmount = 0;
                 $chargepaymentIds = array();  //Create the variable for the chargepaymentids as an array.
 
                 foreach ($PaidSubscriptionPayments->jsonSerialize() as $k => $PaidSubscriptionPayment) {
                     $chargepaymentIds[] = $PaidSubscriptionPayment->Payment_id;
+                    $refundAmount += $PaidSubscriptionPayment->Amount;
                 }
+
                 $uniquechargepaymentIds = array_unique($chargepaymentIds);
 
                 $cancelledpaymentResults = new NestedSerializable();
@@ -250,7 +254,7 @@ namespace GHES\VLP {
                     if ($chargepaymentId != null) {
                         $chargePayment = Payment::Get($chargepaymentId);
                         // Run the cancellation for each charge payment
-                        $cancelledpaymentResult = Payment::refund($chargePayment->Amount, $chargePayment);
+                        $cancelledpaymentResult = Payment::refund($refundAmount, $chargePayment);
 
                         // Get all SubscriptionPayments for charge payment id
 
@@ -585,6 +589,37 @@ namespace GHES\VLP {
                                                     sp.Subscription_id = %i 
                                                         and 
                                                     sp.Status = 'Paid'", $subscriptionId);
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
+        public static function GetAllFuturePaidBySubscriptionId($subscriptionId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query(
+                                                    "SELECT sp.*, 
+                                                        p.DateCreated as PaymentDate
+                                                    from SubscriptionPayment sp
+                                                        Left Join Payment p on sp.Payment_id = p.id
+                                                    where 
+                                                    sp.Subscription_id = %i 
+                                                        and 
+                                                    sp.Status = 'Paid'
+                                                        and
+                                                    Date(sp.StartDate) > Date(Now())", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);

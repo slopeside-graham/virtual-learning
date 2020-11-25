@@ -284,17 +284,21 @@ namespace GHES\VLP {
             $controller = new AnetController\CreateTransactionController($request);
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
-            $tresponse =  $response->getTransactionResponse();
-            if ($tresponse->getErrors() != null) {
-                $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
-                if ($tresponseError == 54) {
-                    $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
-                    return $voidResponse;
-                } else {
-                    return $response;
+            if ($response != null) {
+                $tresponse =  $response->getTransactionResponse();
+                if ($tresponse->getErrors() != null) {
+                    $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
+                    if ($tresponseError == 54) {
+                        $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
+                        return $voidResponse;
+                    } else {
+                        return $response;
+                    }
                 }
+                return $response;
+            } else {
+                return new \WP_Error('There was no response');
             }
-            return $response;
         }
 
         public function refundCustomerProfileBankAccount($profileid, $paymentprofileid, $refundAmount, $originalPayment)

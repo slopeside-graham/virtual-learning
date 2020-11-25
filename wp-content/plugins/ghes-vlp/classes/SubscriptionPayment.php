@@ -259,7 +259,7 @@ namespace GHES\VLP {
                         if (!is_wp_error($cancelledpaymentResult)) {
                             $cancelledSubscriptionPayments = SubscriptionPayment::GetAllByPaymentId($chargepaymentId);
                             foreach ($cancelledSubscriptionPayments->jsonSerialize() as $k => $cancelledSubscriptionPayment) {
-                                if ($cancelledpaymentResult->Type = 'Void') {
+                                if ($cancelledpaymentResult->Type == 'Void') {
                                     SubscriptionPayment::refundPaidMonthlySubscriptionPaymentbyId($cancelledSubscriptionPayment->id, $cancelledpaymentResult->id);
                                 } else {
                                     SubscriptionPayment::refundPaidFutureMonthlySubscriptionPaymentbyId($cancelledSubscriptionPayment->id, $cancelledpaymentResult->id);
@@ -277,8 +277,6 @@ namespace GHES\VLP {
             } else {
                 return new \WP_Error("Nothing was cancelled, something went wrong.");
             }
-
-
             return $subscriptionPayments;
         }
 

@@ -385,7 +385,7 @@ namespace GHES\VLP {
                             $subscriptionresult = Subscription::ActivateSubscriptionByParentId($Parent->id);
                             //
                             if (!is_wp_error($subscriptionresult)) {
-                                $emailresult = Email::SendChargeEmail($chargepayment); 
+                                $emailresult = Email::SendChargeEmail($chargepayment);
                                 return true;
                             } else {
                                 return $subscriptionresult;
@@ -409,7 +409,7 @@ namespace GHES\VLP {
             return true;
         }
 
-        public static function refund($refundAmount, $chargepayment)
+        public static function refund($refundAmount, $chargepayment, $voidAmount)
         {
             $refundPayment = new Payment;
             // Get the User ID
@@ -420,23 +420,25 @@ namespace GHES\VLP {
             $Parent_id = $Parent->id;
 
             $customerProfile = new customerProfile();
-            $chargeResult = $customerProfile->refundCustomerProfile($Parent->customerProfileId, $Parent->customerPaymentProfileId, $refundAmount, $chargepayment);
-            // Create the payment record from the response.
-            $refundPaymentResult = $refundPayment->CreateRefundFromResponse($chargeResult, $refundAmount);
+            $chargeResult = $customerProfile->refundCustomer($Parent->customerProfileId, $Parent->customerPaymentProfileId, $refundAmount, $chargepayment, $voidAmount);
+            if ($chargeResult != false) {
+                // Create the payment record from the response.
+                $refundPaymentResult = $refundPayment->CreateRefundFromResponse($chargeResult, $refundAmount);
 
-            if (!is_array($chargeResult)) {
-                $result = customerProfile::analyzeANresponse($chargeResult);
-            } else {
-                $result = customerProfile::analyzeANresponse($chargeResult[0]);
-            }
+                if (!is_array($chargeResult)) {
+                    $result = customerProfile::analyzeANresponse($chargeResult);
+                } else {
+                    $result = customerProfile::analyzeANresponse($chargeResult[0]);
+                }
 
 
-            if (!is_wp_error($result)) {
-                return $refundPaymentResult;
-            } else {
-                $error_string = $result->get_error_message();
-                return new \WP_Error('Refund_Error', 'An error occured: ' . $error_string, array('status' => 400));
-            }
+                if (!is_wp_error($result)) {
+                    return $refundPaymentResult;
+                } else {
+                    $error_string = $result->get_error_message();
+                    return new \WP_Error('Refund_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                }
+            } return;
         }
 
         public function CreatePaymentFromResponse($chargeResult)

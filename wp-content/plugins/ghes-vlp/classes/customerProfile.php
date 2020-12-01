@@ -239,69 +239,88 @@ namespace GHES\VLP {
             return $response;
         }
 
-        public function refundCustomerProfile($profileid, $paymentprofileid, $refundAmount, $originalPayment)
+        public function refundCustomer($profileid, $paymentprofileid, $refundAmount, $originalPayment, $voidAmount)
         {
-
-            if ($originalPayment->accountType != "eCheck") {
-                $response = $this->refundCustomerProfileCreditCard($profileid, $paymentprofileid, $refundAmount, $originalPayment);
-            } else if ($originalPayment->accountType == "eCheck") {
-                $response = $this->refundCustomerProfileBankAccount($profileid, $paymentprofileid, $refundAmount, $originalPayment);
+            $originalPaymentDetails = $this->getTransactionDetails($originalPayment);
+            $refTransId = $originalPayment->transId;
+            if ($originalPaymentDetails) {
+                $originalPaymentStatus = $originalPaymentDetails->getTransaction()->getTransactionStatus();
+                if ($originalPaymentStatus == 'settledSuccessfully') {
+                    $response = $this->refundCustomerProfile($profileid, $paymentprofileid, $refundAmount, $originalPayment);
+                } else {
+                    $response = $this->voidCustomerProfileCharge($profileid, $paymentprofileid, $voidAmount, $originalPayment);
+                }
             }
             return $response;
         }
 
-        public function refundCustomerProfileCreditCard($profileid, $paymentprofileid, $refundAmount, $originalPayment)
+        public function getTransactionDetails($originalPayment)
         {
             $refTransId = $originalPayment->transId;
             /* Create a merchantAuthenticationType object with authentication details */
             $merchantAuthentication = $this->setMerchantAuthentication();
 
-            // Set the transaction's refId
-            $refId = 'ref' . time();
+            $transactionId = $originalPayment->transId;
 
-            // set payment profile for customer
-
-            $paymentProfile = new AnetAPI\PaymentProfileType();
-            $paymentProfile->setpaymentProfileId($paymentprofileid);
-
-            // set customer profile
-            $customerProfile = new AnetAPI\CustomerProfilePaymentType();
-            $customerProfile->setCustomerProfileId($profileid);
-            $customerProfile->setPaymentProfile($paymentProfile);
-
-            //create a transaction
-            $transactionRequest = new AnetAPI\TransactionRequestType();
-            $transactionRequest->setTransactionType("refundTransaction");
-            $transactionRequest->setAmount($refundAmount);
-            $transactionRequest->setRefTransId($refTransId);
-            $transactionRequest->setProfile($customerProfile);
-
-
-            $request = new AnetAPI\CreateTransactionRequest();
+            $request = new AnetAPI\GetTransactionDetailsRequest();
             $request->setMerchantAuthentication($merchantAuthentication);
-            $request->setRefId($refId);
-            $request->setTransactionRequest($transactionRequest);
-            $controller = new AnetController\CreateTransactionController($request);
+            $request->setTransId($transactionId);
+
+            $controller = new AnetController\GetTransactionDetailsController($request);
+
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
-            if ($response != null) {
-                $tresponse =  $response->getTransactionResponse();
-                if ($tresponse->getErrors() != null) {
-                    $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
-                    if ($tresponseError == 54) {
-                        $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
-                        return $voidResponse;
-                    } else {
-                        return $response;
-                    }
-                }
+            if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
                 return $response;
             } else {
-                return new \WP_Error('There was no response');
+                //Failed
+                $errorMessages = $response->getMessages()->getMessage();
+                return new \Exception($errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
             }
         }
 
-        public function refundCustomerProfileBankAccount($profileid, $paymentprofileid, $refundAmount, $originalPayment)
+        public function refundCustomerProfile($profileid, $paymentprofileid, $refundAmount, $originalPayment)
+        {
+            if ($refundAmount != 0) {
+                $refTransId = $originalPayment->transId;
+                /* Create a merchantAuthenticationType object with authentication details */
+                $merchantAuthentication = $this->setMerchantAuthentication();
+
+                // Set the transaction's refId
+                $refId = 'ref' . time();
+
+                // set payment profile for customer
+
+                $paymentProfile = new AnetAPI\PaymentProfileType();
+                $paymentProfile->setpaymentProfileId($paymentprofileid);
+
+                // set customer profile
+                $customerProfile = new AnetAPI\CustomerProfilePaymentType();
+                $customerProfile->setCustomerProfileId($profileid);
+                $customerProfile->setPaymentProfile($paymentProfile);
+
+                //create a transaction
+                $transactionRequest = new AnetAPI\TransactionRequestType();
+                $transactionRequest->setTransactionType("refundTransaction");
+                $transactionRequest->setAmount($refundAmount);
+                $transactionRequest->setRefTransId($refTransId);
+                $transactionRequest->setProfile($customerProfile);
+
+
+                $request = new AnetAPI\CreateTransactionRequest();
+                $request->setMerchantAuthentication($merchantAuthentication);
+                $request->setRefId($refId);
+                $request->setTransactionRequest($transactionRequest);
+                $controller = new AnetController\CreateTransactionController($request);
+                $response = $controller->executeWithApiResponse($this->getEnvironment());
+
+                return $response;
+            } else {
+                return false;
+            }
+        }
+
+        public function voidCustomerProfileCharge($profileid, $paymentprofileid, $voidAmount, $originalPayment)
         {
             $refTransId = $originalPayment->transId;
             /* Create a merchantAuthenticationType object with authentication details */
@@ -319,48 +338,12 @@ namespace GHES\VLP {
             $customerProfile = new AnetAPI\CustomerProfilePaymentType();
             $customerProfile->setCustomerProfileId($profileid);
             $customerProfile->setPaymentProfile($paymentProfile);
-
-            //create a transaction
-            $transactionRequest = new AnetAPI\TransactionRequestType();
-            $transactionRequest->setTransactionType("refundTransaction");
-            $transactionRequest->setAmount($refundAmount);
-            $transactionRequest->setRefTransId($refTransId);
-            $transactionRequest->setProfile($customerProfile);
-
-
-            $request = new AnetAPI\CreateTransactionRequest();
-            $request->setMerchantAuthentication($merchantAuthentication);
-            $request->setRefId($refId);
-            $request->setTransactionRequest($transactionRequest);
-            $controller = new AnetController\CreateTransactionController($request);
-            $response = $controller->executeWithApiResponse($this->getEnvironment());
-
-            $tresponse =  $response->getTransactionResponse();
-            if ($tresponse->getErrors() != null) {
-                $tresponseError = $tresponse->getErrors()[0]->getErrorCode();
-                if ($tresponseError == 54) {
-                    $voidResponse = $this->voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount);
-                    return $voidResponse;
-                } else {
-                    return $response;
-                }
-            }
-            return $response;
-        }
-
-        public function voidCustomerProfileCharge($customerProfile, $refTransId, $refundAmount)
-        {
-            /* Create a merchantAuthenticationType object with authentication details */
-            $merchantAuthentication = $this->setMerchantAuthentication();
-
-            // Set the transaction's refId
-            $refId = 'ref' . time();
 
             // Void Trasaction because it is unsettled
             //create a transaction
             $transactionRequest = new AnetAPI\TransactionRequestType();
             $transactionRequest->setTransactionType("voidTransaction");
-            $transactionRequest->setAmount($refundAmount);
+            $transactionRequest->setAmount($voidAmount);
             $transactionRequest->setRefTransId($refTransId);
             $transactionRequest->setProfile($customerProfile);
 

@@ -43,8 +43,10 @@ function vlp_past_payments($atts, $content = null)
             $paidPayments = GHES\VLP\SubscriptionPayment::GetAllExceptUnpaidandCancelledBySubscriptionId($paidSubscription->id);
             if ($paidPayments->jsonSerialize()) {
                 foreach ($paidPayments->jsonSerialize() as $k => $paidPayment) {
+                    $payment = GHES\VLP\Payment::Get($paidPayment->Payment_id);
                     $output .= '<li>' . $paidPayment->Status . ' - $' . $paidPayment->Amount . ' - ' . date('m/d/Y', strtotime($paidPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($paidPayment->EndDate)) . '<br/>';
-                    $output .= 'Payment Date: ' .  date('m/d/Y', strtotime($paidPayment->PaymentDate)) . '</li>';
+                    $output .= 'Payment Date: ' .  date('m/d/Y', strtotime($paidPayment->PaymentDate)) . ', ';
+                    $output .= $payment->accountType . ' - ' . $payment->accountNumber . '</li>';
                 }
             } else {
                 $output .= '<li>There are no past payments for this subscription.</li>';

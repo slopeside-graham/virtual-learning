@@ -220,8 +220,6 @@ namespace GHES\VLP {
 
         public static function cancelMonthlyPayments($subscriptionId)
         {
-            // TODO: Refund all months that are paid in advance. Do not refund current month.
-
             $subscriptionPayments = SubscriptionPayment::GetAllBySubscriptionId($subscriptionId);
             if ($subscriptionPayments->jsonSerialize()) {
 
@@ -233,17 +231,16 @@ namespace GHES\VLP {
                     }
                 }
 
-                //Then refund/void anything that is paid inthe future for this subscription
-                $PaidSubscriptionPayments = SubscriptionPayment::GetAllFuturePaidBySubscriptionId($subscriptionId);
-                
-                // Get original Payment ID's and calculate amount to be refunded.
-                $refundAmount = 0;
+                //Then refund/void anything that is paid in the future for this subscription
+                $PaidSubscriptionPayments = SubscriptionPayment::GetAllPaidBySubscriptionId($subscriptionId);
+                // Get original Payment ID's.
+
                 $chargepaymentIds = array();  //Create the variable for the chargepaymentids as an array.
 
                 foreach ($PaidSubscriptionPayments->jsonSerialize() as $k => $PaidSubscriptionPayment) {
                     $chargepaymentIds[] = $PaidSubscriptionPayment->Payment_id;
-                    $refundAmount += $PaidSubscriptionPayment->Amount;
                 }
+
 
                 $uniquechargepaymentIds = array_unique($chargepaymentIds);
 
@@ -253,8 +250,17 @@ namespace GHES\VLP {
                 foreach ($uniquechargepaymentIds as $chargepaymentId) {
                     if ($chargepaymentId != null) {
                         $chargePayment = Payment::Get($chargepaymentId);
+                        $paymentAmount = $chargePayment->Amount;
+                        $voidAmount = $paymentAmount;
+                        $currentSubscriptionPayment = SubscriptionPayment::GetCurrentPaidBySubscriptionId($subscriptionId);
+                        if ($currentSubscriptionPayment->jsonSerialize()) {
+                            $currentSubscriptionPaymentAmount = $currentSubscriptionPayment->jsonSerialize()[0]->Amount;
+                            $refundAmount = $paymentAmount - $currentSubscriptionPaymentAmount;
+                        } else {
+                            $refundAmount = $paymentAmount;
+                        }
                         // Run the cancellation for each charge payment
-                        $cancelledpaymentResult = Payment::refund($refundAmount, $chargePayment);
+                        $cancelledpaymentResult = Payment::refund($refundAmount, $chargePayment, $voidAmount);
 
                         // Get all SubscriptionPayments for charge payment id
 
@@ -298,8 +304,9 @@ namespace GHES\VLP {
                         $refundPercent = $refundDays / 365;
                         //Multiply that number by the amount paid
                         $refundAmount = round($refundPercent * $subscription->Total, 2);
+                        $voidAmount = $subscription->Total;
 
-                        $paymentResult = Payment::refund($refundAmount, $subscriptionPayment);
+                        $paymentResult = Payment::refund($refundAmount, $subscriptionPayment, $voidAmount);
 
                         if (!is_wp_error($paymentResult)) {
                             SubscriptionPayment::refundPaidYearlySubscriptionPayment($subscriptionId, $paymentResult->id);
@@ -610,7 +617,7 @@ namespace GHES\VLP {
 
             try {
                 $results = VLPUtils::$db->query(
-                                                    "SELECT sp.*, 
+                    "SELECT sp.*, 
                                                         p.DateCreated as PaymentDate
                                                     from SubscriptionPayment sp
                                                         Left Join Payment p on sp.Payment_id = p.id
@@ -619,7 +626,9 @@ namespace GHES\VLP {
                                                         and 
                                                     sp.Status = 'Paid'
                                                         and
-                                                    Date(sp.StartDate) > Date(Now())", $subscriptionId);
+                                                    Date(sp.StartDate) > Date(Now())",
+                    $subscriptionId
+                );
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -705,6 +714,31 @@ namespace GHES\VLP {
                                                             Subscription_id = %i 
                                                             and Date(StartDate) <= Date(Now())
                                                             and Status Not In ('Paid', 'Cancelled')", $subscriptionId);
+
+                foreach ($results as $row) {
+                    $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
+                    $SubscriptionPayments->add_item($SubscriptionPayment);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionPayments;
+        }
+
+        public static function GetCurrentPaidBySubscriptionId($subscriptionId)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionPayments = new NestedSerializable();
+
+            try {
+                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
+                                                        where 
+                                                            Subscription_id = %i 
+                                                            and Date(StartDate) <= Date(Now())
+                                                            and Status = 'Paid'", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);

@@ -252,17 +252,25 @@ namespace GHES\VLP {
                         $chargePayment = Payment::Get($chargepaymentId);
                         $paymentAmount = $chargePayment->Amount;
                         $voidAmount = $paymentAmount;
+
+                        // Get the refund amount for each payment
+                        $paidSubscriptionPayments = SubscriptionPayment::GetAllPaidBySubscriptionIdandPaymentId($subscriptionId, $chargepaymentId);
                         $currentSubscriptionPayment = SubscriptionPayment::GetCurrentPaidBySubscriptionId($subscriptionId);
-                        if ($currentSubscriptionPayment->jsonSerialize()) {
-                            $currentSubscriptionPaymentAmount = $currentSubscriptionPayment->jsonSerialize()[0]->Amount;
-                            $refundAmount = $paymentAmount - $currentSubscriptionPaymentAmount;
-                        } else {
-                            $refundAmount = $paymentAmount;
+                        $currentSubscriptionPaymentId = $currentSubscriptionPayment->jsonSerialize()[0]->id;
+
+                        $totalPaid = 0;
+                        $refundAmount = 0; // This should be the total payment, except for the current month.
+
+                        foreach ($paidSubscriptionPayments->jsonSerialize() as $k => $paidSubscriptionPayment) {
+                            $totalPaid += $paidSubscriptionPayment->Amount; //This is the total amount paid. This should match $chargePayment->Amount
+                            if ($paidSubscriptionPayment->id != $currentSubscriptionPaymentId) {
+                                $refundAmount += $paidSubscriptionPayment->Amount;
+                            }
                         }
                         // Run the cancellation for each charge payment
                         $cancelledpaymentResult = Payment::refund($refundAmount, $chargePayment, $voidAmount);
 
-                        // Get all SubscriptionPayments for charge payment id
+
 
 
                         // Update each $cancelledSubscriptionPayments to Refunded, and insert the $cancelledpaymentResult->id

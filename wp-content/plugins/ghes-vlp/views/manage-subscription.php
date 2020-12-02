@@ -46,7 +46,7 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '<ul>';
             foreach ($unpaidSubscriptions->jsonSerialize() as $k => $currentUnpaidSubscription) {
                 $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($currentUnpaidSubscription->SubscriptionDefinition_id);
-                $subscriptionPayments = \GHES\VLP\SubscriptionPayment::GetCurrentDueBySubscriptionId($currentUnpaidSubscription->id);
+                $subscriptionPayments = GHES\VLP\SubscriptionPayment::GetCurrentDueBySubscriptionId($currentUnpaidSubscription->id);
                 if ($currentUnpaidSubscription->PaymentFrequency == "yearly") {
                     $paymentFrequency = "Yearly";
                 } else if ($currentUnpaidSubscription->PaymentFrequency == "monthly") {
@@ -61,12 +61,13 @@ function vlp_manage_subscription($atts, $content = null)
                 } else {
                     $output .= '<li>You have no payments currently due.</li>';
                 }
+                $pastPayments = GHES\VLP\Payment::GetAllBySubscriptionId($currentUnpaidSubscription->id);
+                if ($pastPayments->jsonSerialize()) {
+                    $output .= '<li><a href="' . $pastpaymentslink . '">View Past Payments &#8594;</a></li>';
+                }
                 $output .= '</ul>';
             }
             $output .= '</ul>';
-
-
-            $output .= '<div><a href="' . $pastpaymentslink . '">View Past Payments &#8594;</a></div><hr>';
 
             $output .= '<h3>Upcoming Payments</h3>';
             $output .= '<p>The below items are due in the future. You are welcome to pay for them early if you like. If you are enrolled in automatic billing the payments will be automatically paid.</p>';
@@ -74,7 +75,7 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '<ul>';
             foreach ($unpaidSubscriptions->jsonSerialize() as $k => $futureUnpaidSubscription) {
                 $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($futureUnpaidSubscription->SubscriptionDefinition_id);
-                $subscriptionPayments = \GHES\VLP\SubscriptionPayment::GetUpcomingBySubscriptionId($futureUnpaidSubscription->id);
+                $subscriptionPayments = GHES\VLP\SubscriptionPayment::GetUpcomingBySubscriptionId($futureUnpaidSubscription->id);
                 if ($futureUnpaidSubscription->PaymentFrequency == "yearly") {
                     $paymentFrequency = "Yearly";
                 } else if ($futureUnpaidSubscription->PaymentFrequency == "monthly") {

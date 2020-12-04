@@ -51,7 +51,11 @@ function vlp_select_child($atts, $content = null)
         header('Location: ' . $destinationURL);
         exit;
     } else if ($children->count() < 1) {
-        $output .= "You have no children";
+        setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
+        $output .= "<p>You have no children registered, so your progress will not be tracked.</p>";
+        $output .= '<ul>';
+        $output .= '<li><a href="' . $destinationURL . '">Continue to Virtual Learning</a></li>';
+        $output .= '<li><a href="' . get_option('parent_profile_url') . '">Manage Children</a></li>';
         return $output;
     } else if ($children->count() > 1) {
         setcookie('VLPAgeGroupId', $agegroupid, 0, '/');

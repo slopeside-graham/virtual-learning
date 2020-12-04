@@ -62,7 +62,17 @@ function vlp_cancel_confirmation($atts, $content = null)
     }
     $output .= '</ul>';
 
+    $output .= '<hr>';
+    $output .= '<div class="vll-links">';
 
+    $managesubscriptionlink = get_permalink(esc_attr(get_option('vlp-manage')));
+    $launchgameboardlink = get_permalink(esc_attr(get_option('vlp-agetree'))) . '?destination=Gameboard';
+    $myprofilelink = get_permalink(esc_attr(get_option('registration_welcome_url')));
+    $output .= '<a href="' . $managesubscriptionlink . '">Manage Subscription</a>';
+    $output .= '<a href="' . $launchgameboardlink . '">Launch Gameboard</a>';
+    $output .= '<a href="' . $myprofilelink . '">My Profile</a>';
+
+    $output .= '</div>';
 
 
 

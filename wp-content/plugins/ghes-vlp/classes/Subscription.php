@@ -512,7 +512,7 @@ namespace GHES\VLP {
                                                         and
                                                         Date(Now()) between Date(SP.StartDate) and Date(SP.EndDate)
                                                         and 
-                                                        S.Status <> 'Cancelled'",
+                                                        SP.Status Not in ('Refunded', 'Cancelled')",
                     $parentid
                 );
                 foreach ($results as $row) {

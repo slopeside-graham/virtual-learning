@@ -37,7 +37,7 @@ function vlp_select_subscription($atts, $content = null)
 
     $output .= '<form id="select-subscription-vll">';
     $output .= '<h3>Select Subscription Level:</h3>';
-    $subscriptiondefinitions = SubscriptionDefinition::GetAll();
+    $subscriptiondefinitions = SubscriptionDefinition::GetAllNotHidden();
 
     foreach ($subscriptiondefinitions->jsonSerialize() as $k => $subscriptiondefinition) {
         $output .= '<input type="radio" id="subscription-' . $subscriptiondefinition->id . '" name="subscription-select" value="' . $subscriptiondefinition->id . '" data-monthly-price="' . $subscriptiondefinition->MonthlyAmount . '" data-yearly-price="' . $subscriptiondefinition->YearlyAmount . '" required validationMessage="Please Select a Subscription Level">';
@@ -52,13 +52,14 @@ function vlp_select_subscription($atts, $content = null)
     $output .= '<label for="yearly">&nbsp;Yearly</label><br/>';
     $output .= '<span class="k-invalid-msg" data-for="payment-frequency"></span><br/>';
     $output .= '<div class="recurring-billing"><label for="recurring"><input type="checkbox" name="recurring" id="recurring">&nbsp;Enable Recurring Billing</label></div>';
-    $today = date("m/d/Y");
-    $oneyear = date("m/d/Y", strtotime('+1 years, -1 days'));
-    $output .= '<h3>Subscription Start Date: <span id="sub-start-date">' . $today . '</span><h3>';
-    $output .= '<h3>Subscription End Date: <span id="sub-end-date">' . $oneyear . '</span><h3>';
+    $today = wp_date("m/d/Y");
+    $oneyear = wp_date("m/d/Y", strtotime('+1 years, -1 days'));
+    $output .= '<p>New Subscription - <span id="sub-start-date">' . $today . '</span> - ';
+    $output .= '<span id="sub-end-date">' . $oneyear . '</span></p>';
     $output .= '<h3 id="subscription-total-area">Total Due Today: </h3>';
+    $output .= '<hr/>';
 
-    $output .= '<button name="continue-payment-vlp" id="continue-payment-vlp" class="ghes-save" type="submit">Continue to Payment</button>';
+    $output .= '<button name="continue-payment-vlp" id="continue-payment-vlp" class="ghes-save green-btn" type="submit">Continue to Payment</button>';
     $output .= '<div id="window"></div>';
     $output .= '</form>';
     // $output .= $billinginfo;

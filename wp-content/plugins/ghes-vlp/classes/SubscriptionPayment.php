@@ -821,11 +821,12 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
-                                                        where 
-                                                            Subscription_id = %i
-                                                            and Date(StartDate) > Date(Now())
-                                                            and Status Not In ('Paid', 'Cancelled')", $subscriptionId);
+                $results = VLPUtils::$db->query(
+                                                "SELECT * from SubscriptionPayment 
+                                                where 
+                                                    Subscription_id = %i
+                                                    and Date(StartDate) > Date(Now())
+                                                    and Status in ('Unpaid', 'Pending')", $subscriptionId);
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);

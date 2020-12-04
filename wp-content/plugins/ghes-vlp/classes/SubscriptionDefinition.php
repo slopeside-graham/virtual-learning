@@ -270,6 +270,27 @@ namespace GHES\VLP {
             return $SubscriptionDefinitions;
         }
 
+        public static function GetAllNotHidden()
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $SubscriptionDefinitions = new NestedSerializable();
+
+            try {
+                    $results = VLPUtils::$db->query("select * from SubscriptionDefinition where Hidden = 0 order by Name ASC");
+
+                foreach ($results as $row) {
+                    $SubscriptionDefinition = SubscriptionDefinition::populatefromRow($row);
+                    $SubscriptionDefinitions->add_item($SubscriptionDefinition);  // Add the lesson to the collection
+
+                }
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionDefinition_GetAll_Error', $e->getMessage());
+            }
+            return $SubscriptionDefinitions;
+        }
+
         // Helper function to populate a lesson from a MeekroDB Row
         public static function populatefromRow($row): ?SubscriptionDefinition
         {

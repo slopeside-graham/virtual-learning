@@ -76,7 +76,7 @@ function calculateTotal() {
 
     var totalDue = currentDue + futureDue;
 
-    $("#current-due").text("Current Due: $" + currentDue);
+    // $("#current-due").text("Current Due: $" + currentDue);
     $(".total-due").text("Total Due: $" + totalDue);
 
     if (totalDue > 0) {

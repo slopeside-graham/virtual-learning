@@ -35,3 +35,6 @@ add_shortcode( 'vlp_payment_confirmation', 'vlp_payment_confirmation' );
 
 include_once(plugin_dir_path( __FILE__ ) . 'views/cancel-confirmation.php'); 
 add_shortcode( 'vlp_cancel_confirmation', 'vlp_cancel_confirmation' );
+
+include_once(plugin_dir_path( __FILE__ ) . 'views/welcome-vlp.php'); 
+add_shortcode( 'vlp_welcome', 'vlp_welcome' );

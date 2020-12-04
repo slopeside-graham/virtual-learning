@@ -21,10 +21,7 @@ function enqueue_agetree_scripts()
 
 function vlp_agetree($atts, $content = null)
 {
-
-    GHES\VLP\Utils::CheckSubscriptionStatus();
     GHES\VLP\Utils::CheckLoggedInVLPParent();
-
     enqueue_agetree_scripts();
 
     //Uset all  Cookies

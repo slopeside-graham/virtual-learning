@@ -189,6 +189,7 @@ namespace GHES\VLP {
             $emailbody = str_replace('~ManageSubscriptionLink~', $ManageSubscriptionLink, $emailbody);
             $emailbody = str_replace('~LaunchGameboardLink~', $LaunchGameboardLink, $emailbody);
             $emailbody = str_replace('~MyProfileLink~', $MyProfileLink, $emailbody);
+            $emailbody = str_replace('~taxid~', get_option('registration-taxid'), $emailbody);
 
             wp_mail($sendtoemail, 'GHES Virtual Learning Payment Succesful', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
             return true;
@@ -247,6 +248,7 @@ namespace GHES\VLP {
             $emailbody = str_replace('~SubscriptionEndDate~', $SubscriptionEndDate, $emailbody);
             $emailbody = str_replace('~SubscriptionRefundsList~', $SubscriptionRefundsList, $emailbody);
             $emailbody = str_replace('~SubscriptionPaymentsList~', $SubscriptionPaymentsList, $emailbody);
+            $emailbody = str_replace('~taxid~', get_option('registration-taxid'), $emailbody);
 
             wp_mail($sendtoemail, 'GHES Virtual Learning Cancelled', $emailbody, array('Content-Type: text/html; charset=UTF-8'));
             return true;
@@ -282,6 +284,7 @@ namespace GHES\VLP {
             $emailbody = str_replace('~Zip~', $replacements->Zip, $emailbody);
             $emailbody = str_replace('~PhoneNumber~', $replacements->PhoneNumber, $emailbody);
             $emailbody = str_replace('~Email~', $replacements->Email, $emailbody);
+            $emailbody = str_replace('~taxid~', get_option('registration-taxid'), $emailbody);
 
             return $emailbody;
         }

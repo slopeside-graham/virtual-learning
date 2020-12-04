@@ -25,6 +25,13 @@ $(document).ready(function () {
         document.cookie = "refund=false";
     }
 
+    $("#vlp-bill-ExpirationMonth").kendoDateInput({
+        format: "MM",
+    });
+
+    $("#vlp-bill-ExpirationYear").kendoDateInput({
+        format: "yyyy"
+    });
 
 });
 

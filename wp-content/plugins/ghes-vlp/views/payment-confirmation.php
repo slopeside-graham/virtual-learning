@@ -39,7 +39,7 @@ function vlp_payment_confirmation($atts, $content = null)
         $output .= '<p>Payment Amount: ' . $formatter->formatCurrency($payment->Amount, 'USD') . '<br/>';
         $output .= 'Payment Date: ' . date('m/d/Y', strtotime($payment->DateCreated)) . '</p>';
     }
-
+    $output .= '<div class="tax">Georgetownhill Early School Tax ID: ' . get_option('registration-taxid') . '</div>';
     $subscriptions = Subscription::GetAllByPaymentId($paymentid);
 /*
     $output .= '<div id="payments-list"></div>';

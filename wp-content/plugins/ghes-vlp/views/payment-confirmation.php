@@ -34,14 +34,15 @@ function vlp_payment_confirmation($atts, $content = null)
     $paymentid = $_COOKIE['paymentid'];
 
     $payment  = Payment::Get($paymentid);
-
-    if ($payment->jsonSerialize()) {
-        $output .= '<p>Payment Amount: ' . $formatter->formatCurrency($payment->Amount, 'USD') . '<br/>';
-        $output .= 'Payment Date: ' . date('m/d/Y', strtotime($payment->DateCreated)) . '</p>';
+    if ($payment != null) {
+        if ($payment->jsonSerialize()) {
+            $output .= '<p>Payment Amount: ' . $formatter->formatCurrency($payment->Amount, 'USD') . '<br/>';
+            $output .= 'Payment Date: ' . date('m/d/Y', strtotime($payment->DateCreated)) . '</p>';
+        }
     }
     $output .= '<div class="tax">Georgetownhill Early School Tax ID: ' . get_option('registration-taxid') . '</div>';
     $subscriptions = Subscription::GetAllByPaymentId($paymentid);
-/*
+    /*
     $output .= '<div id="payments-list"></div>';
 
     $output .= '<script type="text/x-kendo-template" id="payment-list-template">';
@@ -65,7 +66,7 @@ function vlp_payment_confirmation($atts, $content = null)
             $output .= '</ul>';
         }
         $output .= '</ul>';
-    } 
+    }
 
     $output .= '<div class="vll-links">';
 

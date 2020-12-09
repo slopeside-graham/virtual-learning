@@ -30,7 +30,11 @@ $(document).ready(function () {
     });
 
     $("#vlp-bill-ExpirationYear").kendoDateInput({
-        format: "yyyy"
+        format: "yyyy",
+    });
+
+    $("#vlp-bill-CardCode").kendoMaskedTextBox({
+        mask: "000"
     });
 
 });

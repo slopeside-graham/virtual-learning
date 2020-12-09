@@ -79,17 +79,17 @@
         <div class="three-column">
             <div>
                 <label for="ccExpMonth">Expiration Month</label><br />
-                <input required class="" placeholder="01" name="ccExpMonth" id="vlp-bill-ExpirationMonth"
+                <input pattern="\d+" class="" placeholder="01" name="ccExpMonth" id="vlp-bill-ExpirationMonth"
                     autocomplete="cc-exp-month" validationMessage="Expiration Month is Required">
             </div>
             <div>
                 <label for="ccExpYear">Expiration Year</label><br />
-                <input required class="" name="ccExpYear" id="vlp-bill-ExpirationYear" autocomplete="cc-exp-year"
+                <input pattern="\d+" class="" name="ccExpYear" id="vlp-bill-ExpirationYear" autocomplete="cc-exp-year"
                     validationMessage="Expiration Year is Required"><br />
             </div>
             <div>
                 <label for="ccCSV">Code</label><br />
-                <input required class="k-textbox" placeholder="123" pattern="\d{3}|\d{4}"
+                <input required class="" placeholder="123"
                     name="ccCSV" id="vlp-bill-CardCode" autocomplete="cc-csc"
                     validationMessage="Security Code is Required">
             </div>

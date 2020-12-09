@@ -20,7 +20,8 @@ function enqueue_select_subscription_scripts()
 function vlp_select_subscription($atts, $content = null)
 {
     GHES\VLP\Utils::CheckLoggedInParent();
-    $parentid = GHES\Parents::UserID();
+    $parent = GHES\Parents::GetByUserID(get_current_user_id());
+    $parentid = $parent->id;
 
     $allSubscriptions = Subscription::GetAllActiveByParentId($parentid);
 
@@ -49,7 +50,7 @@ function vlp_select_subscription($atts, $content = null)
         $subscriptiondefinitions = SubscriptionDefinition::GetAllNotHidden();
         if ($numberofsubscriptiondefenitions == 1) {
             foreach ($subscriptiondefinitions->jsonSerialize() as $k => $subscriptiondefinition) {
-                $output .= '<input type="radio" checked disabled id="subscription-' . $subscriptiondefinition->id . '" name="subscription-select" value="' . $subscriptiondefinition->id . '" data-monthly-price="' . $subscriptiondefinition->MonthlyAmount . '" data-yearly-price="' . $subscriptiondefinition->YearlyAmount . '" required validationMessage="Please Select a Subscription Level">';
+                $output .= '<input type="radio" id="subscription-' . $subscriptiondefinition->id . '" name="subscription-select" value="' . $subscriptiondefinition->id . '" data-monthly-price="' . $subscriptiondefinition->MonthlyAmount . '" data-yearly-price="' . $subscriptiondefinition->YearlyAmount . '" required validationMessage="Please Select a Subscription Level">';
                 $output .= '<label for="subscription-' . $subscriptiondefinition->id . '">&nbsp;' . $subscriptiondefinition->Name . '</label><br/>';
             }
         } else {

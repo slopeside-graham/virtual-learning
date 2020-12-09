@@ -13,8 +13,12 @@ $(document).ready(function () {
         }
     });
 });
-
-
+window.onload = function () {
+    populateTotal()
+}
+function populateTotal() {
+    //TODO: autopopulate the price if things are checked
+}
 $("input[name='subscription-select'").click(function (e) {
 
     $monthlyPrice = e.currentTarget.dataset.monthlyPrice;
@@ -51,6 +55,7 @@ $("input[name='payment-frequency']").click(function (e) {
 });
 
 function createSubscription() {
+    displayLoading('#select-subscription-vll');
     $.ajax({
         url: wpApiSettings.root + "ghes-vlp/v1/subscription",
         method: "POST",

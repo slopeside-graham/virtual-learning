@@ -33,7 +33,7 @@ function vlp_cancel_confirmation($atts, $content = null)
     $totalPayment = 0;
     $payments = Payment::GetAllCancelledBySubscriptionId($subscriptioncancelid);
     foreach ($payments->jsonSerialize() as $k => $payment) {
-        $totalPayment = +$payment->Amount;
+        $totalPayment += $payment->Amount;
     }
 
     $output .= '<h3>Refund Amount: ' . $formatter->formatCurrency($totalPayment, 'USD') . '</h3>';

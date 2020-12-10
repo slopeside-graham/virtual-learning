@@ -47,7 +47,7 @@ function vlp_welcome()
         $output .= '</ul>';
         $output .= '</ul>'; // close section links
     } else {
-        $output .= '<ul id="parent-isnot-vlp-links" class="section-links">';
+        $output .= '<ul class="section-links">';
         $output .= '<li><a href="' . get_permalink(get_option("vlp-purchase")) . '">Subscribe Now</a></li>';
         $output .= '</ul>'; // close section links
     }

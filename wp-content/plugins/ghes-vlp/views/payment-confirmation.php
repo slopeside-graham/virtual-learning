@@ -16,6 +16,7 @@ use GHES\VLP\SubscriptionPayment;
 function enqueue_payment_confirmation_scripts()
 {
     wp_enqueue_script('wp-api-payment-confirmation');
+    wp_enqueue_style('print-vlp-style');
 }
 
 function vlp_payment_confirmation($atts, $content = null)

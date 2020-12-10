@@ -107,6 +107,8 @@ function register_vlp_script_style_frontend()
   wp_register_style('purchase-vlp-style', plugins_url('/ghes-vlp/css/purchase.css'), array(), scriptver);
   wp_enqueue_style('purchase-vlp-style');
 
+  wp_register_style('print-vlp-style', plugins_url('/ghes-vlp/css/print-area.css'), array(), scriptver);
+
   wp_register_script('wp-api-browse-themes', plugins_url('ghes-vlp/js/browse-themes.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-browse-themes', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 

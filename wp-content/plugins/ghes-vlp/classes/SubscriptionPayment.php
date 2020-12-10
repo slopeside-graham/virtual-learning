@@ -314,7 +314,9 @@ namespace GHES\VLP {
                         $refundAmount = round($refundPercent * $subscription->Total, 2);
                         $voidAmount = $subscription->Total;
 
-                        $paymentResult = Payment::refund($refundAmount, $subscriptionPayment, $voidAmount);
+                        $originalPayment = Payment::Get($subscriptionPayment->Payment_id);
+
+                        $paymentResult = Payment::refund($refundAmount, $originalPayment, $voidAmount);
 
                         if (!is_wp_error($paymentResult)) {
                             SubscriptionPayment::refundPaidYearlySubscriptionPayment($subscriptionId, $paymentResult->id);
@@ -372,8 +374,8 @@ namespace GHES\VLP {
                         Subscription_id=%i
                             and
                         Status = 'Paid'",
-                    $subscriptionId,
-                    $paymentId
+                        $paymentId,
+                        $subscriptionId
                 );
                 $counter = VLPUtils::$db->affectedRows();
                 foreach ($results as $row) {

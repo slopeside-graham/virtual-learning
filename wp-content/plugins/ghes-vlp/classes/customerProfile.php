@@ -244,6 +244,7 @@ namespace GHES\VLP {
         public function refundCustomer($profileid, $paymentprofileid, $refundAmount, $originalPayment, $voidAmount)
         {
             $originalPaymentDetails = $this->getTransactionDetails($originalPayment);
+            if(!is_wp_error($originalPaymentDetails)) {
             $refTransId = $originalPayment->transId;
             if ($originalPaymentDetails) {
                 $originalPaymentStatus = $originalPaymentDetails->getTransaction()->getTransactionStatus();
@@ -253,6 +254,9 @@ namespace GHES\VLP {
                     $response = $this->voidCustomerProfileCharge($profileid, $paymentprofileid, $voidAmount, $originalPayment);
                 }
             }
+        } else {
+            return false;
+        }
             return $response;
         }
 
@@ -277,7 +281,7 @@ namespace GHES\VLP {
             } else {
                 //Failed
                 $errorMessages = $response->getMessages()->getMessage();
-                return new \Exception($errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText());
+                return new \WP_Error($errorMessages[0]->getCode(), $errorMessages[0]->getText());
             }
         }
 

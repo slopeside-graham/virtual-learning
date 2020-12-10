@@ -435,7 +435,6 @@ namespace GHES\VLP {
                     $result = customerProfile::analyzeANresponse($chargeResult[0]);
                 }
 
-
                 if (!is_wp_error($result)) {
                     return $refundPaymentResult;
                 } else {
@@ -443,7 +442,7 @@ namespace GHES\VLP {
                     return new \WP_Error('Refund_Error', 'An error occured: ' . $error_string, array('status' => 400));
                 }
             }
-            return;
+            return new \WP_Error('Refund_Error', 'An error occured: The transaction could not be refunded.');
         }
 
         public function CreatePaymentFromResponse($chargeResult)

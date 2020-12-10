@@ -20,6 +20,8 @@ function enqueue_cancel_confirmation_scripts()
 
 function vlp_cancel_confirmation($atts, $content = null)
 {
+
+    GHES\VLP\Utils::CheckSubscriptionStatus();
     $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
     GHES\VLP\Utils::CheckLoggedInParent();
     enqueue_cancel_confirmation_scripts();

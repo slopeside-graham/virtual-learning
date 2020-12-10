@@ -34,6 +34,7 @@ function vlp_past_payments($atts, $content = null)
         $output .= '<hr>';
         $output .= '<div class="paid-payments">';
         $output .= '<h3>My Past Payments</h3>';
+        $output .= '<div class="tax">Georgetownhill Early School Tax ID: ' . get_option('registration-taxid') . '</div>';
         $output .= '<ul>';
 
         foreach ($paidSubscriptions->jsonSerialize() as $k => $paidSubscription) {

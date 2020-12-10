@@ -15,7 +15,7 @@ namespace GHES\VLP {
 
         private $APILoginId;
         private $APIKey;
-        private $ENVIRONMENT;
+        private static $ENVIRONMENT = null;
         private $refId;
         private $merchantAuthentication;
         public $responseText;
@@ -32,7 +32,6 @@ namespace GHES\VLP {
 
             $this->APILoginId = VLPUtils::getencryptedsetting('registration-apilogin');
             $this->APIKey = VLPUtils::getencryptedsetting('registration-apikey');
-            $this->ENVIRONMENT = VLPUtils::getunencryptedsetting('registration-environment');
 
             $this->refId = 'ref' . time();
             $this->merchantAuthentication = $this->setMerchantAuthentication();
@@ -105,10 +104,13 @@ namespace GHES\VLP {
             ];
         }
 
-        public function getEnvironment()
+        public static function getEnvironment()
         {
             // ENVIRONMENT is set when class is constructed / instantiated
-            return $this->ENVIRONMENT;
+            if (customerProfile::$ENVIRONMENT == null) {
+            customerProfile::$ENVIRONMENT = VLPUtils::getunencryptedsetting('registration-environment');
+            }
+            return customerProfile::$ENVIRONMENT;
         }
 
         public function setMerchantAuthentication()
@@ -145,7 +147,7 @@ namespace GHES\VLP {
 
             // Create the controller and get the response
             $controller = new AnetController\CreateCustomerProfileController($request);
-            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            $response = $controller->executeWithApiResponse(customerProfile::getEnvironment());
 
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
                 $response->getCustomerProfileId();
@@ -194,7 +196,7 @@ namespace GHES\VLP {
             $request->setMerchantAuthentication($merchantAuthentication);
             $request->setCustomerProfileId($profileIdRequested);
             $controller = new AnetController\GetCustomerProfileController($request);
-            $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+            $response = $controller->executeWithApiResponse(customerProfile::getEnvironment());
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
                 return $response;
             } else {
@@ -234,7 +236,7 @@ namespace GHES\VLP {
             $request->setRefId($refId);
             $request->setTransactionRequest($transactionRequestType);
             $controller = new AnetController\CreateTransactionController($request);
-            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            $response = $controller->executeWithApiResponse(customerProfile::getEnvironment());
 
             return $response;
         }
@@ -268,7 +270,7 @@ namespace GHES\VLP {
 
             $controller = new AnetController\GetTransactionDetailsController($request);
 
-            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            $response = $controller->executeWithApiResponse(customerProfile::getEnvironment());
 
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
                 return $response;
@@ -312,7 +314,7 @@ namespace GHES\VLP {
                 $request->setRefId($refId);
                 $request->setTransactionRequest($transactionRequest);
                 $controller = new AnetController\CreateTransactionController($request);
-                $response = $controller->executeWithApiResponse($this->getEnvironment());
+                $response = $controller->executeWithApiResponse(customerProfile::getEnvironment());
 
                 return $response;
             } else {
@@ -353,7 +355,7 @@ namespace GHES\VLP {
             $request->setRefId($refId);
             $request->setTransactionRequest($transactionRequest);
             $controller = new AnetController\CreateTransactionController($request);
-            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            $response = $controller->executeWithApiResponse(customerProfile::getEnvironment());
 
             return array($response, $void = true);
         }

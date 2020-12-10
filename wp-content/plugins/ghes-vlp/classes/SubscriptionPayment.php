@@ -717,11 +717,15 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
-                                                        where 
-                                                            Subscription_id = %i 
-                                                            and Date(StartDate) <= Date(Now())
-                                                            and Status Not In ('Paid', 'Cancelled')", $subscriptionId);
+                $results = VLPUtils::$db->query(
+                    "SELECT sp.* 
+                    from SubscriptionPayment sp
+                    where 
+                    Subscription_id = %i 
+                    and Date(StartDate) <= Date(Now())
+                    and Status Not In ('Paid', 'Cancelled')",
+                    $subscriptionId
+                );
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -742,11 +746,16 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
-                                                        where 
-                                                            Subscription_id = %i 
-                                                            and Date(StartDate) <= Date(Now())
-                                                            and Status = 'Paid'", $subscriptionId);
+                $results = VLPUtils::$db->query(
+                    "SELECT sp.* 
+               from SubscriptionPayment sp
+                Left Join Payment p on sp.Payment_id = p.id
+                where 
+                Subscription_id = %i 
+                and Date(StartDate) <= Date(Now())
+                and sp.Status = 'Paid'",
+                    $subscriptionId
+                );
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -766,7 +775,13 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select * from SubscriptionPayment where Payment_id = %i", $paymentResultid);
+                $results = VLPUtils::$db->query(
+                    "SELECT sp.* 
+                    from SubscriptionPayment sp
+                    Left Join Payment p on sp.Payment_id = p.id
+                    where Payment_id = %i",
+                    $paymentResultid
+                );
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -794,13 +809,16 @@ namespace GHES\VLP {
             $PendingPayments = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select sp.*,
-                                                        s.ParentID as ParentId 
-                                                    from SubscriptionPayment sp
-                                                        Left Join Subscription s on sp.Subscription_id = s.id
-                                                    where 
-                                                        ParentId = %i 
-                                                        and sp.Status = 'Pending'", $parentId);
+                $results = VLPUtils::$db->query(
+                    "SELECT sp.*,
+                    s.ParentID as ParentId
+                    from SubscriptionPayment sp
+                    Left Join Subscription s on sp.Subscription_id = s.id
+                    where 
+                    ParentId = %i 
+                    and sp.Status in ('Pending')",
+                    $parentId
+                );
 
                 foreach ($results as $row) {
                     $PendingPayment = SubscriptionPayment::populatefromRow($row);
@@ -822,11 +840,14 @@ namespace GHES\VLP {
 
             try {
                 $results = VLPUtils::$db->query(
-                                                "SELECT * from SubscriptionPayment 
-                                                where 
-                                                    Subscription_id = %i
-                                                    and Date(StartDate) > Date(Now())
-                                                    and Status in ('Unpaid', 'Pending')", $subscriptionId);
+                    "SELECT sp.* 
+                    from SubscriptionPayment sp
+                    where 
+                    Subscription_id = %i
+                    and Date(StartDate) > Date(Now())
+                    and Status in ('Unpaid', 'Pending')",
+                    $subscriptionId
+                );
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);
@@ -847,11 +868,17 @@ namespace GHES\VLP {
             $SubscriptionPayments = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("select * from SubscriptionPayment 
-                                                        where 
-                                                            Subscription_id = %i
-                                                            and Date(StartDate) > Date(Now())
-                                                            and Status = 'Paid'", $subscriptionId);
+                $results = VLPUtils::$db->query(
+                    "SELECT sp.* 
+                    p.DateCreated as PaymentDate
+                    from SubscriptionPayment sp
+                    Left Join Payment p on sp.Payment_id = p.id
+                    where 
+                    Subscription_id = %i
+                    and Date(StartDate) > Date(Now())
+                    and Status = 'Paid'",
+                    $subscriptionId
+                );
 
                 foreach ($results as $row) {
                     $SubscriptionPayment = SubscriptionPayment::populatefromRow($row);

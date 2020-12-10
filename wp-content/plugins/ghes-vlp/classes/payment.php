@@ -353,13 +353,17 @@ namespace GHES\VLP {
             // Charge customerProfile
             try {
                 $pendingPayments = SubscriptionPayment::GetAllPendingByParentId($Parent_id);
-                if (!is_wp_error($pendingPayments)) {
-                    $backendAmount = 0;
-                    foreach ($pendingPayments->jsonSerialize() as $i => $pendingPayment) {
-                        $backendAmount += $pendingPayment->Amount;
+                if (!empty($pendingPayments->jsonSerialize())) {
+                    if (!is_wp_error($pendingPayments)) {
+                        $backendAmount = 0;
+                        foreach ($pendingPayments->jsonSerialize() as $i => $pendingPayment) {
+                            $backendAmount += $pendingPayment->Amount;
+                        }
+                    } else {
+                        return new \WP_Error('ChargePayment_Error', $pendingPayments->getMessage());
                     }
                 } else {
-                    return new \WP_Error('ChargePayment_Error', $pendingPayments->getMessage());
+                    return new \WP_Error('ChargePayment_Error', 'No Pending Payments. Please refresh the page and try again.');
                 }
                 if ($this->Amount == $backendAmount) {
                     $Amount = $backendAmount;
@@ -438,7 +442,8 @@ namespace GHES\VLP {
                     $error_string = $result->get_error_message();
                     return new \WP_Error('Refund_Error', 'An error occured: ' . $error_string, array('status' => 400));
                 }
-            } return;
+            }
+            return;
         }
 
         public function CreatePaymentFromResponse($chargeResult)

@@ -40,6 +40,7 @@ $(document).ready(function () {
 });
 
 window.onload = function () {
+    //pendingPayment();
     calculateTotal();
 
     var idselector = function () { return this.dataset.id; };
@@ -173,6 +174,7 @@ function purchaseSubscription() {
 
 function pendingPayment(payment) {
     if (payment.status == 'Unpaid') {
+        displayLoading('.entry-content');
         $.ajax({
             url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
             method: "PUT",
@@ -185,6 +187,7 @@ function pendingPayment(payment) {
                 Status: "Pending"
             },
             success: function (result) {
+                hideLoading('.entry-content');
                 console.log("Success:" + result);
                 //Success!
                 window.dataLayer = window.dataLayer || [];
@@ -199,7 +202,7 @@ function pendingPayment(payment) {
                         "An unexpected error occured.  Please review your submission and try again."
                     );
                 }
-                hideLoading('.purchase-vll-billing');
+                hideLoading('.entry-content');
                 console.log(result.responseText);
             }
         })
@@ -293,7 +296,7 @@ function cancelSubscription() {
         success: function (result) {
             //Success!
             console.log("Success:" + result);
-            
+
             document.cookie = "subscriptioncancelid=" + result.id + "; path=/";
             window.location.replace(cancelconfirmationlink);
         },

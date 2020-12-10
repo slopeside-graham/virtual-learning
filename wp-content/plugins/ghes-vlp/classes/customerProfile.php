@@ -148,9 +148,9 @@ namespace GHES\VLP {
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
-                echo "Succesfully created customer profile : " . $response->getCustomerProfileId() . "\n";
+                $response->getCustomerProfileId();
                 $paymentProfileid = $response->getCustomerPaymentProfileIdList();
-                echo "SUCCESS: PAYMENT PROFILE ID : " . $paymentProfileid[0] . "\n";
+                $paymentProfileid[0];
                 try {
                     $this->id = $response->getCustomerProfileId();
                     $parent = \GHES\Parents::Get($Parent_id);

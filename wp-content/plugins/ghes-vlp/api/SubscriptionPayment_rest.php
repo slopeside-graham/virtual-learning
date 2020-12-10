@@ -248,7 +248,6 @@ namespace GHES\VLP {
          */
         public function create_item($request)
         {
-
             $subscriptionpayment = SubscriptionPayment::populatefromRow($request);
             $success = $subscriptionpayment->Create();
             $subscriptionpayment = SubscriptionPayment::Get($subscriptionpayment->id);

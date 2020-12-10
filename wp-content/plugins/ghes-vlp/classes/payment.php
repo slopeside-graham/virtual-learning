@@ -341,7 +341,7 @@ namespace GHES\VLP {
                     $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
                     $anCustomerPaymentProfile = $customerPaymentProfile->getanCustomerPaymentProfile();
                     $result = $customerProfile->createCustomerProfile($anCustomerPaymentProfile, $Parent_id);
-                    if ($result == TRUE) {
+                    if (!is_wp_error($result)) {
                         $Parent = \GHES\Parents::GetByUserID($User_id); // This is refreshuing the parent to get the new anet profile ids'.
                     } else {
                         return $result;

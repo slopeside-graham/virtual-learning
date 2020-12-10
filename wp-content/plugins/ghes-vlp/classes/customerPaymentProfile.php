@@ -363,11 +363,11 @@ namespace GHES\VLP {
 
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
                 // Ignore error below - nothig to be done about it.
-                echo "Create Customer Payment Profile SUCCESS: " . $response->getCustomerPaymentProfileId() . "\n";
+                $response->getCustomerPaymentProfileId();
             } else {
-                echo "Create Customer Payment Profile: ERROR Invalid response\n";
+                //Failed
                 $errorMessages = $response->getMessages()->getMessage();
-                echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+                $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
             }
             return true;
         }

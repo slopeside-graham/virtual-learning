@@ -121,7 +121,7 @@ function purchaseSubscription() {
         beforeSend: function (xhr) {
             xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
         },
-        timeout: 60000,
+        timeout: 0,
         data: {
             Amount: calculateTotal(),
             CardNumber: $("#vlp-bill-CardNumber").val().replace(/\s/g, ''),

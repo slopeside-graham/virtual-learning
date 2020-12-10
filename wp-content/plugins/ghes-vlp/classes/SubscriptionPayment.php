@@ -905,7 +905,7 @@ namespace GHES\VLP {
             $SubscriptionPayment->StartDate = $row['StartDate'];
             $SubscriptionPayment->EndDate = $row['EndDate'];
             $SubscriptionPayment->Payment_id = $row['Payment_id'];
-            $SubscriptionPayment->PaymentDate = $row['PaymentDate'];
+            $SubscriptionPayment->PaymentDate = $row['PaymentDate']; //TODO: Exception - Undefinex Index
             return $SubscriptionPayment;
         }
     }

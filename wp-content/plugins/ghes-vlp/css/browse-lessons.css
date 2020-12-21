@@ -99,12 +99,13 @@
 
 /* CSS for the POPup */
 #lessons-listView .lesson-popup {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
-    width: -webkit-fill-available;
-    margin: 30px;
     height: 400px;
+    margin-left: 25%;
+    margin-right: 25%;
+    margin-top: 10%;
 }
 #lessons-listView .lesson-popup .lesson-content {
     height: 100%;

@@ -120,7 +120,3 @@
 #lessons-listView  .resources {
     margin-top: 20px;
 }
-@media screen and (max-width: 1024px) {
-    #lessons-listView .lesson-popup {
-    }
-}

@@ -100,12 +100,12 @@
 /* CSS for the POPup */
 #lessons-listView .lesson-popup {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
     height: 400px;
-    margin-left: 25%;
-    margin-right: 25%;
-    margin-top: 10%;
+    transform: translate(-50%, -50%);
+    max-height: 100vh;
+    max-width: 100vw;
 }
 #lessons-listView .lesson-popup .lesson-content {
     height: 100%;
@@ -119,4 +119,8 @@
 }
 #lessons-listView  .resources {
     margin-top: 20px;
+}
+@media screen and (max-width: 1024px) {
+    #lessons-listView .lesson-popup {
+    }
 }

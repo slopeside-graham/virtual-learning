@@ -16,6 +16,7 @@ use GHES\VLP\Utils;
 
 function enqueue_agetree_scripts()
 {
+    enqueue_kendo_scripts();
     wp_enqueue_script('wp-api-agetree');
 }
 

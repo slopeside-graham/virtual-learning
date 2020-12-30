@@ -14,6 +14,7 @@ use GHES\VLP\Utils;
 
 function enqueue_past_payments_scripts()
 {
+    enqueue_kendo_scripts();
     wp_enqueue_script('wp-api-past-payments');
     wp_enqueue_style('print-vlp-style');
 }

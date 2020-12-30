@@ -14,6 +14,7 @@ use GHES\VLP\Subscription;
 
 function enqueue_select_subscription_scripts()
 {
+    enqueue_kendo_scripts();
     wp_enqueue_script('wp-api-select-subscription');
 }
 

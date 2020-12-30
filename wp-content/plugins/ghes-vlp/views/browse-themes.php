@@ -15,6 +15,7 @@ use GHES\Children;
 
 function enqueue_browse_themes_scripts()
 {
+    enqueue_kendo_scripts();
     wp_enqueue_script('wp-api-browse-themes');
 }
 

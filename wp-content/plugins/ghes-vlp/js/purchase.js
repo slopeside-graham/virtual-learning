@@ -40,7 +40,6 @@ $(document).ready(function () {
 });
 
 window.onload = function () {
-    //pendingPayment();
     calculateTotal();
 
     var idselector = function () { return this.dataset.id; };
@@ -93,6 +92,7 @@ function calculateTotal() {
 
     if (totalDue > 0) {
         $("#showpaymentbtn").prop('disabled', false);
+        $("#showpaymentbtn").show();
     } else {
         $("#showpaymentbtn").prop('disabled', true);
         $("#showpaymentbtn").hide();
@@ -174,75 +174,76 @@ function purchaseSubscription() {
 }
 
 function pendingPayment(payment) {
-    if (payment.status == 'Unpaid') {
-        displayLoading('.entry-content');
-        $.ajax({
-            url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
-            method: "PUT",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
-            },
-            timeout: 60000,
-            data: {
-                id: payment.id,
-                Status: "Pending"
-            },
-            success: function (result) {
-                hideLoading('.entry-content');
-                console.log("Success:" + result);
-                //Success!
-                window.dataLayer = window.dataLayer || [];
-            },
-            error: function (result) {
-                console.log("Update Payment Status to Pending Failed");
+    displayLoading('.entry-content');
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
+        method: "PUT",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        timeout: 60000,
+        data: {
+            id: payment.id,
+            Status: "Pending"
+        },
+        success: function (result) {
+            calculateTotal();
+            hideLoading('.entry-content');
+            console.log("Success:" + result);
+            //Success!
+            window.dataLayer = window.dataLayer || [];
 
-                if (typeof result.responseJSON !== "undefined") {
-                    alert(result.responseJSON.message);
-                } else {
-                    alert(
-                        "An unexpected error occured.  Please review your submission and try again."
-                    );
-                }
-                hideLoading('.entry-content');
-                console.log(result.responseText);
+        },
+        error: function (result) {
+            console.log("Update Payment Status to Pending Failed");
+
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            } else {
+                alert(
+                    "An unexpected error occured.  Please review your submission and try again."
+                );
             }
-        })
-    }
+            hideLoading('.entry-content');
+            console.log(result.responseText);
+        }
+    })
 }
 
 function unpendingPayment(payment) {
-    if (payment.status == "Pending") {
-        $.ajax({
-            url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
-            method: "PUT",
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
-            },
-            timeout: 60000,
-            data: {
-                id: payment.id,
-                Status: "Unpaid"
-            },
-            success: function (result) {
-                console.log("Success:" + result);
-                //Success!
-                window.dataLayer = window.dataLayer || [];
-            },
-            error: function (result) {
-                console.log("Update Status to Unpaid Failed");
+    displayLoading('.entry-content');
+    $.ajax({
+        url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
+        method: "PUT",
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-WP-Nonce", wpApiSettings.nonce);
+        },
+        timeout: 60000,
+        data: {
+            id: payment.id,
+            Status: "Unpaid"
+        },
+        success: function (result) {
+            calculateTotal();
+            hideLoading('.entry-content');
+            console.log("Success:" + result);
+            //Success!
+            window.dataLayer = window.dataLayer || [];
+        },
+        error: function (result) {
+            console.log("Update Status to Unpaid Failed");
 
-                if (typeof result.responseJSON !== "undefined") {
-                    alert(result.responseJSON.message);
-                } else {
-                    alert(
-                        "An unexpected error occured.  Please review your submission and try again."
-                    );
-                }
-                hideLoading('.purchase-vll-billing');
-                console.log(result.responseText);
+            if (typeof result.responseJSON !== "undefined") {
+                alert(result.responseJSON.message);
+            } else {
+                alert(
+                    "An unexpected error occured.  Please review your submission and try again."
+                );
             }
-        })
-    }
+            hideLoading('.entry-content');
+            console.log(result.responseText);
+        }
+    })
 }
 var selectedSubscriptionId
 function openCancelDialog(selectedSubscription) {

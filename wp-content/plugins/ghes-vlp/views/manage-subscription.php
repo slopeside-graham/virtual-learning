@@ -77,7 +77,7 @@ function vlp_manage_subscription($atts, $content = null)
                     $output .= '<li>You have no payments currently due.</li>';
                     if ($activeSubscriptionPayments->jsonSerialize()) {
                         foreach ($activeSubscriptionPayments->jsonSerialize() as $k => $activeSubscriptionPayment) {
-                            $output .= '<li>Your subscription will stay active until: ' . date('m/d/Y', strtotime($activeSubscriptionPayment->EndDate)) . '</li>';
+                            $output .= '<li>Your subscription will stay active until ' . date('m/d/Y', strtotime($activeSubscriptionPayment->EndDate)) . '.</li>';
                         }
                     }
                 }
@@ -151,5 +151,17 @@ function vlp_manage_subscription($atts, $content = null)
         $selectSubscriptionPage = get_permalink(esc_attr(get_option('vlp-purchase')));
         $output .= '<a href="' . $selectSubscriptionPage . '">You have no active subscriptions, Please select a subscription first -></a>';
     }
+    $output .= '<hr>';
+
+    $managesubscriptionlink = get_permalink(esc_attr(get_option('vlp-manage')));
+    $launchgameboardlink = get_permalink(esc_attr(get_option('vlp-agetree'))) . '?destination=Gameboard';
+    $myprofilelink = get_permalink(esc_attr(get_option('registration_welcome_url')));
+
+    $output .= '<div class="vll-links">';
+        $output .= '<a href="' . $managesubscriptionlink . '">Manage Subscription</a>';
+        $output .= '<a href="' . $launchgameboardlink . '">Launch Gameboard</a>';
+        $output .= '<a href="' . $myprofilelink . '">My Profile</a>';
+    $output .= '</div>';
+
     return $output;
 }

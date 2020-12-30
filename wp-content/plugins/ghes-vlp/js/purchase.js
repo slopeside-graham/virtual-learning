@@ -95,6 +95,7 @@ function calculateTotal() {
         $("#showpaymentbtn").prop('disabled', false);
     } else {
         $("#showpaymentbtn").prop('disabled', true);
+        $("#showpaymentbtn").hide();
     }
 
     console.log("Total Checked Current Payment: " + currentDue);

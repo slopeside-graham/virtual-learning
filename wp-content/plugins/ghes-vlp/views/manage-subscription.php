@@ -76,7 +76,7 @@ function vlp_manage_subscription($atts, $content = null)
                     }
                 } else {
                     $output .= '<li>You have no payments currently due.</li>';
-                    if ($activeSubscriptionPayments->jsonSerialize()) {
+                    if ($activeSubscriptionPayments->jsonSerialize() && $currentUnpaidSubscription->Status == "Cancelled") {
                         foreach ($activeSubscriptionPayments->jsonSerialize() as $k => $activeSubscriptionPayment) {
                             $output .= '<li>Your subscription will stay active until ' . date('m/d/Y', strtotime($activeSubscriptionPayment->EndDate)) . '.</li>';
                         }

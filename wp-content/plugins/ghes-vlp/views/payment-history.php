@@ -15,6 +15,7 @@ use GHES\VLP\Utils;
 function enqueue_vlp_payment_history_scripts()
 {
     enqueue_kendo_scripts();
+    wp_enqueue_script('wp-api-frontend-utils');
     wp_enqueue_script('wp-api-vlp-payment-history');
     wp_enqueue_style('print-vlp-style');
 }

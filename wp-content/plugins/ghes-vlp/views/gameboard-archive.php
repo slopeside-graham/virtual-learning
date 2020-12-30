@@ -16,6 +16,7 @@ use GHES\Children;
 function enqueue_gameboard_archive_scripts()
 {
     enqueue_kendo_scripts();
+    wp_enqueue_script('wp-api-frontend-utils');
     wp_enqueue_script('wp-api-gameboard-archive');
 }
 

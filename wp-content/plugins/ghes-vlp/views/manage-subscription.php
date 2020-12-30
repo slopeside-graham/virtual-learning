@@ -15,6 +15,7 @@ use GHES\VLP\Utils;
 function enqueue_manage_scripts()
 {
     enqueue_kendo_scripts();
+    wp_enqueue_script('wp-api-frontend-utils');
     wp_enqueue_script('wp-api-manage');
 }
 

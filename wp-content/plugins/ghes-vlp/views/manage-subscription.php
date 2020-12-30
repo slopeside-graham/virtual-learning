@@ -39,6 +39,11 @@ function vlp_manage_subscription($atts, $content = null)
 
     $subscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
     if ($subscriptions->jsonSerialize()) {
+        foreach ($subscriptions->jsonSerialize() as $k => $subscription) {
+            if ($subscription->Status != "Cancelled") {
+                $output .= "Subscription Active";
+            }
+        } 
 
         $unpaidSubscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
         if ($unpaidSubscriptions->jsonSerialize()) {
@@ -48,6 +53,7 @@ function vlp_manage_subscription($atts, $content = null)
             foreach ($unpaidSubscriptions->jsonSerialize() as $k => $currentUnpaidSubscription) {
                 $subscriptionDefinition = GHES\VLP\SubscriptionDefinition::Get($currentUnpaidSubscription->SubscriptionDefinition_id);
                 $subscriptionPayments = GHES\VLP\SubscriptionPayment::GetCurrentDueBySubscriptionId($currentUnpaidSubscription->id);
+                $activeSubscriptionPayments = GHES\VLP\SubscriptionPayment::GetAllPaidBySubscriptionId($currentUnpaidSubscription->id);
                 if ($currentUnpaidSubscription->PaymentFrequency == "yearly") {
                     $paymentFrequency = "Yearly";
                 } else if ($currentUnpaidSubscription->PaymentFrequency == "monthly") {
@@ -69,6 +75,11 @@ function vlp_manage_subscription($atts, $content = null)
                     }
                 } else {
                     $output .= '<li>You have no payments currently due.</li>';
+                    if ($activeSubscriptionPayments->jsonSerialize()) {
+                        foreach ($activeSubscriptionPayments->jsonSerialize() as $k => $activeSubscriptionPayment) {
+                            $output .= '<li>Your subscription will stay active until: ' . date('m/d/Y', strtotime($activeSubscriptionPayment->EndDate)) . '</li>';
+                        }
+                    }
                 }
                 $pastPayments = GHES\VLP\Payment::GetAllBySubscriptionId($currentUnpaidSubscription->id);
                 if ($pastPayments->jsonSerialize()) {

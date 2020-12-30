@@ -38,3 +38,6 @@ add_shortcode( 'vlp_cancel_confirmation', 'vlp_cancel_confirmation' );
 
 include_once(plugin_dir_path( __FILE__ ) . 'views/welcome-vlp.php'); 
 add_shortcode( 'vlp_welcome', 'vlp_welcome' );
+
+include_once(plugin_dir_path( __FILE__ ) . 'views/payment-history.php'); 
+add_shortcode( 'vlp_parent_payment_history', 'vlp_parent_payment_history' );

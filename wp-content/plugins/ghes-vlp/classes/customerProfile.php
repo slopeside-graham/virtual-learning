@@ -249,7 +249,14 @@ namespace GHES\VLP {
             if ($originalPaymentDetails) {
                 $originalPaymentStatus = $originalPaymentDetails->getTransaction()->getTransactionStatus();
                 if ($originalPaymentStatus == 'settledSuccessfully') {
-                    $response = $this->refundCustomerProfile($profileid, $paymentprofileid, $refundAmount, $originalPayment);
+                    $refundResonse = $this->refundCustomerProfile($profileid, $paymentprofileid, $refundAmount, $originalPayment);
+                    if ($refundResonse != false) {
+                        $response = $refundResonse; // This is a successful refund
+                    } else if ($refundResonse == false){
+                        $response = "Nothing to refund."; // This happens if refind ampount is 0. the refund doesnt happen, but the cancellation can still continue.
+                    } else {
+                        $response = false;
+                    }
                 } else {
                     $response = $this->voidCustomerProfileCharge($profileid, $paymentprofileid, $voidAmount, $originalPayment);
                 }

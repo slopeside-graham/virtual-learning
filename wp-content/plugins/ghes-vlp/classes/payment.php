@@ -425,10 +425,12 @@ namespace GHES\VLP {
 
             $customerProfile = new customerProfile();
             $chargeResult = $customerProfile->refundCustomer($Parent->customerProfileId, $Parent->customerPaymentProfileId, $refundAmount, $chargepayment, $voidAmount);
-            if ($chargeResult != false) {
+
+            if ($chargeResult = "Nothing to refund.") {
+                return true;
+            } else if ($chargeResult != false) {
                 // Create the payment record from the response.
                 $refundPaymentResult = $refundPayment->CreateRefundFromResponse($chargeResult, $refundAmount);
-
                 if (!is_array($chargeResult)) {
                     $result = customerProfile::analyzeANresponse($chargeResult);
                 } else {

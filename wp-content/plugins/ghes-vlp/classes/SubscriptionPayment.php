@@ -265,7 +265,7 @@ namespace GHES\VLP {
                             $totalPaid += $paidSubscriptionPayment->Amount; //This is the total amount paid. This should match $chargePayment->Amount
                             if ($paidSubscriptionPayment->id != $currentSubscriptionPaymentId) {
                                 $refundAmount += $paidSubscriptionPayment->Amount;
-                            }
+                            } 
                         }
                         // Run the cancellation for each charge payment
                         $cancelledpaymentResult = Payment::refund($refundAmount, $chargePayment, $voidAmount);

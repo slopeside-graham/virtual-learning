@@ -34,6 +34,10 @@ $(function () {
                             editable: false,
                             nullable: true
                         },
+                        Type: {
+                            editable: false,
+                            nullable: true,
+                        },
                         Amount: {
                             editable: false,
                             nullable: true,
@@ -56,7 +60,7 @@ $(function () {
                             nullable: true,
                             type: "date",
                             format: "{0:yyyy-MM-dd}",
-                            parse: parseVLPDate
+                            //parse: parseVLPDate - Not needed since date is returning already parsed.
                         }
                     }
                 }
@@ -95,7 +99,11 @@ $(function () {
                     title: "Status",
                     template: function (dataItem) {
                         if (dataItem.ResponseCode == 1) {
-                            return "Paid"
+                            if (dataItem.Type == "Charge") {
+                                return "Purchase"
+                            } else {
+                                return "Refund"
+                            }
                         } else {
                             return "Payment Error"
                         }
@@ -112,12 +120,15 @@ $(function () {
                     format: "{0:c}"
                 },
                 {
-                    field: "accountNumber",
+                    field: "account",
                     title: "Account",
-                },
-                {
-                    field: "accountType",
-                    title: "Payment Type",
+                    template: function (dataItem) {
+                        if(dataItem.accountNumber != null) {
+                            return dataItem.accountType + " - " + dataItem.accountNumber;
+                        } else {
+                            return "";
+                        }
+                    }
                 },
                 {
                     command:

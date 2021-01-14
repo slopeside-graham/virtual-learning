@@ -250,8 +250,8 @@ namespace GHES\VLP {
         public function create_item($request)
         {
             $paymentmethod = PaymentMethod::populatefromRow($request);
-            $paymentmethodsuccess = $paymentmethod->charge($request);
-            $paymentmethod = PaymentMethod::Get($paymentmethod->id);
+            $paymentmethodsuccess = $paymentmethod->Create($request);
+            $paymentmethod = PaymentMethod::Get($paymentmethodsuccess->id);
 
             if (!is_wp_error($paymentmethodsuccess)) {
                 return rest_ensure_response($paymentmethod);

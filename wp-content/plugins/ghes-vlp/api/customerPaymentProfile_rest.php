@@ -191,9 +191,9 @@ namespace GHES\VLP {
                 $customerPaymentProfile = customerPaymentProfile::GetAll();
             }
 
-            if (!is_wp_error($customerPaymentProfile))
+            if (!is_wp_error($customerPaymentProfile)) {
                 return rest_ensure_response($customerPaymentProfile);
-            else {
+            } else {
                 $error_string = $customerPaymentProfile->get_error_message();
                 return new \WP_Error('customerPaymentProfile_Get_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }

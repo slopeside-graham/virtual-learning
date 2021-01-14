@@ -18,7 +18,7 @@ namespace GHES\VLP {
         private $_ParentId;
         private $_customerProfileId;
         private $_customerPaymentProfileId;
-        private $_Default;
+        private $_DefaultPayment;
         private $_DateCreated;
         private $_DateModified;
 
@@ -71,15 +71,15 @@ namespace GHES\VLP {
             }
         }
 
-        protected function Default($value = null)
+        protected function DefaultPayment($value = null)
         {
             // If value was provided, set the value
             if ($value) {
-                $this->_Default = $value;
+                $this->_DefaultPayment = $value;
             }
             // If no value was provided return the existing value
             else {
-                return $this->_Default;
+                return $this->_DefaultPayment;
             }
         }
 
@@ -114,7 +114,7 @@ namespace GHES\VLP {
                 'ParentId' => $this->ParentId,
                 'customerProfileId' => $this->customerProfileId,
                 'customerPaymentProfileId' => $this->customerPaymentProfileId,
-                'Default' => $this->Default,
+                'DefaultPayment' => $this->DefaultPayment,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified
             ];
@@ -132,13 +132,41 @@ namespace GHES\VLP {
                     'ParentId' => $this->ParentId,
                     'customerProfileId' => $this->customerProfileId,
                     'customerPaymentProfileId' => $this->customerPaymentProfileId,
-                    'Default' => $this->Default
+                    'DefaultPayment' => $this->DefaultPayment
                 ));
                 $this->id = VLPUtils::$db->insertId();
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('Payments_Create_Error', $e->getMessage());
             }
             return true;
+        }
+
+        public static function CreateFromAN($response)
+        {
+
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            //Build each field since this is coming from another class
+            $ParentId = \GHES\Parents::GetByUserID(get_current_user_id())->id;
+            $customerProfileId = $response->customerProfileId;
+            $customerPaymentProfileId = $response->customerPaymentProfileId;
+            $DefaultPayment = $response->DefaultPayment;
+
+            try {
+
+                VLPUtils::$db->insert('PaymentMethod', array(
+                    'ParentId' => $ParentId,
+                    'customerProfileId' => $customerProfileId,
+                    'customerPaymentProfileId' => $customerPaymentProfileId,
+                    'DefaultPayment' => $DefaultPayment
+                ));
+                $paymentMethodid = VLPUtils::$db->insertId();
+                $paymentMethod = PaymentMethod::Get($paymentMethodid);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('Payments_Create_Error', $e->getMessage());
+            }
+            return $paymentMethod;
         }
 
         // We are not using any function besides Create at the moment. So I am not updating these.
@@ -156,13 +184,13 @@ namespace GHES\VLP {
                     ParentId=%s, 
                     customerProfileId=%i, 
                     customerPaymentProfileId=%i,
-                    Default=%i
+                    DefaultPayment=%i
                 WHERE 
                     id=%i",
                     $this->ParentId,
                     $this->customerProfileId,
                     $this->customerPaymentProfileId,
-                    $this->Default,
+                    $this->DefaultPayment,
                     $this->id
                 );
 
@@ -183,6 +211,38 @@ namespace GHES\VLP {
             try {
 
                 $row = VLPUtils::$db->queryFirstRow("select * from PaymentMethod where id = %i", $thisid);
+                $PaymentMethod = PaymentMethod::populatefromRow($row);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('PaymentMethod_Get_Error', $e->getMessage());
+            }
+            return $PaymentMethod;
+        }
+
+        public static function GetByPaymentProfileId($thisid)
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $parentId = \GHES\Parents::GetByUserID(get_current_user_id())->id;
+
+            try {
+                $row = VLPUtils::$db->queryFirstRow("select * from PaymentMethod where customerPaymentProfileId = %i and ParentId = %i", $thisid, $parentId);
+                $PaymentMethod = PaymentMethod::populatefromRow($row);
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('PaymentMethod_Get_Error', $e->getMessage());
+            }
+            return $PaymentMethod;
+        }
+
+        public static function GetByParentId()
+        {
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            $parentId = \GHES\Parents::GetByUserID(get_current_user_id())->id;
+
+            try {
+                $row = VLPUtils::$db->queryFirstRow("select * from PaymentMethod where ParentId = %i", $parentId);
                 $PaymentMethod = PaymentMethod::populatefromRow($row);
             } catch (\MeekroDBException $e) {
                 return new \WP_Error('PaymentMethod_Get_Error', $e->getMessage());
@@ -222,7 +282,7 @@ namespace GHES\VLP {
             $PaymentMethod->ParentId = $row['ParentId'];
             $PaymentMethod->customerProfileId = $row['customerProfileId'];
             $PaymentMethod->customerPaymentProfileId = $row['customerPaymentProfileId'];
-            $PaymentMethod->Default = $row['Default'];
+            $PaymentMethod->DefaultPayment = $row['DefaultPayment'];
             $PaymentMethod->DateCreated = $row['DateCreated'];
             $PaymentMethod->DateModified = $row['DateModified'];
             return $PaymentMethod;

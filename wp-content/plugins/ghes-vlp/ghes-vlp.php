@@ -217,3 +217,4 @@ function ghes_vlp_add_custom_roles()
   $admin_role->add_cap('vlp_manage_entries');
 }
 register_activation_hook(__FILE__, 'ghes_vlp_add_custom_roles');
+

@@ -16,7 +16,15 @@ function enqueue_vlp_welcome_api_scripts()
 
 function vlp_welcome()
 {
+    /*
+    // Use the below code to manually assingavlp to a parent
 
+// NOTE: Of course change 3 to the appropriate user ID
+$u = new WP_User( 482 );
+
+// Add role
+$u->add_role( 'VLP Parent' );
+*/
     Utils::redirectNotLoggedIn();
 
     enqueue_vlp_welcome_api_scripts();

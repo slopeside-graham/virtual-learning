@@ -628,6 +628,41 @@ namespace GHES\VLP {
             return $response;
         }
 
+        public function GetByPaymentMethod($PaymentMethod)
+        {
+            $parent = \GHES\Parents::GetByUserID(get_current_user_id());
+
+            $customerProfileId = $PaymentMethod->customerProfileId;
+            $customerPaymentProfileId = $PaymentMethod->customerPaymentProfileId;
+
+            //$customerProfile = customerProfile::Get($customerProfileId);
+
+            $merchantAuthentication = $this->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            //request requires customerProfileId and customerPaymentProfileId
+            $request = new AnetAPI\GetCustomerPaymentProfileRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setCustomerProfileId($customerProfileId);
+            $request->setCustomerPaymentProfileId($customerPaymentProfileId);
+
+            $controller = new AnetController\GetCustomerPaymentProfileController($request);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            if (($response != null)) {
+                if ($response->getMessages()->getResultCode() == "Ok") {
+                    $this->populatefromAN($response);
+                    return $this;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
         public static function populatefromANobject($row): ?customerPaymentProfile
         {
             if ($row == null)
@@ -660,6 +695,40 @@ namespace GHES\VLP {
             $customerPaymentProfile->Country = 'USA';
             $customerPaymentProfile->PhoneNumber = $row->getBillto()->getPhoneNumber();
             return $customerPaymentProfile;
+        }
+
+        public function populatefromAN($row): ?customerPaymentProfile
+        {
+            if ($row == null)
+                return null;
+
+            $row = $row->getPaymentProfile();
+            $this->id = $row->getCustomerPaymentProfileId();
+            //Only populate if it is a Credit Card
+            if ($row->getPayment()->getCreditCard() != null) {
+                $this->CardNumber = $row->getPayment()->getCreditCard()->getCardNumber();
+                $this->ExpirationDate = $row->getPayment()->getCreditCard()->getExpirationDate();
+                // Cannot get card code. Illegal. $this->CardCode = $row->getPayment()->getCreditCard()->getCardCode();
+                $this->CardType = $row->getPayment()->getCreditCard()->getCardType();
+            }
+            //Only Populate if it is a bank account
+            if ($row->getPayment()->getbankAccount() != null) {
+                $this->AccountType = $row->getPayment()->getAccountType();
+                $this->EcheckType = $row->getPayment()->getBankAccount()->getECheckType();
+                $this->RoutingNumber = $row->getPayment()->getBankAccount()->getRoutingNumber();
+                $this->AccountNumber = $row->getPayment()->getBankAccount()->getAccountNumber();
+                $this->NameOnAccount = $row->getPayment()->getBankAccount()->getNameOnAccount();
+                $this->BankName = $row->getPayment()->getBankAccount()->getBankName();
+            }
+            $this->FirstName = $row->getBillto()->getFirstName();
+            $this->LastName = $row->getBillto()->getLastName();
+            $this->Address = $row->getBillto()->getAddress();
+            $this->City = $row->getBillto()->getCity();
+            $this->State = $row->getBillto()->getState();
+            $this->Zip = $row->getBillto()->getZip();
+            $this->Country = 'USA';
+            $this->PhoneNumber = $row->getBillto()->getPhoneNumber();
+            return $this;
         }
 
         public static function populatefromRow($row): ?customerPaymentProfile

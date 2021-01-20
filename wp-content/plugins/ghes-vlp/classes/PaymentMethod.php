@@ -22,6 +22,27 @@ namespace GHES\VLP {
         private $_DateCreated;
         private $_DateModified;
 
+        private $_CardNumber;
+        private $_ExpirationDate;
+        private $_CardCode;
+        private $_CardType;
+
+        private $_AccountType;
+        private $_EcheckType;
+        private $_RoutingNumber;
+        private $_AccountNumber;
+        private $_NameOnAccount;
+        private $_BankName;
+
+        private $_FirstName;
+        private $_LastName;
+        private $_Address;
+        private $_City;
+        private $_State;
+        private $_Zip;
+        private $_Country;
+        private $_PhoneNumber;
+
 
         protected function id($value = null)
         {
@@ -107,6 +128,217 @@ namespace GHES\VLP {
             }
         }
 
+        protected function CardNumber($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_CardNumber = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_CardNumber;
+            }
+        }
+
+        protected function ExpirationDate($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_ExpirationDate = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_ExpirationDate;
+            }
+        }
+
+        protected function CardCode($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_CardCode = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_CardCode;
+            }
+        }
+
+        protected function CardType($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_CardType = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_CardType;
+            }
+        }
+
+        protected function AccountType($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_AccountType = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_AccountType;
+            }
+        }
+        protected function EcheckType($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_EcheckType = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_EcheckType;
+            }
+        }
+        protected function RoutingNumber($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_RoutingNumber = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_RoutingNumber;
+            }
+        }
+        protected function AccountNumber($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_AccountNumber = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_AccountNumber;
+            }
+        }
+        protected function NameOnAccount($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_NameOnAccount = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_NameOnAccount;
+            }
+        }
+        protected function BankName($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_BankName = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_BankName;
+            }
+        }
+
+        protected function FirstName($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_FirstName = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_FirstName;
+            }
+        }
+
+        protected function LastName($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_LastName = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_LastName;
+            }
+        }
+
+        protected function Address($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Address = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Address;
+            }
+        }
+
+        protected function City($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_City = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_City;
+            }
+        }
+
+        protected function State($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_State = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_State;
+            }
+        }
+
+        protected function Zip($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Zip = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Zip;
+            }
+        }
+
+        protected function Country($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Country = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Country;
+            }
+        }
+
+        protected function PhoneNumber($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_PhoneNumber = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_PhoneNumber;
+            }
+        }
+
         public function jsonSerialize()
         {
             return [
@@ -116,7 +348,28 @@ namespace GHES\VLP {
                 'customerPaymentProfileId' => $this->customerPaymentProfileId,
                 'DefaultPayment' => $this->DefaultPayment,
                 'DateCreated' => $this->DateCreated,
-                'DateModified' => $this->DateModified
+                'DateModified' => $this->DateModified,
+
+                'CardNumber' => $this->CardNumber,
+                'CardCode' => $this->CardCode,
+                'ExpirationDate' => $this->ExpirationDate,
+                'CardType' => $this->CardType,
+
+                'AccountType' => $this->AccountType,
+                'EcheckType' => $this->EcheckType,
+                'RoutingNumber' => $this->RoutingNumber,
+                'AccountNumber' => $this->AccountNumber,
+                'NameOnAccount' => $this->NameOnAccount,
+                'BankName' => $this->BankName,
+
+                'FirstName' => $this->FirstName,
+                'LastName' => $this->LastName,
+                'Address' => $this->Address,
+                'City' => $this->City,
+                'State' => $this->State,
+                'Zip' => $this->Zip,
+                'Country' => $this->Country,
+                'PhoneNumber' => $this->PhoneNumber
             ];
         }
 
@@ -252,23 +505,64 @@ namespace GHES\VLP {
 
         public static function GetAll()
         {
-            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
-            VLPUtils::$db->throw_exception_on_error = true;
+            //Only allow this function to get payment methods fro the current Parent
+            if (is_user_logged_in() && \GHES\ghes_base::UserIsParent()) {
 
-            $PaymentMethods = new NestedSerializable();
+                VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+                VLPUtils::$db->throw_exception_on_error = true;
 
-            try {
-                $results = VLPUtils::$db->query("select * from PaymentMethod");
+                $parentId = \GHES\Parents::GetByUserID(get_current_user_id())->id;
 
-                foreach ($results as $row) {
-                    $PaymentMethod = PaymentMethod::populatefromRow($row);
-                    $PaymentMethods->add_item($PaymentMethod);  // Add the lesson to the collection
+                $PaymentMethods = new NestedSerializable();
 
+                try {
+                    $results = VLPUtils::$db->query("select * from PaymentMethod where ParentId = %i", $parentId);
+
+                    foreach ($results as $row) {
+                        $PaymentMethod = PaymentMethod::populatefromRow($row);
+
+                        // Fill in all the other details from Authorize.Net for this payment Method
+                        $PaymentMethod->populatefromAN();
+
+                        $PaymentMethods->add_item($PaymentMethod);  // Add the lesson to the collection
+
+                    }
+                } catch (\MeekroDBException $e) {
+                    return new \WP_Error('PaymentMethod_GetAll_Error', $e->getMessage());
                 }
-            } catch (\MeekroDBException $e) {
-                return new \WP_Error('PaymentMethod_GetAll_Error', $e->getMessage());
+                return $PaymentMethods;
+            } else {
+                return new \WP_Error('PaymentMethod_GetAll_Error', 'Current User is not a Parent');
             }
-            return $PaymentMethods;
+        }
+
+        private function populatefromAN()
+        {
+            $customerPaymentProfile = new customerPaymentProfile;
+            $success = $customerPaymentProfile->GetByPaymentMethod($this);
+
+            if ($success != false) {
+                $this->CardNumber = $customerPaymentProfile->CardNumber;
+                $this->CardCode = $customerPaymentProfile->CardCode;
+                $this->ExpirationDate = $customerPaymentProfile->ExpirationDate;
+                $this->CardType = $customerPaymentProfile->CardType;
+
+                $this->AccountType = $customerPaymentProfile->AccountType;
+                $this->EcheckType = $customerPaymentProfile->EcheckType;
+                $this->RoutingNumber = $customerPaymentProfile->RoutingNumber;
+                $this->AccountNumber = $customerPaymentProfile->AccountNumber;
+                $this->NameOnAccount = $customerPaymentProfile->NameOnAccount;
+                $this->BankName = $customerPaymentProfile->BankName;
+
+                $this->FirstName = $customerPaymentProfile->FirstName;
+                $this->LastName = $customerPaymentProfile->LastName;
+                $this->Address = $customerPaymentProfile->Address;
+                $this->City = $customerPaymentProfile->City;
+                $this->State = $customerPaymentProfile->State;
+                $this->Zip = $customerPaymentProfile->Zip;
+                $this->Country = $customerPaymentProfile->Country;
+                $this->PhoneNumber = $customerPaymentProfile->PhoneNumber;
+            }
         }
 
         // Helper function to populate a lesson from a MeekroDB Row

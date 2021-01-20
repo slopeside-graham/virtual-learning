@@ -32,11 +32,11 @@ function vlp_select_subscription($atts, $content = null)
         enqueue_select_subscription_scripts();
 
         $output = '';
-?>
-        <script>
-            var manageSubscriptionPage = "<?php echo (get_permalink(get_option('vlp-manage'))); ?>";
-        </script>
-<?php
+
+        $output .= '<script>';
+        $output .= 'var manageSubscriptionPage = "' . (get_permalink(get_option('vlp-manage'))) . '"';
+        $output .= '</script>';
+
 
         $output .= '<form id="select-subscription-vll">';
         $output .= '<h3>Select Subscription Level:</h3>';
@@ -84,6 +84,7 @@ function vlp_select_subscription($atts, $content = null)
         return $output;
     } else {
         $managesubscription = get_permalink(esc_attr(get_option('vlp-manage')));
-        header("Location: $managesubscription");
+        wp_redirect( $managesubscription);
+       // header("Location: $managesubscription");
     }
 }

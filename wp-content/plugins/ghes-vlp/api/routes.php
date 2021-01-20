@@ -128,8 +128,8 @@ function register_vlp_controllers()
     $controller->register_routes();
 
     // Resource Controller
-    $controller = new GHES\VLP\customerPaymentProfile_rest();
-    $controller->register_routes();
+    //$controller = new GHES\VLP\customerPaymentProfile_rest();
+   // $controller->register_routes();
 
     // Resource Controller
     $controller = new GHES\VLP\PaymentMethod_rest();

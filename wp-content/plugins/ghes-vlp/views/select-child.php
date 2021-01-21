@@ -44,12 +44,7 @@ function vlp_select_child($atts, $content = null)
 
     $children = Children::GetAllByAge($ageEndDate, $ageStartDate);
     setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
-    if ($children->count() == 1) {
-
-        setcookie('VLPSelectedChild', $children->jsonSerialize()[0]->id, 0, '/');
-        header('Location: ' . $destinationURL);
-        exit;
-    } else if ($children->count() < 1) {
+    if ($children->count() < 1) {
         // let's not do this...
         //$output .= "You have no children";
         //return $output;
@@ -58,8 +53,7 @@ function vlp_select_child($atts, $content = null)
         setcookie('VLPSelectedChild', '', 1, '/');
         header('Location: ' . $destinationURL);
         exit;
-
-    } else if ($children->count() > 1) {
+    } else {
 
         $output .= '<div class="list-children">';
 

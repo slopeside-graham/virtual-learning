@@ -22,10 +22,10 @@ function vlp_agetree($atts, $content = null)
 {
     enqueue_agetree_scripts();
 
-    //Uset all  Cookies
-    setcookie('VLPAgeGroupId', '', 1, '/');
-    setcookie('VLPSelectedChild', '', 1, '/');
-    setcookie('VLPThemeId', '', 1, '/');
+    //Unset all  Cookies
+    setcookie('VLPAgeGroupId', '', 0, '/');
+    setcookie('VLPSelectedChild', '', 0, '/');
+    setcookie('VLPThemeId', '', 0, '/');
 
     $destination = $_GET["destination"];
     $destinationURL = '';
@@ -46,7 +46,7 @@ function vlp_agetree($atts, $content = null)
         $agegroupimage = $agegroup->Image_id;
         $agegroupposition = $agegroup->Position;
 
-        $output .= '<a class="age-group-icon position-' . $agegroupposition . '" href="' . get_permalink(get_option('vlp-select-child')) . '?destination=' . $destination . '&VLPAgeGroupId=' . $agegroupid . '" data-agegroupid="' . $agegroupid . '">' . wp_get_attachment_image($agegroupimage, 'large') . '</a>';
+        $output .= '<a onClick="setAgeGroupId(' . $agegroupid . ')" class="age-group-icon position-' . $agegroupposition . '" href="' . get_permalink(get_option('vlp-select-child')) . '?destination=' . $destination . '&VLPAgeGroupId=' . $agegroupid . '" data-agegroupid="' . $agegroupid . '">' . wp_get_attachment_image($agegroupimage, 'large') . '</a>';
     }
 
     $output .= '</div>';

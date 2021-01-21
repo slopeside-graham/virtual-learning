@@ -15,6 +15,7 @@ use GHES\Children;
 
 function enqueue_browse_lessons_scripts()
 {
+    enqueue_kendo_scripts();
     wp_enqueue_script('wp-api-browse-lessons');
 }
 
@@ -23,7 +24,6 @@ function vlp_browse_lessons($atts, $content = null)
     enqueue_browse_lessons_scripts();
 
     $output = '';
-
     $playicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/play.svg');
     $articon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/art.svg');
     $learnicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/learn.svg');

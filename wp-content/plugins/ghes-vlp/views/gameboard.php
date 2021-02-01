@@ -59,7 +59,7 @@ function vlp_gameboard($atts, $content = null)
 
     if (isset($_GET['theme-date'])) {
         $themedate = $_GET['theme-date'];
-    } else if (isset($_COOKIE['VLPThemeId'])) {
+    } else if (strlen($_COOKIE['VLPThemeId']) > 0) {
         $theme = Theme::Get($_COOKIE['VLPThemeId']);
         $themedate = $theme->StartDate->format('Y-m-d');
     } else {

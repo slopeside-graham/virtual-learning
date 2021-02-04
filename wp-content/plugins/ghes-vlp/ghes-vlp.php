@@ -163,7 +163,7 @@ function ghes_vlp_register_menu_pages()
     'Virtual Learning Platform',
     'vlp_manage_options',
     'ghes-vlp/admin/admin.php',
-    'vlp_page_admin',
+    'administrator',
     'dashicons-book',
     2
   );
@@ -202,7 +202,7 @@ function ghes_vlp_add_custom_roles()
     'VLP Admin',
     array(
       'vlp_manage_options' => true,
-      'vlp_manage_entries' => true,
+      'vlp_manage_entries' => true
     )
   );
   add_role(
@@ -218,3 +218,13 @@ function ghes_vlp_add_custom_roles()
 }
 register_activation_hook(__FILE__, 'ghes_vlp_add_custom_roles');
 
+function add_vlp_admin_role() {
+  // Gets the simple_role role object.
+  $role = get_role( 'VLP Admin' );
+
+  // Add a new capability.
+  $role->add_cap( 'read', true );
+}
+
+// Add simple_role capabilities, priority must be after the initial role definition.
+add_action( 'init', 'add_vlp_admin_role', 11 );

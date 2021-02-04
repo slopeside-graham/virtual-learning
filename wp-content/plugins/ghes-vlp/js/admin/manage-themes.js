@@ -232,6 +232,7 @@ $(function () {
           autoBind: false,
           dataTextField: "Status",
           dataValueField: "value",
+          valuePrimitive: true,
           dataSource: [
             {
               Status: "Draft",

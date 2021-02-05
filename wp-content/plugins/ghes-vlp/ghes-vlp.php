@@ -224,6 +224,7 @@ function add_vlp_admin_role() {
 
   // Add a new capability.
   $role->add_cap( 'read', true );
+  $role->add_cap( 'upload_files', true );
 }
 
 // Add simple_role capabilities, priority must be after the initial role definition.

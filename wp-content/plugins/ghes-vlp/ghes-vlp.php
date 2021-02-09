@@ -163,7 +163,7 @@ function ghes_vlp_register_menu_pages()
     'Virtual Learning Platform',
     'vlp_manage_options',
     'ghes-vlp/admin/admin.php',
-    'administrator',
+    'vlp_page_admin',
     'dashicons-book',
     2
   );

@@ -23,20 +23,17 @@ function enqueue_browse_lessons_scripts()
 function vlp_browse_lessons($atts, $content = null)
 {
     GHES\VLP\Utils::CheckLoggedInVLPParent();
-
     enqueue_browse_lessons_scripts();
 
     $output = '';
+    $playicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/play.svg');
+    $articon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/art.svg');
+    $learnicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/learn.svg');
+    $nurtureicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/nurture.svg');
 
-    $playicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/play.svg');
-    $articon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/art.svg');
-    $learnicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/learn.svg');
-    $nurtureicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/nurture.svg');
+    $gobuttonURL = plugin_dir_url(dirname(__FILE__)) . '/assets/Buttons/Go Button.png';
 
-    $gobutton = plugin_dir_url(dirname(__FILE__)) . '/assets/Buttons/Go Button.png';
-
-    $completionIcon = plugin_dir_url(dirname(__FILE__)) . 'assets/Star.png';
-
+    $completionIconURL = plugin_dir_url(dirname(__FILE__)) . 'assets/Star.png';
 
     $output .= '<div class="hidden-lesson-icons">';
     $output .= '<div hidden id="play-icon">' . $playicon . '</div>';
@@ -57,10 +54,10 @@ function vlp_browse_lessons($atts, $content = null)
         $output .= '    <span class="browse-lesson-spacer-blue">&nbsp;</span>';
         $output .= '    <span class="browse-lesson-theme-title">#: ThemeTitle#</span>';
         $output .= '    <span class="browse-lesson-spacer">&nbsp;</span>';
-        $output .= '    <span class="browse-lesson-title Completed-#: Completed#">#: Title#<span class="lesson-completion-icon"><img src="' . $completionIcon . '" /></span></span>';
+        $output .= '    <span class="browse-lesson-title Completed-#: Completed#">#: Title#<span class="lesson-completion-icon"><img src="' . $completionIconURL . '" /></span></span>';
         $output .= '    <span class="browse-lesson-go-btn">Lets Go!</span>';
         $output .= '    <span class="browse-lesson-spacer">&nbsp;</span>';
-        $output .= '    <span class="browse-lesson-go-icon" data-lesson-id="#: id#" onclick="openLessonPopup(this)"><img src="' . $gobutton . '"></span>'; //TODO what does this link to?
+        $output .= '    <span class="browse-lesson-go-icon" data-lesson-id="#: id#" onclick="openLessonPopup(this)"><img src="' . $gobuttonURL . '"></span>'; //TODO what does this link to?
         $output .= ' </div>';
         $output .= ' <div class="lesson-popup type-#: Type#" id="lesson-#: id#">';
             $output .= '<span class="close-button" onclick="closeLessonPopup(this)">&times;</span>';
@@ -73,7 +70,7 @@ function vlp_browse_lessons($atts, $content = null)
                 $output .= '</div>';
                 $output .= '<div class="second-column">';
                     $output .= '<div class="lesson-video">';
-                        $output .= '<iframe src="#: VideoURL #"frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe><span class="completion-icon video-completion-icon"><img src="' . $completionIcon . '" /></span>';
+                        $output .= '<iframe src="#: VideoURL #"frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe><span class="completion-icon video-completion-icon"><img src="' . $completionIconURL . '" /></span>';
                     $output .= '</div>';
                     $output .= '<div class="resources"><span class="related-materials-title">Related Materials</span><br/>';
                         $output .= '<ul id="resources-listView-lesson-#: id#" class="related-materials-list"></ul>';

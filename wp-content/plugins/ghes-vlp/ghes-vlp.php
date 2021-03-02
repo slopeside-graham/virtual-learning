@@ -135,6 +135,8 @@ function register_vlp_script_style_frontend()
 
   wp_register_script('wp-api-frontend-utils', plugins_url('ghes-vlp/js/utils.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-frontend-utils', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
+
+  wp_enqueue_script('wp-api-frontend-utils');
   
 
   // Include Vimeo's Player API Library
@@ -218,7 +220,7 @@ function ghes_vlp_add_custom_roles()
     'VLP Admin',
     array(
       'vlp_manage_options' => true,
-      'vlp_manage_entries' => true,
+      'vlp_manage_entries' => true
     )
   );
   add_role(
@@ -233,6 +235,18 @@ function ghes_vlp_add_custom_roles()
   $admin_role->add_cap('vlp_manage_entries');
 }
 register_activation_hook(__FILE__, 'ghes_vlp_add_custom_roles');
+
+function add_vlp_admin_role() {
+  // Gets the simple_role role object.
+  $role = get_role( 'VLP Admin' );
+
+  // Add a new capability.
+  $role->add_cap( 'read', true );
+  $role->add_cap( 'upload_files', true );
+}
+
+// Add simple_role capabilities, priority must be after the initial role definition.
+add_action( 'init', 'add_vlp_admin_role', 11 );
 
 // The following script is used to add arole
 /*

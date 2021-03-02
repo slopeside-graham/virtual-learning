@@ -20,6 +20,7 @@ namespace GHES\VLP {
         private $_AgeGroupTitle;
         private $_Completed;
         private $_PercentComplete;
+        private $_Status;
         private $_DateCreated;
         private $_DateModified;
 
@@ -144,6 +145,20 @@ namespace GHES\VLP {
                 return $this->_PercentComplete;
             }
         }
+
+        protected function Status($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->_Status = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_Status;
+            }
+        }
+
+
         protected function DateCreated($value = null)
         {
             // If value was provided, set the value
@@ -181,9 +196,24 @@ namespace GHES\VLP {
                 'AgeGroupTitle' => $this->AgeGroupTitle,
                 'Completed' => $this->Completed,
                 'PercentComplete' => $this->PercentComplete,
+                'Status' => $this->Status,
                 'DateCreated' => $this->DateCreated,
                 'DateModified' => $this->DateModified,
             ];
+        }
+
+        // Status Values
+        public static function Draft()
+        {
+            return 'Draft';
+        }
+        public static function Published()
+        {
+            return 'Published';
+        }
+        public static function Archived()
+        {
+            return 'Archived';
         }
 
         public function Create()
@@ -199,7 +229,8 @@ namespace GHES\VLP {
                     'StartDate' => $this->StartDate,
                     'EndDate' => $this->EndDate,
                     'Gameboard_id' => $this->Gameboard_id,
-                    'AgeGroup_id' => $this->AgeGroup_id
+                    'AgeGroup_id' => $this->AgeGroup_id,
+                    'Status' => $this->Status
                 ));
                 $this->id = VLPUtils::$db->insertId();
             } catch (\MeekroDBException $e) {
@@ -225,7 +256,8 @@ namespace GHES\VLP {
                     StartDate=%t, 
                     EndDate=%t,
                     Gameboard_id=%i,
-                    AgeGroup_id=%i
+                    AgeGroup_id=%i,
+                    Status=%s
                 WHERE 
                     id=%i",
                     $this->Title,
@@ -233,6 +265,7 @@ namespace GHES\VLP {
                     $this->EndDate,
                     $this->Gameboard_id,
                     $this->AgeGroup_id,
+                    $this->Status,
                     $this->id
                 );
 
@@ -240,9 +273,9 @@ namespace GHES\VLP {
 
                 $theme = Theme::Get($this->id);
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Theme_Update_Error', $e->getMessage());
+                return new \WP_Error('Theme_Update_Database_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_Update_Error', $e->getMessage());
             }
             return $theme;
         }
@@ -261,7 +294,7 @@ namespace GHES\VLP {
                 echo $e->getMessage();
                 return new \WP_Error('Theme_Delete_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_Delete_Error', $e->getMessage());
             }
             return true;
         }
@@ -272,14 +305,26 @@ namespace GHES\VLP {
             VLPUtils::$db->throw_exception_on_error = true;
 
             try {
-
-                $row = VLPUtils::$db->queryFirstRow("
-                select t.*, 
-                    gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
-                from Theme t
-                    Inner Join Gameboard gb on t.Gameboard_id = gb.id
-                    Inner Join AgeGroup ag on t.Agegroup_id = ag.id
-                where t.id = %i", $thisid);
+                if (ghes_vlp_base::UserCanEdit()) {
+                    $SQL = "select t.*, 
+                            gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
+                        from Theme t
+                            Inner Join Gameboard gb on t.Gameboard_id = gb.id
+                            Inner Join AgeGroup ag on t.Agegroup_id = ag.id
+                        where t.id = %i";
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $thisid, Theme::Published());
+                } else {
+                    $SQL = "select t.*, 
+                            gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
+                        from Theme t
+                            Inner Join Gameboard gb on t.Gameboard_id = gb.id
+                            Inner Join AgeGroup ag on t.Agegroup_id = ag.id
+                        where
+                            t.id = %i
+                            and t.Status = %s
+                        ";
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $thisid, Theme::Published());
+                }
 
                 $theme = Theme::populatefromRow($row);
             } catch (\MeekroDBException $e) {
@@ -292,6 +337,8 @@ namespace GHES\VLP {
 
         public static function GetbyDate($date)
         {
+            // This function supports published Themes only..
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -302,9 +349,10 @@ namespace GHES\VLP {
                                                                     Left Join Child_Theme_Status cts on t.id = cts.Theme_id
                                                                 where
                                                                  %? between t.StartDate and t.EndDate
-                                                                 and (cts.Child_id = %i or isnull(cts.Child_id ))", $date, $child_id);
+                                                                 and (cts.Child_id = %i or isnull(cts.Child_id ))
+                                                                 and t.Status=%s", $date, $child_id, Theme::Published());
                 } else {
-                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate", $date);
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate and t.Status=%s", $date, Theme::Published());
                 }
                 if (isset($row)) {
                     $theme = Theme::populatefromRow($row);
@@ -312,46 +360,65 @@ namespace GHES\VLP {
                     return null;
                 }
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Theme_Get_Database_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDate_Database_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDate_Error', $e->getMessage());
             }
             return $theme;
         }
 
         public static function GetbyDateandAgeGroup($date, $agegroupid)
         {
+            // This function supports published Themes only..
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
-            // Get any theme between the dates provided, UNION that with the any theme published before the date provided, order by StartDate desc so that we get the most recent
-            $SQL = 'select t.*, 
-                        cts.Completed, 
-                        cts.PercentComplete 
-                    from Theme t
-                        Left Join Child_Theme_Status cts on t.id = cts.Theme_id and cts.Child_id = %i
-                    where
-                        %t between t.StartDate and t.EndDate
-                        and t.AgeGroup_id = %i
-                    UNION
-                    select t2.*,
-                        cts2.Completed, 
-                        cts2.PercentComplete 
-                    from Theme t2
-                        Left Join Child_Theme_Status cts2 on t2.id = cts2.Theme_id and cts2.Child_id = %i
-                    where
-                        %t > t2.StartDate
-                        and t2.AgeGroup_id = %i
-                    Order By StartDate desc;';
+
             try {
                 if (isset($_COOKIE['VLPSelectedChild'])) {
+                    // Get any theme between the dates provided, UNION that with the any theme published before the date provided, order by StartDate desc so that we get the most recent
+                    $SQL = 'select t.*, 
+                                cts.Completed, 
+                                cts.PercentComplete 
+                            from Theme t
+                                Left Join Child_Theme_Status cts on t.id = cts.Theme_id and cts.Child_id = %i
+                            where
+                                %t between t.StartDate and t.EndDate
+                                and t.AgeGroup_id = %i
+                                and t.Status=%s
+                            UNION
+                            select t2.*,
+                                cts2.Completed, 
+                                cts2.PercentComplete 
+                            from Theme t2
+                                Left Join Child_Theme_Status cts2 on t2.id = cts2.Theme_id and cts2.Child_id = %i
+                            where
+                                %t > t2.StartDate
+                                and t2.AgeGroup_id = %i
+                                and t2.Status=%s
+                            Order By StartDate desc;';
                     $child_id = $_COOKIE['VLPSelectedChild'];
-                    $row = VLPUtils::$db->queryFirstRow($SQL, $child_id, $date, $agegroupid, $child_id, $date, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $child_id, $date, $agegroupid, Theme::Published(), $child_id, $date, $agegroupid, Theme::Published());
                 } else if (isset($_COOKIE['VLPAgeGroupId']) && !isset($_COOKIE['VLPSelectedChild'])) {
-                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate
-                    and AgeGroup_id = %i", $date, $agegroupid);
+                    $SQL = "select t.* 
+                            from
+                                Theme t
+                            where 
+                                %t between t.StartDate and t.EndDate
+                                and t.AgeGroup_id = %i
+                                and t.Status=%s            
+                            UNION
+                            select t2.* 
+                            from Theme t2
+                            where
+                                %t > t2.StartDate
+                                and t2.AgeGroup_id = %i
+                                and t2.Status=%s
+                            Order By StartDate desc;";
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $date, $agegroupid, Theme::Published(), $date, $agegroupid, Theme::Published());
                 } else {
-                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate", $date);
+                    $row = VLPUtils::$db->queryFirstRow("select * from Theme where %t between StartDate and EndDate and Status=%s", $date, Theme::Published());
                 }
                 if (isset($row)) {
                     $theme = Theme::populatefromRow($row);
@@ -359,15 +426,17 @@ namespace GHES\VLP {
                     return null;
                 }
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Theme_Get_Database_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDateandAgeGroup_Database_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDateandAgeGroup_Error', $e->getMessage());
             }
             return $theme;
         }
 
         public static function GetbyDateandAgeGroupNext($themeid, $agegroupid)
         {
+            // This function supports published Themes only..
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -382,44 +451,45 @@ namespace GHES\VLP {
                     where
                         t.StartDate > (Select StartDate from Theme where id=%i)
                         and t.AgeGroup_id = %i
+                        and t.Status=%s
                     Order By StartDate asc;';
-                    $row = VLPUtils::$db->queryFirstRow($SQL, $child_id, $themeid, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $child_id, $themeid, $agegroupid, Theme::Published());
                 } else if (isset($agegroupid) && !isset($_COOKIE['VLPSelectedChild'])) {
-                    $SQL = 'select t.*, 
-                        cts.Completed, 
-                        cts.PercentComplete 
+                    $SQL = 'select t.* 
                     from Theme t
                     where
                         t.StartDate > (Select StartDate from Theme where id=%i)
                         and t.AgeGroup_id = %i
+                        and t.Status=%s
                     Order By StartDate asc;';
-                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid, Theme::Published());
                 } else {
-                    $SQL = 'select t.*, 
-                        cts.Completed, 
-                        cts.PercentComplete 
+                    $SQL = 'select t.* 
                     from Theme t
                     where
                         t.StartDate > (Select StartDate from Theme where id=%i)
+                        and t.Status=%s
                     Order By StartDate asc;';
-                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid, Theme::Published());
                 }
+
                 if (isset($row)) {
                     $theme = Theme::populatefromRow($row);
                 } else {
                     return null;
                 }
-                
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Theme_Get_Database_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDateandAgeGroupNext_Database_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDateandAgeGroupNext_Error', $e->getMessage());
             }
             return $theme;
         }
 
         public static function GetbyDateandAgeGroupPrevious($themeid, $agegroupid)
         {
+            // This function supports published Themes only..
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -434,27 +504,26 @@ namespace GHES\VLP {
                     where
                         t.StartDate < (Select StartDate from Theme where id=%i)
                         and t.AgeGroup_id = %i
+                        and t.Status=%s
                     Order By StartDate desc;';
-                    $row = VLPUtils::$db->queryFirstRow($SQL, $child_id, $themeid, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $child_id, $themeid, $agegroupid, Theme::Published());
                 } else if (isset($agegroupid) && !isset($_COOKIE['VLPSelectedChild'])) {
-                    $SQL = 'select t.*, 
-                        cts.Completed, 
-                        cts.PercentComplete 
+                    $SQL = 'select t.* 
                     from Theme t
                     where
                         t.StartDate < (Select StartDate from Theme where id=%i)
                         and t.AgeGroup_id = %i
+                        and t.Status=%s
                     Order By StartDate desc;';
-                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid, Theme::Published());
                 } else {
-                    $SQL = 'select t.*, 
-                        cts.Completed, 
-                        cts.PercentComplete 
+                    $SQL = 'select t.* 
                     from Theme t
                     where
                         t.StartDate < (Select StartDate from Theme where id=%i)
+                        and t.Status=%s
                     Order By StartDate desc;';
-                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid);
+                    $row = VLPUtils::$db->queryFirstRow($SQL, $themeid, $agegroupid, Theme::Published());
                 }
 
                 if (isset($row)) {
@@ -462,33 +531,36 @@ namespace GHES\VLP {
                 } else {
                     return null;
                 }
-
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Theme_Get_Database_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDateandAgeGroupPrevious_Database_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyDateandAgeGroupPrevious_Error', $e->getMessage());
             }
             return $theme;
         }
 
         public static function GetbyAgeGroup($agegroupid)
         {
+            // This function supports published Themes only..
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
             try {
-                $row = VLPUtils::$db->queryFirstRow("select * from Theme where AgeGroup_id = %i", $agegroupid);
+                $row = VLPUtils::$db->queryFirstRow("select * from Theme where AgeGroup_id = %i and Status=%s", $agegroupid, Theme::Published());
                 $theme = Theme::populatefromRow($row);
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyAgeGroup_Database_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetbyAgeGroup_Error', $e->getMessage());
             }
             return $theme;
         }
 
         public static function GetAllbyAgeGroup($agegroupid)
         {
+            // This function supports published Themes only..
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -507,7 +579,8 @@ namespace GHES\VLP {
                     Inner Join Gameboard gb on t.Gameboard_id = gb.id
                     Inner Join AgeGroup ag on t.Agegroup_id = ag.id
                 Where 
-                    AgeGroup_id = %i", $child_id, $agegroupid);
+                    AgeGroup_id = %i
+                    and Status=%s", $child_id, $agegroupid, Theme::Published());
 
                 foreach ($results as $row) {
                     $theme = Theme::populatefromRow($row);
@@ -515,11 +588,9 @@ namespace GHES\VLP {
 
                 }
             } catch (\MeekroDBException $e) {
-                return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetAllbyAgeGroup_Database_Error', $e->getMessage());
             } catch (Exception $e) {
-                return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
-            } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
+                return new \WP_Error('Theme_GetAllbyAgeGroup_Error', $e->getMessage());
             }
             return $themes;
         }
@@ -533,12 +604,23 @@ namespace GHES\VLP {
             $themes = new NestedSerializable();
 
             try {
-                $results = VLPUtils::$db->query("
-                select t.*, 
-                    gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
-                from Theme t
-                    Inner Join Gameboard gb on t.Gameboard_id = gb.id
-                    Inner Join AgeGroup ag on t.Agegroup_id = ag.id");
+                if (ghes_vlp_base::UserCanEdit()) {
+                    $SQL = "select t.*, 
+                                gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
+                            from Theme t
+                                Inner Join Gameboard gb on t.Gameboard_id = gb.id
+                                Inner Join AgeGroup ag on t.Agegroup_id = ag.id";
+                    $results = VLPUtils::$db->query($SQL);
+                } else {
+                    $SQL = "select t.*, 
+                            gb.Title as GameboardTitle, ag.Name as AgeGroupTitle
+                        from Theme t
+                            Inner Join Gameboard gb on t.Gameboard_id = gb.id
+                            Inner Join AgeGroup ag on t.Agegroup_id = ag.id
+                        WHERE
+                            t.Status=%s";
+                    $results = VLPUtils::$db->query($SQL, Theme::Published());
+                }
 
                 foreach ($results as $row) {
                     $theme = Theme::populatefromRow($row);
@@ -549,8 +631,6 @@ namespace GHES\VLP {
                 return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
             } catch (Exception $e) {
                 return new \WP_Error('Theme_GetAll_Error', $e->getMessage());
-            } catch (Exception $e) {
-                return new \WP_Error('Theme_Get_Error', $e->getMessage());
             }
             return $themes;
         }
@@ -559,8 +639,8 @@ namespace GHES\VLP {
         public static function populatefromRow($row): ?Theme
         {
             if ($row == null)
-            return null;
-            
+                return null;
+
             $theme = new Theme();
             $theme->id = $row['id'];
             $theme->Title = $row['Title'];
@@ -572,6 +652,7 @@ namespace GHES\VLP {
             $theme->AgeGroupTitle = $row['AgeGroupTitle'];
             $theme->Completed = $row['Completed'];
             $theme->PercentComplete = $row['PercentComplete'];
+            $theme->Status = $row['Status'];
             return $theme;
         }
     }

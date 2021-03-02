@@ -396,6 +396,10 @@ $(function () {
                 });
             }
         },
+        sort: {
+            field: "StartDate",
+            dir: "asc"
+        },
         schema: {
             model: {
                 id: "id",
@@ -458,6 +462,7 @@ function AddNewResource() {
                 // refreshes the ListView
                 listView.dataSource.read();
                 listView.refresh();
+                $(".k-grid-update").removeClass("k-state-disabled");
             },
             error: function (result) {
                 hideLoading("#LessonRelatedMaterials");
@@ -510,7 +515,9 @@ function UpdateVideo(video) {
 function ResourceRequired() {
     if (($("#newResourceTitle").val() != "") && ($("#newResourceId").val() != "") || $("#newResourceLink").val() != "") {
         $("#addResource").removeClass("k-state-disabled");
+        $("#addResource").addClass("k-primary");
     } else if ($("#newResourceTitle").val() == "") {
         $("#addResource").addClass("k-state-disabled");
+        $(".k-grid-update").addClass("k-state-disabled");
     }
 }

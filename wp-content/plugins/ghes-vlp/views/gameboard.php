@@ -54,7 +54,7 @@ function vlp_gameboard($atts, $content = null)
     } else if (isset($_COOKIE['VLPAgeGroupId'])) {
         $agegroupid = $_COOKIE['VLPAgeGroupId'];
     } else {
-        $output .= 'No Chid or Age group Selected';
+        $output .= 'No Child or Age group Selected'; 
         return $output;
     }
 
@@ -62,7 +62,7 @@ function vlp_gameboard($atts, $content = null)
 
     if (isset($_GET['theme-date'])) {
         $themedate = $_GET['theme-date'];
-    } else if (isset($_COOKIE['VLPThemeId'])) {
+    } else if (strlen($_COOKIE['VLPThemeId']) > 0) {
         $theme = Theme::Get($_COOKIE['VLPThemeId']);
         $themedate = $theme->StartDate->format('Y-m-d');
     } else {
@@ -82,14 +82,12 @@ function vlp_gameboard($atts, $content = null)
         $themeDateObjectNextWeek = new DateTime($themedate);
         $oneWeek = new DateInterval('P7D');
 
-        $themelastweekdate = $themeDateObjectLastWeek->sub($oneWeek);
-        $themenextweekdate = $themeDateObjectNextWeek->add($oneWeek);
         $themestartdate = $theme->StartDate;
         $themeenddate = $theme->EndDate;
         $themecompleted = $theme->Completed;
         $themepercentcompleted = $theme->PercentComplete;
-        $lastweekstheme = Theme::GetbyDateandAgeGroup($themelastweekdate, $agegroupid);
-        $nextweekstheme = Theme::GetbyDateandAgeGroup($themenextweekdate, $agegroupid);
+        $lastweekstheme = Theme::GetbyDateandAgeGroupPrevious($themeid, $agegroupid);
+        $nextweekstheme = Theme::GetbyDateandAgeGroupNext($themeid, $agegroupid );
 
         if ($themecompleted) {
             $themeprogress = "completed";
@@ -103,6 +101,7 @@ function vlp_gameboard($atts, $content = null)
         $output .= '<div class="navigation-button last-week">';
 
         if (!is_null($lastweekstheme)) {
+            $themelastweekdate = $lastweekstheme->StartDate;
             $output .= '<a href="?theme-date=' . $themelastweekdate->format('Y-m-d') . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $previousWeekButton . '" /></a>';
         }
         $output .= '</div>';
@@ -111,6 +110,7 @@ function vlp_gameboard($atts, $content = null)
 
         $output .= '<div class="navigation-button next-week">';
         if (!is_null($nextweekstheme)) {
+            $themenextweekdate = $nextweekstheme->StartDate;
             $output .= '<a href="?theme-date=' . $themenextweekdate->format('Y-m-d') . '&age-group=' . $agegroupid . '"><img class="nav-btn-img" src="' . $nextWeekButton . '" /></a>';
         }
         $output .= '</div>';
@@ -141,14 +141,15 @@ function vlp_gameboard($atts, $content = null)
                         $lessonprogress = $percentcomplete;
                     }
 
+
                     if ($lesson->Type == 'Play') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/play.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/play.svg');
                     } else if ($lesson->Type == 'Art') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/art.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/art.svg');
                     } else if ($lesson->Type == 'Learn') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/learn.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/learn.svg');
                     } else if ($lesson->Type == 'Nurture') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/nurture.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/nurture.svg');
                     } else {
                         $lessonicon = "No Icon Found";
                     }
@@ -171,13 +172,13 @@ function vlp_gameboard($atts, $content = null)
                     }
 
                     if ($lesson->Type == 'Play') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/play.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/play.svg');
                     } else if ($lesson->Type == 'Art') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/art.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/art.svg');
                     } else if ($lesson->Type == 'Learn') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/learn.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/learn.svg');
                     } else if ($lesson->Type == 'Nurture') {
-                        $lessonicon = file_get_contents(plugin_dir_url(dirname(__FILE__)) . '/assets/icons/nurture.svg');
+                        $lessonicon = file_get_contents(plugin_dir_path(__FILE__) . '../assets/icons/nurture.svg');
                     } else {
                         $lessonicon = "No Icon Found";
                     }

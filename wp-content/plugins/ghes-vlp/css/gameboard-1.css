@@ -35,6 +35,10 @@
         left: 524px;
         bottom: 443px;
     }
+    .L-9-position {
+        left: 665px;
+        bottom: 400px;
+    }
 }
 
 /* Screen Size Max 1199px min 992px */
@@ -74,6 +78,10 @@
         left: 447px;
         bottom: 405px;
     }
+    .L-9-position {
+        left: 570px;
+        bottom: 390px;
+    }
 }
 
 /* Screen Size Max 991px min 768px */
@@ -110,6 +118,10 @@
     .L-8-position {
         left: 337px;
         bottom: 321px;
+    }
+    .L-9-position {
+        left: 440px;
+        bottom: 310px;
     }
 }
 
@@ -149,6 +161,10 @@
         left: 263px;
         bottom: 257px;
     }
+    .L-9-position {
+        left: 343px;
+        bottom: 244px;
+    }
 }
 
 /* Screen Size Max 599px min 500px */
@@ -186,6 +202,10 @@
         left: 225px;
         bottom: 216px;
     }
+    .L-9-position {
+        left: 280px;
+        bottom: 205px;
+    }
 }
 
 /* Screen Size Max 499px and below */
@@ -222,5 +242,9 @@
     .L-8-position {
         grid-column-start: 2;
         grid-row-start: 9;
+    }
+    .L-9-position {
+        grid-column-start: 4;
+        grid-row-start: 10;
     }
 }

@@ -65,7 +65,14 @@ $(function () {
             var dataSource = themedataSource
             $("#themes-listView").kendoListView({
                 dataSource: dataSource,
-                template: kendo.template($("#template").html())
+                template: kendo.template($("#template").html()),
+                dataBound: function(e) {
+                    if(this.dataSource.data().length == 0){
+                        //custom logic
+                        $("#themes-listView").parent().append("<p>&nbsp;</p><h2>No Themes found</h2><p>&nbsp;</p>");
+                        $("#themes-listView").hide();
+                    }
+                },
             });
         });
     });

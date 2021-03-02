@@ -346,6 +346,8 @@ namespace GHES\VLP {
 
         public static function GetAllbyThemeId($themeid)
         {
+            // Function only supports publised themes
+
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
@@ -367,7 +369,9 @@ namespace GHES\VLP {
                         Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id and cls.Child_id = %i
                         Inner Join Theme t on l.Theme_id = t.id
                         Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
-                    where Theme_id = %i", $child_id, $themeid);
+                    where
+                        Theme_id = %i
+                        and t.Status=%s", $child_id, $themeid, Theme::Published());
                 } else {
                     $results = VLPUtils::$db->query("                
                     select l.*, 
@@ -416,7 +420,9 @@ namespace GHES\VLP {
                     Left Join Child_Lesson_Status cls on l.id = cls.Lesson_id and cls.Child_id = %i
                         Inner Join Theme t on l.Theme_id = t.id
                         Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
-                    where t.AgeGroup_id = %i", $child_id, $ageGroupid);
+                    where
+                        t.AgeGroup_id = %i
+                        and t.Status=%s", $child_id, $ageGroupid, Theme::Published());
                 } else {
                     $results = VLPUtils::$db->query("                
                     select l.*, 
@@ -428,7 +434,9 @@ namespace GHES\VLP {
                     from Lesson l
                         Inner Join Theme t on l.Theme_id = t.id
                         Inner Join AgeGroup ag on ag.id = t.AgeGroup_id 
-                    where t.AgeGroup_id = %i", $ageGroupid);
+                    where
+                        t.AgeGroup_id = %i
+                        and t.Status=%s", $ageGroupid, Theme::Published());
                 }
 
                 foreach ($results as $row) {

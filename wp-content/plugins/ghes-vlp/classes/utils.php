@@ -47,29 +47,33 @@ namespace GHES\VLP {
         public static function CheckLoggedInParent()
         {
             $user = wp_get_current_user();
-            if (!ghes_vlp_base::UserIsParent()) {
+            if (current_user_can('manage_options')) {
+                return;
+            } else if (!ghes_vlp_base::UserIsParent()) {
                 $registrationpage = get_permalink(esc_attr(get_option('registration_welcome_url')));
                 header("Location: $registrationpage");
             }
         }
         public static function CheckLoggedInVLPParent()
         {
-            if (!ghes_vlp_base::UserIsVLPParent()) {
+            if (current_user_can('manage_options')) {
+                return;
+            } else if (!ghes_vlp_base::UserIsVLPParent()) {
                 $profilepage = get_permalink(esc_attr(get_option('registration_welcome_url')));
                 header("Location: $profilepage");
             }
         }
-        public static function CheckSubscriptionStatus() {
+        public static function CheckSubscriptionStatus()
+        {
             $userid = \GHES\Parents::UserID();
             $parentid = \GHES\Parents::GetByUserID(get_current_user_id())->id;
             $currentSubscriptions = Subscription::GetAllCurrentByParentId($parentid);
 
-            if($currentSubscriptions->jsonSerialize()) {
+            if ($currentSubscriptions->jsonSerialize()) {
                 Utils::AddVLPRole($userid);
             } else {
                 Utils::RemoveVLPRole($userid);
             }
         }
-
     }
 }

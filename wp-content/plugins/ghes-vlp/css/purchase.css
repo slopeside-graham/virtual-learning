@@ -12,6 +12,7 @@
 
 .purchase-vll-billing {
     display: none;
+    padding: 40px;
 }
 
 .purchase-vll-billing .three-column {
@@ -49,6 +50,7 @@
 .vll-links {
     display: flex;
     justify-content: space-around;
+    padding: 40px;
 }
 
 .vll-links a {

@@ -66,8 +66,9 @@ function vlp_cancel_confirmation($atts, $content = null)
     }
     $output .= '</ul>';
 
-    $output .= '<hr>';
+
     $output .= '<div class="vll-links">';
+    $output .= '<hr>';
 
     $managesubscriptionlink = get_permalink(esc_attr(get_option('vlp-manage')));
     $launchgameboardlink = get_permalink(esc_attr(get_option('vlp-agetree'))) . '?destination=Gameboard';

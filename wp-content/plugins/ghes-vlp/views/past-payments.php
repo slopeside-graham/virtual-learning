@@ -64,8 +64,9 @@ function vlp_past_payments($atts, $content = null)
 
         $output .= '</ul>';
         $output .= '</div>';
-        $output .= '<hr>';
+
         $output .= '<div class="vll-links">';
+        $output .= '<hr>';
 
         $managesubscriptionlink = get_permalink(esc_attr(get_option('vlp-manage')));
         $launchgameboardlink = get_permalink(esc_attr(get_option('vlp-agetree'))) . '?destination=Gameboard';

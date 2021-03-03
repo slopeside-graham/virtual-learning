@@ -15,8 +15,8 @@ use GHES\VLP\SubscriptionPayment;
 
 function enqueue_payment_confirmation_scripts()
 {
-    enqueue_kendo_scripts();
-    wp_enqueue_script('wp-api-frontend-utils');
+    //enqueue_kendo_scripts();
+    //wp_enqueue_script('wp-api-frontend-utils');
     wp_enqueue_script('wp-api-payment-confirmation');
     wp_enqueue_style('print-vlp-style');
 }
@@ -72,6 +72,7 @@ function vlp_payment_confirmation($atts, $content = null)
     }
 
     $output .= '<div class="vll-links">';
+    $output .= '<hr>';
 
     $managesubscriptionlink = get_permalink(esc_attr(get_option('vlp-manage')));
     $launchgameboardlink = get_permalink(esc_attr(get_option('vlp-agetree'))) . '?destination=Gameboard';

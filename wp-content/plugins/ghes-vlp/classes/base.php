@@ -42,6 +42,12 @@ namespace GHES\VLP {
       return ghes_vlp_base::$_UserIsDirector || \current_user_can('Reg-Admin') || \current_user_can('administrator');
     }
 
+    public static function UserCanEdit()
+    {
+      ghes_vlp_base::init();
+      return  \current_user_can('vlp_manage_entries') || \current_user_can('administrator');
+    }
+
     public static function UserEmail()
     {
       ghes_vlp_base::init();

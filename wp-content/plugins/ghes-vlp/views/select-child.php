@@ -54,10 +54,11 @@ function vlp_select_child($atts, $content = null)
         exit;
     } else if ($children->count() < 1) {
         setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
-        $output .= "<p>You have no children registered, so your progress will not be tracked.</p>";
+        $output .= "<p>You have no children registered in this age group, so your progress will not be tracked.</p>";
         $output .= '<ul>';
+        $output .= '<li><a href="' . get_permalink(get_option('vlp-agetree')) . '?destination=' . $destination . '">Select a Different Age Group</a></li>';
         $output .= '<li><a href="' . $destinationURL . '">Continue to Virtual Learning</a></li>';
-        $output .= '<li><a href="' . get_option('parent_profile_url') . '">Manage Children</a></li>';
+        $output .= '<li><a href="' . get_permalink(get_option('add_edit_children_url')) . '">Add/Edit Children</a></li>';
         return $output;
     } else if ($children->count() > 1) {
         setcookie('VLPAgeGroupId', $agegroupid, 0, '/');

@@ -226,7 +226,7 @@ img.nav-btn-img {
 }
 
 .resources a {
-    color: white;
+    color: white !important;
     border-bottom: none !important;
 }
 

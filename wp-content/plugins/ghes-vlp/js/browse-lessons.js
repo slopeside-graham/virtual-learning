@@ -41,7 +41,7 @@ $(function () {
                 },
             },
             sort: {
-                field: "Title",
+                field: "ThemeTitle",
                 dir: "asc"
             },
             schema: {

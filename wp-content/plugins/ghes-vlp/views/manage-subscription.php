@@ -40,12 +40,6 @@ function vlp_manage_subscription($atts, $content = null)
 
     $subscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
     if ($subscriptions->jsonSerialize()) {
-        foreach ($subscriptions->jsonSerialize() as $k => $subscription) {
-            if ($subscription->Status != "Cancelled") {
-                $output .= "Subscription Active";
-            }
-        } 
-
         $unpaidSubscriptions = GHES\VLP\Subscription::GetAllActiveByParentId($parentid);
         if ($unpaidSubscriptions->jsonSerialize()) {
 
@@ -63,7 +57,7 @@ function vlp_manage_subscription($atts, $content = null)
                 if ($currentUnpaidSubscription->Status == 'Unpaid') {
                     $output .= '<li data-subscriptionId="' . $currentUnpaidSubscription->id . '" data-subscriptionType="' . $currentUnpaidSubscription->PaymentFrequency . '">' . $subscriptionDefinition->Name . ' - ' . $currentUnpaidSubscription->StartDate . ' - ' . $currentUnpaidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments. ';
                 } else {
-                    $output .= '<li data-subscriptionId="' . $currentUnpaidSubscription->id . '" data-subscriptionType="' . $currentUnpaidSubscription->PaymentFrequency . '">' . $currentUnpaidSubscription->Status . ': ' . $subscriptionDefinition->Name . ' - ' . $currentUnpaidSubscription->StartDate . ' - ' . $currentUnpaidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments. ';
+                    $output .= '<li data-subscriptionId="' . $currentUnpaidSubscription->id . '" data-subscriptionType="' . $currentUnpaidSubscription->PaymentFrequency . '"><strong>' . $currentUnpaidSubscription->Status . ':</strong> ' . $subscriptionDefinition->Name . ' - ' . $currentUnpaidSubscription->StartDate . ' - ' . $currentUnpaidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments. ';
                 }
                 if ($currentUnpaidSubscription->Status != 'Cancelled' && $currentUnpaidSubscription->Status !=  'Unpaid') {
                     $output .= '<button class="cancel-button cancel-btn" onclick="openCancelDialog(this)">Cancel Subscription</button>';
@@ -96,15 +90,14 @@ function vlp_manage_subscription($atts, $content = null)
                 $subscriptionPayments = GHES\VLP\SubscriptionPayment::GetUpcomingBySubscriptionId($futureUnpaidSubscription->id);
                 if ($subscriptionPayments->jsonSerialize()) {
                     $output .= '<h3>Upcoming Payments</h3>';
-                    $output .= '<p>The below items are due in the future. You are welcome to pay for them early if you like. If you are enrolled in automatic billing the payments will be automatically paid.</p>';
-                    $output .= '<p>If you would like to pay fo future months, please select the items to pay for and click the "Pay Now" button.</p>';
-                    $output .= '<ul>';
+                    $output .= '<p>See below for future payments due. If you would like to pay these early, please select the months and click the “Pay Now” button. If you are enrolled in automatic billing payments will be automatically charged to the card on file.</p>';
+                    //$output .= '<ul>';
                     if ($futureUnpaidSubscription->PaymentFrequency == "yearly") {
                         $paymentFrequency = "Yearly";
                     } else if ($futureUnpaidSubscription->PaymentFrequency == "monthly") {
                         $paymentFrequency = "Monthly";
                     }
-                    $output .= '<li>' . $subscriptionDefinition->Name . ' - ' . $futureUnpaidSubscription->StartDate . ' - ' . $futureUnpaidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments.</li>';
+                    //$output .= '<li>' . $subscriptionDefinition->Name . ' - ' . $futureUnpaidSubscription->StartDate . ' - ' . $futureUnpaidSubscription->EndDate . ' - ' . $paymentFrequency . ' Payments.</li>';
                     $output .= '<ul class="checkbox-list">';
                     if ($subscriptionPayments->jsonSerialize()) {
                         foreach ($subscriptionPayments->jsonSerialize() as $k => $subscriptionPayment) {
@@ -114,9 +107,9 @@ function vlp_manage_subscription($atts, $content = null)
                                 $checked = null;
                             }
                             if ($subscriptionPayment->Status == 'Unpaid') {
-                                $output .= '<li><label><input type="checkbox" ' .  $checked . ' class="future-due subscription-payment" data-id="' . $subscriptionPayment->id . '" data-status="' . $subscriptionPayment->Status . '"" value="' . $subscriptionPayment->Amount . '"> Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
+                                $output .= '<li><label><input type="checkbox" ' .  $checked . ' class="future-due subscription-payment" data-id="' . $subscriptionPayment->id . '" data-status="' . $subscriptionPayment->Status . '"" value="' . $subscriptionPayment->Amount . '"> $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
                             } else {
-                                $output .= '<li><label><input type="checkbox" ' .  $checked . ' class="future-due subscription-payment" data-id="' . $subscriptionPayment->id . '" data-status="' . $subscriptionPayment->Status . '"" value="' . $subscriptionPayment->Amount . '"> ' . $subscriptionPayment->Status . ' - Amount: $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
+                                $output .= '<li><label><input type="checkbox" ' .  $checked . ' class="future-due subscription-payment" data-id="' . $subscriptionPayment->id . '" data-status="' . $subscriptionPayment->Status . '"" value="' . $subscriptionPayment->Amount . '"> $' . $subscriptionPayment->Amount . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->StartDate)) . ' - ' . date('m/d/Y', strtotime($subscriptionPayment->EndDate)) . '</label></li>';
                             }
                         }
                     } else {
@@ -125,7 +118,7 @@ function vlp_manage_subscription($atts, $content = null)
                     $output .= '</ul>';
                 }
             }
-            $output .= '</ul>';
+            //$output .= '</ul>';
 
             $output .= '<h3 class="total-due">Total Due: $0.00</h3><br/>';
 

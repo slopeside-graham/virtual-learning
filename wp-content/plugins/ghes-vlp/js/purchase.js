@@ -174,7 +174,7 @@ function purchaseSubscription() {
 }
 
 function pendingPayment(payment) {
-    displayLoading('.entry-content');
+    displayLoading('.checkbox-list');
     $.ajax({
         url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
         method: "PUT",
@@ -188,7 +188,7 @@ function pendingPayment(payment) {
         },
         success: function (result) {
             calculateTotal();
-            hideLoading('.entry-content');
+            hideLoading('.checkbox-list');
             console.log("Success:" + result);
             //Success!
             window.dataLayer = window.dataLayer || [];
@@ -196,7 +196,7 @@ function pendingPayment(payment) {
         },
         error: function (result) {
             console.log("Update Payment Status to Pending Failed");
-
+            hideLoading('.checkbox-list');
             if (typeof result.responseJSON !== "undefined") {
                 alert(result.responseJSON.message);
             } else {
@@ -204,14 +204,14 @@ function pendingPayment(payment) {
                     "An unexpected error occured.  Please review your submission and try again."
                 );
             }
-            hideLoading('.entry-content');
+            
             console.log(result.responseText);
         }
     })
 }
 
 function unpendingPayment(payment) {
-    displayLoading('.entry-content');
+    displayLoading('.checkbox-list');
     $.ajax({
         url: wpApiSettings.root + "ghes-vlp/v1/subscriptionpayment",
         method: "PUT",
@@ -225,14 +225,14 @@ function unpendingPayment(payment) {
         },
         success: function (result) {
             calculateTotal();
-            hideLoading('.entry-content');
+            hideLoading('.checkbox-list');
             console.log("Success:" + result);
             //Success!
             window.dataLayer = window.dataLayer || [];
         },
         error: function (result) {
             console.log("Update Status to Unpaid Failed");
-
+            hideLoading('.checkbox-list');
             if (typeof result.responseJSON !== "undefined") {
                 alert(result.responseJSON.message);
             } else {
@@ -240,7 +240,7 @@ function unpendingPayment(payment) {
                     "An unexpected error occured.  Please review your submission and try again."
                 );
             }
-            hideLoading('.entry-content');
+            
             console.log(result.responseText);
         }
     })

@@ -14,7 +14,14 @@
 #lessons-listView .browse-lessons {
     display: grid;
     grid-template-columns: 50px 20px 3fr 5px 2fr 100px 10px 70px;
+    grid-template-rows: minmax(65px, 1fr);
     align-items: end;
+}
+.browse-lessons span {
+    align-self: stretch;
+    display: inline-flex;
+    align-items: flex-end;
+    min-height: 65px;
 }
 .browse-lesson-icon svg {
     border-radius: 50%;
@@ -48,32 +55,27 @@
 .browse-lesson-theme-title {
     background-color: #e1edf4;
     padding-left: 20px;
-    padding-top: 30px;
     font-weight: 600;
     font-style: italic;
     font-size: 23px;
     color: #1a71ad;
     border-bottom: 1px solid #1a71ad;
-    padding-bottom: 5px;
 }
 .browse-lesson-title {
     background-color: #fef2e5;
     padding-left: 20px;
-    padding-top: 30px;
+    padding-right: 20px;
     font-weight: 400;
     font-size: 23px;
     color: #1a71ad;
     border-bottom: 1px solid #1a71ad;
-    padding-bottom: 5px;
 }
 .browse-lesson-go-btn {
-    padding-top: 30px;
     text-align: right;
     font-weight: 400;
     font-size: 23px;
     color: #1a71ad;
     border-bottom: 1px solid #1a71ad;
-    padding-bottom: 5px;
 }
 .browse-lesson-spacer-blue {
     background-color: #e1edf4;

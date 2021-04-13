@@ -34,7 +34,7 @@ $(function () {
             },
             sort: {
                 field: "StartDate",
-                dir: "asc"
+                dir: "desc"
             },
             schema: {
                 model: {

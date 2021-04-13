@@ -34,18 +34,21 @@ function vlp_select_child($atts, $content = null)
     } else if ($destination == "Themes") {
         $destinationURL = get_permalink(get_option("vlp-themes"));
     } else {
-        return "Please return to the Virtual Learning Page and select an option.";
+        $destinationURL = get_permalink(get_option("vlp-gameboard"));
     }
 
-    $ageGroup = AgeGroup::Get($agegroupid);
+    if ($agegroupid) {
+        $ageGroup = AgeGroup::Get($agegroupid);
+        $ageStartInterval = new DateInterval('P' . $ageGroup->AgeStart . 'M');
+        $ageEndInterval = new DateInterval('P' . $ageGroup->AgeEnd . 'M');
+        $ageEndDate = (new DateTime(date("Y-m-d")))->sub($ageStartInterval);
+        $ageStartDate = (new DateTime(date("Y-m-d")))->sub($ageEndInterval);
 
-    $ageStartInterval = new DateInterval('P' . $ageGroup->AgeStart . 'M');
-    $ageEndInterval = new DateInterval('P' . $ageGroup->AgeEnd . 'M');
-    $ageEndDate = (new DateTime(date("Y-m-d")))->sub($ageStartInterval);
-    $ageStartDate = (new DateTime(date("Y-m-d")))->sub($ageEndInterval);
+        $children = Children::GetAllByAge($ageEndDate, $ageStartDate);
+    } else {
+        $children = Children::GetAll();
+    }
 
-
-    $children = Children::GetAllByAge($ageEndDate, $ageStartDate);
     if ($children->count() == 1) {
 
         setcookie('VLPSelectedChild', $children->jsonSerialize()[0]->id, 0, '/');
@@ -69,11 +72,17 @@ function vlp_select_child($atts, $content = null)
             $childFirstName = $child->FirstName;
             $childLastName = $child->LastName;
             $childDOB = $child->DOB->format('l F j, Y');
-            $output .= '<div class="single-child">';
-            $output .= '<span class="Child-First-Name">' . $childFirstName . '</span> ';
-            $output .= '<span class="Child-Last-Name">' . $childLastName . '</span><br/>';
-            $output .= '<a href="' . $destinationURL . '" data-child-id="' . $child->id . '" onclick="setChildID(this)">Select Child</a>';
-            $output .= '</div>';
+            $childAgeMonths = $child->DOB->diff(new DateTime('today'))->m;
+            $childAgeYears = ($child->DOB->diff(new DateTime('today'))->y) * 12;
+            $childAgeTotalMonths = $childAgeMonths + $childAgeYears;
+            $childAgeGroup = AgeGroup::GetByAgeMonths($childAgeTotalMonths);
+            if ($childAgeGroup) {
+                $output .= '<div class="single-child">';
+                $output .= '<span class="Child-First-Name">' . $childFirstName . '</span> ';
+                $output .= '<span class="Child-Last-Name">' . $childLastName . '</span><br/>';
+                $output .= '<a href="' . $destinationURL . '" data-child-id="' . $child->id . '" data-child-age-group="' . $childAgeGroup->id . '" onclick="setChildID(this)">Select Child</a>';
+                $output .= '</div>';
+            }
         }
 
         $output .= '</div>';

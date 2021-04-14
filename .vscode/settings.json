@@ -1,0 +1,6 @@
+{
+    "sync.autoUpload": true,
+    "sync.forceDownload": true,
+    "sync.quietSync": true,
+    "php.validate.executablePath": "/usr/bin/php"
+}

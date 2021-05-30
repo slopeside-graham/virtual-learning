@@ -249,6 +249,51 @@ namespace GHES\VLP {
             return true;
         }
 
+        public function CreateFreeSubscription()
+        {
+
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            try {
+                \DB::startTransaction();
+
+                VLPUtils::$db->insert('Subscription', array(
+                    'id' => $this->id,
+                    'ParentID' => $this->ParentID,
+                    'StartDate' => $this->StartDate,
+                    'EndDate' => $this->EndDate,
+                    'Status' => "Paid",
+                    'PaymentFrequency' => "Once",
+                    'SubscriptionDefinition_id' => $this->SubscriptionDefinition_id,
+                    'Total' => 0,
+                    'RecurringBilling' => 0
+                ));
+                $this->id = VLPUtils::$db->insertId();
+                // Create Subsciption Payments
+                try {
+                    $subscriptionpayment = new SubscriptionPayment();
+
+                    $subscriptionpayment->Status = "Paid";
+                    $subscriptionpayment->Amount = 0;
+                    $subscriptionpayment->Subscription_id = $this->id;
+                    $subscriptionpayment->StartDate = new \DateTime($this->StartDate);
+                    $subscriptionpayment->EndDate = new \DateTime($this->EndDate);
+                    $subscriptionpayment->Payment_id = null;
+
+                    $subscriptionpayment->CreateFromFreeSubscription();
+                } catch (\MeekroDBException $e) {
+                    \DB::rollback();
+                    return new \WP_Error('Subscription_Create_Error', $e->getMessage());
+                }
+            } catch (\MeekroDBException $e) {
+                \DB::rollback();
+                return new \WP_Error('Subscription_Create_Error', $e->getMessage());
+            }
+            \DB::commit();
+            return true;
+        }
+
         public function Update()
         {
 

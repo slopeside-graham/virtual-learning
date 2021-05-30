@@ -191,6 +191,30 @@ namespace GHES\VLP {
             return true;
         }
 
+        public function CreateFromFreeSubscription()
+        {
+
+            VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
+            VLPUtils::$db->throw_exception_on_error = true;
+
+            try {
+
+                VLPUtils::$db->insert('SubscriptionPayment', array(
+                    'id' => $this->id,
+                    'Status' => $this->Status,
+                    'Amount' => $this->Amount,
+                    'Subscription_id' => $this->Subscription_id,
+                    'StartDate' => $this->StartDate,
+                    'EndDate' => $this->EndDate,
+                    'Payment_id' => $this->Payment_id
+                ));
+                $this->id = VLPUtils::$db->insertId();
+            } catch (\MeekroDBException $e) {
+                return new \WP_Error('SubscriptionPayment_Create_Error', $e->getMessage());
+            }
+            return true;
+        }
+
         public function Update()
         {
 

@@ -1,5 +1,7 @@
 <?php
 
+// phpinfo();
+
 use GHES\Utils;
 use GHES\VLP\Utils as VLPUtils;
 

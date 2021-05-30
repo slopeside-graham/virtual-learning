@@ -1,7 +1,9 @@
 <?php
 
+use Awf\Date\Date;
 use GHES\Utils;
 use GHES\ghes_base;
+use GHES\VLP\Subscription;
 
 /*****************************************
      Cookies Authentication
@@ -16,6 +18,16 @@ function enqueue_vlp_welcome_api_scripts()
 
 function vlp_welcome()
 {
+
+    // This is for testing only. Remove once done
+    /*
+    $freeSubscription = new GHES\VLP\Subscription();
+
+    $freeSubscription->ParentID = 26;
+    $freeSubscription->StartDate = new Date();
+    $freeSubscription->EndDate = new Date();
+    $freeSubscription->SubscriptionDefinition_id = 1;
+    */
 
     Utils::redirectNotLoggedIn();
     GHES\VLP\Utils::CheckSubscriptionStatus();

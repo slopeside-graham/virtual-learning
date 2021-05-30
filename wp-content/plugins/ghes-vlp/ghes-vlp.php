@@ -94,6 +94,9 @@ function register_vlp_script_style_frontend()
   wp_register_script('wp-api-gameboard-archive', plugins_url('ghes-vlp/js/gameboard-archive.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-gameboard-archive', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
+  wp_register_style('vll-style', plugins_url('/ghes-vlp/css/reg-style.css'), array(), scriptver);
+  wp_enqueue_style('vll-style');
+
   wp_register_style('browse-themes-style', plugins_url('/ghes-vlp/css/browse-themes.css'), array(), scriptver);
   wp_enqueue_style('browse-themes-style');
 

@@ -1,0 +1,15 @@
+.vlp-section {
+    display: block;
+}
+.vlp-section .button-links {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 50%;
+    margin: auto;
+    column-gap: 20px;
+}
+.vlp-section .button-links a {
+    flex-grow: 1;
+    text-align: center;
+}

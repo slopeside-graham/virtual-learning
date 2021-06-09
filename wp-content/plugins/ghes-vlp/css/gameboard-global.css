@@ -57,10 +57,33 @@
 img.nav-btn-img {
     max-width: 200px !important;
 }
-
-.view-all-weeks-btn {
-    margin-top: 20px;
-    display: block;
+.vll-navigation-buttons {
+    display: grid;
+    grid-template-columns: 60% 40%;
+}
+.vll-first-column {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #11A899;
+    padding: 5px;
+}
+.vll-second-column {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #1A73B7;
+    padding: 5px;
+}
+.age-name {
+    color: white;
+    text-align: center;
+}
+.age-name .child-first-name {
+    font-weight: 700;
+}
+.childrenicons {
+    max-height: 40px;
 }
 
 .last-week {

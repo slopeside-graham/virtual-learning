@@ -41,3 +41,6 @@ add_shortcode( 'vlp_welcome', 'vlp_welcome' );
 
 include_once(plugin_dir_path( __FILE__ ) . 'views/payment-history.php'); 
 add_shortcode( 'vlp_parent_payment_history', 'vlp_parent_payment_history' );
+
+include_once(plugin_dir_path( __FILE__ ) . 'views/manage-payment-methods.php'); 
+add_shortcode( 'vlp_parent_payment_method', 'vlp_parent_payment_method' );

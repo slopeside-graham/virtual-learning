@@ -22,6 +22,7 @@ namespace GHES\VLP {
         private $_CardNumber;
         private $_ExpirationDate;
         private $_CardCode;
+        private $_CardType;
 
         private $_AccountType;
         private $_EcheckType;
@@ -111,6 +112,19 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_CardCode;
+            }
+        }
+
+        protected function CardType($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                // Do not set this for AN, it is detected by automatically.
+                $this->_CardType = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_CardType;
             }
         }
 
@@ -295,7 +309,26 @@ namespace GHES\VLP {
         {
             // Look at what in in this and make it return that
             return [
-                'id' => $this->id
+                'id' => $this->id,
+                'CardNumber' => $this->CardNumber,
+                'ExpirationDate' => $this->ExpirationDate,
+                'CardType' => $this->CardType,
+
+                'AccountType' => $this->AccountType,
+                'EcheckType' => $this->EcheckType,
+                'RoutingNumber' => $this->RoutingNumber,
+                'AccountNumber' => $this->AccountNumber,
+                'NameOnAccount' => $this->NameOnAccount,
+                'BankName' => $this->BankName,
+
+                'FirstName' => $this->FirstName,
+                'LastName' => $this->LastName,
+                'Address' => $this->Address,
+                'City' => $this->City,
+                'State' => $this->State,
+                'Zip' => $this->Zip,
+                'Country' => $this->Country,
+                'PhoneNumber' => $this->PhoneNumber
             ];
         }
 
@@ -362,6 +395,8 @@ namespace GHES\VLP {
             $response = $controller->executeWithApiResponse($this->getEnvironment());
 
             if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+                // Create the PaymentMethod Record
+                $PaymentMethod = PaymentMethod::CreateFromAN($response);
                 // Ignore error below - nothig to be done about it.
                 $response->getCustomerPaymentProfileId();
             } else {
@@ -383,10 +418,74 @@ namespace GHES\VLP {
             $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
             $customerPaymentProfile->id = $customerPaymentProfileId;
             $customerPaymentProfile->updateCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId);
+
+            return $customerPaymentProfile;
         }
 
 
         function updateCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId)
+        {
+            $merchantAuthentication = $this->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            $request = new AnetAPI\GetCustomerPaymentProfileRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setCustomerProfileId($customerProfileId);
+            $request->setCustomerPaymentProfileId($customerPaymentProfileId);
+
+            $controller = new AnetController\GetCustomerPaymentProfileController($request);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+
+                $paymentMethod = new AnetAPI\PaymentType();
+
+                if (!is_null($this->_ancreditCard->getcardCode()) && !is_null($this->_ancreditCard->getcardNumber()) && !is_null($this->_ancreditCard->getexpirationDate())) {
+                    $paymentMethod->setCreditCard($this->_ancreditCard);
+                } else if (!is_null($this->_anbankAccount->getaccountType() && !is_null($this->_anbankAccount->getroutingNumber()) && !is_null($this->_anbankAccount->getAccountNumber()) && !is_null($this->_anbankAccount->getNameOnAccount()) && !is_null($this->_anbankAccount->getEcheckType()) && !is_null($this->_anbankAccount->getBankName()))) {
+                    $paymentMethod->setBankAccount($this->_anbankAccount);
+                } else {
+                    return new \Exception('Something is wrong with your payment method. Please double check and try again.');
+                }
+
+                $paymentprofile = new AnetAPI\CustomerPaymentProfileExType();
+                $paymentprofile->setBillTo($this->_anBillTo);
+                $paymentprofile->setCustomerPaymentProfileId($customerPaymentProfileId);
+                $paymentprofile->setPayment($paymentMethod);
+
+                // We're updating the billing address but everything has to be passed in an update
+                // For card information you can pass exactly what comes back from an GetCustomerPaymentProfile
+                // if you don't need to update that info
+
+                // Update the Customer Payment Profile object
+
+
+                // Submit a UpdatePaymentProfileRequest
+                $request = new AnetAPI\UpdateCustomerPaymentProfileRequest();
+                $request->setMerchantAuthentication($merchantAuthentication);
+                $request->setCustomerProfileId($customerProfileId);
+                $request->setPaymentProfile($paymentprofile);
+
+                $controller = new AnetController\UpdateCustomerPaymentProfileController($request);
+                $response = $controller->executeWithApiResponse($this->getEnvironment());
+                if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+                    return $response;
+                } else if ($response != null) {
+                    $errorMessages = $response->getMessages()->getMessage();
+                    echo "Failed to Update Customer Payment Profile :  " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+                }
+                return $response;
+            } else {
+                $errorMessages = $response->getMessages()->getMessage();
+                echo "Failed to Get Customer Payment Profile :  " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+            }
+
+            return $response;
+        }
+
+        function Update()
         {
             $merchantAuthentication = $this->setMerchantAuthentication();
 
@@ -496,22 +595,97 @@ namespace GHES\VLP {
             return $paymentProfiles;
         }
 
+        public static function Get($id)
+        {
+            $parent = \GHES\Parents::GetByUserID(get_current_user_id());
+
+            $customerProfileId = $parent->customerProfileId;
+            $customerProfile = customerProfile::Get($customerProfileId);
+
+            $merchantAuthentication = $this->setMerchantAuthentication(); //TODO: How do I make this work?
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            //request requires customerProfileId and customerPaymentProfileId
+            $request = new AnetAPI\GetCustomerPaymentProfileRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setCustomerProfileId($customerProfileId);
+            $request->setCustomerPaymentProfileId($id);
+
+            $controller = new AnetController\GetCustomerPaymentProfileController($request);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            if (($response != null)) {
+                if ($response->getMessages()->getResultCode() == "Ok") {
+                    return $response;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+            return $response;
+        }
+
+        public function GetByPaymentMethod($PaymentMethod)
+        {
+            $parent = \GHES\Parents::GetByUserID(get_current_user_id());
+
+            $customerProfileId = $PaymentMethod->customerProfileId;
+            $customerPaymentProfileId = $PaymentMethod->customerPaymentProfileId;
+
+            //$customerProfile = customerProfile::Get($customerProfileId);
+
+            $merchantAuthentication = $this->setMerchantAuthentication();
+
+            // Set the transaction's refId
+            $refId = 'ref' . time();
+
+            //request requires customerProfileId and customerPaymentProfileId
+            $request = new AnetAPI\GetCustomerPaymentProfileRequest();
+            $request->setMerchantAuthentication($merchantAuthentication);
+            $request->setRefId($refId);
+            $request->setCustomerProfileId($customerProfileId);
+            $request->setCustomerPaymentProfileId($customerPaymentProfileId);
+
+            $controller = new AnetController\GetCustomerPaymentProfileController($request);
+            $response = $controller->executeWithApiResponse($this->getEnvironment());
+            if (($response != null)) {
+                if ($response->getMessages()->getResultCode() == "Ok") {
+                    $this->populatefromAN($response);
+                    return $this;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+
         public static function populatefromANobject($row): ?customerPaymentProfile
         {
             if ($row == null)
                 return null;
 
             $customerPaymentProfile = new customerPaymentProfile();
-            $customerPaymentProfile->id = $row->getanCustomerPaymentProfileId();
-            $customerPaymentProfile->CardNumber = $row->getPayment()->getCreditCard();
-            $customerPaymentProfile->ExpirationDate = $row->getPayment()->getCreditCard();
-            $customerPaymentProfile->CardCode = $row->getPayment()->getCreditCard();
-            $customerPaymentProfile->AccountType = $row->getPayment()->getBankAccount()->getAccountType();
-            $customerPaymentProfile->EcheckType = $row->getPayment()->getBankAccount()->getECheckType();
-            $customerPaymentProfile->RoutingNumber = $row->getPayment()->getBankAccount()->getRoutingNumber();
-            $customerPaymentProfile->AccountNumber = $row->getPayment()->getBankAccount()->getAccountNumber();
-            $customerPaymentProfile->NameOnAccount = $row->getPayment()->getBankAccount()->getNameOnAccount();
-            $customerPaymentProfile->BankName = $row->getPayment()->getBankAccount()->getBankName();
+            $customerPaymentProfile->id = $row->getCustomerPaymentProfileId();
+            //Only populate if it is a Credit Card
+            if ($row->getPayment()->getCreditCard() != null) {
+                $customerPaymentProfile->CardNumber = $row->getPayment()->getCreditCard()->getCardNumber();
+                $customerPaymentProfile->ExpirationDate = $row->getPayment()->getCreditCard()->getExpirationDate();
+                // Cannot get card code. Illegal. $customerPaymentProfile->CardCode = $row->getPayment()->getCreditCard()->getCardCode();
+                $customerPaymentProfile->CardType = $row->getPayment()->getCreditCard()->getCardType();
+            }
+            //Only Populate if it is a bank account
+            if ($row->getPayment()->getbankAccount() != null) {
+                $customerPaymentProfile->AccountType = $row->getPayment()->getAccountType();
+                $customerPaymentProfile->EcheckType = $row->getPayment()->getBankAccount()->getECheckType();
+                $customerPaymentProfile->RoutingNumber = $row->getPayment()->getBankAccount()->getRoutingNumber();
+                $customerPaymentProfile->AccountNumber = $row->getPayment()->getBankAccount()->getAccountNumber();
+                $customerPaymentProfile->NameOnAccount = $row->getPayment()->getBankAccount()->getNameOnAccount();
+                $customerPaymentProfile->BankName = $row->getPayment()->getBankAccount()->getBankName();
+            }
             $customerPaymentProfile->FirstName = $row->getBillto()->getFirstName();
             $customerPaymentProfile->LastName = $row->getBillto()->getLastName();
             $customerPaymentProfile->Address = $row->getBillto()->getAddress();
@@ -521,6 +695,40 @@ namespace GHES\VLP {
             $customerPaymentProfile->Country = 'USA';
             $customerPaymentProfile->PhoneNumber = $row->getBillto()->getPhoneNumber();
             return $customerPaymentProfile;
+        }
+
+        public function populatefromAN($row): ?customerPaymentProfile
+        {
+            if ($row == null)
+                return null;
+
+            $row = $row->getPaymentProfile();
+            $this->id = $row->getCustomerPaymentProfileId();
+            //Only populate if it is a Credit Card
+            if ($row->getPayment()->getCreditCard() != null) {
+                $this->CardNumber = $row->getPayment()->getCreditCard()->getCardNumber();
+                $this->ExpirationDate = $row->getPayment()->getCreditCard()->getExpirationDate();
+                // Cannot get card code. Illegal. $this->CardCode = $row->getPayment()->getCreditCard()->getCardCode();
+                $this->CardType = $row->getPayment()->getCreditCard()->getCardType();
+            }
+            //Only Populate if it is a bank account
+            if ($row->getPayment()->getbankAccount() != null) {
+                $this->AccountType = $row->getPayment()->getAccountType();
+                $this->EcheckType = $row->getPayment()->getBankAccount()->getECheckType();
+                $this->RoutingNumber = $row->getPayment()->getBankAccount()->getRoutingNumber();
+                $this->AccountNumber = $row->getPayment()->getBankAccount()->getAccountNumber();
+                $this->NameOnAccount = $row->getPayment()->getBankAccount()->getNameOnAccount();
+                $this->BankName = $row->getPayment()->getBankAccount()->getBankName();
+            }
+            $this->FirstName = $row->getBillto()->getFirstName();
+            $this->LastName = $row->getBillto()->getLastName();
+            $this->Address = $row->getBillto()->getAddress();
+            $this->City = $row->getBillto()->getCity();
+            $this->State = $row->getBillto()->getState();
+            $this->Zip = $row->getBillto()->getZip();
+            $this->Country = 'USA';
+            $this->PhoneNumber = $row->getBillto()->getPhoneNumber();
+            return $this;
         }
 
         public static function populatefromRow($row): ?customerPaymentProfile

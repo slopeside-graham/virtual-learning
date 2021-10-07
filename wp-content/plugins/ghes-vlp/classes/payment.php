@@ -8,6 +8,7 @@ namespace GHES\VLP {
     use GHES\VLP\customerPaymentProfile;
     use GHES\VLP\SubscriptionPayment;
     use GHES\VLP\Subscription;
+    use GHES\VLP\PaymentMethod;
 
     /**
      * Class Payment
@@ -15,6 +16,7 @@ namespace GHES\VLP {
     class Payment extends ghes_vlp_base implements \JsonSerializable
     {
         private $_id;
+        private $_PaymentMethod_id;
         private $_Type;
         private $_User_id;
         private $_Amount;
@@ -44,6 +46,18 @@ namespace GHES\VLP {
             // If no value was provided return the existing value
             else {
                 return $this->_id;
+            }
+        }
+
+        protected function PaymentMethod_id($value = null)
+        {
+            // If value was provided, set the value
+            if ($value) {
+                $this->PaymentMethod_id = $value;
+            }
+            // If no value was provided return the existing value
+            else {
+                return $this->_PaymentMethod_id;
             }
         }
 
@@ -290,6 +304,7 @@ namespace GHES\VLP {
         {
             return [
                 'id' => $this->id,
+                'PaymentMethod_id' => $this->PaymentMethod_id,
                 'Type' => $this->Type,
                 'User_id' => $this->User_id,
                 'Amount' => $this->Amount,
@@ -330,27 +345,13 @@ namespace GHES\VLP {
             $Parent = \GHES\Parents::GetByUserID($User_id);
             // Get the Parent ID
             $Parent_id = $Parent->id;
-            // Get the Customer Profile ID
-            try {
-                if ($Parent->customerProfileId != NULL && $Parent->customerPaymentProfileId != NULL) {
-                    customerPaymentProfile::updateProfile($Parent, $request);
-                } else {
-                    $customerProfile = customerProfile::populatefromrow($request);
-                    $customerProfile->merchantCustomerId = $Parent_id;
 
-                    $customerPaymentProfile = customerPaymentProfile::populatefromrow($request);
-                    $anCustomerPaymentProfile = $customerPaymentProfile->getanCustomerPaymentProfile();
-                    $result = $customerProfile->createCustomerProfile($anCustomerPaymentProfile, $Parent_id);
-                    if (!is_wp_error($result)) {
-                        $Parent = \GHES\Parents::GetByUserID($User_id); // This is refreshuing the parent to get the new anet profile ids'.
-                    } else {
-                        return $result;
-                    }
-                }
-            } catch (Exception $e) {
-                return new \WP_Error('ChargePayment_Error', $e->getMessage());
-            }
-            // Charge customerProfile
+            // Get the PaymentMethod
+            $PaymentMethod = PaymentMethod::Get($request->id);
+            $customerProfileId = $PaymentMethod->customerProfileId;
+            $customerPaymentProfileId = $PaymentMethod->customerPaymentProfileId;
+
+            //Get the amount to be charged
             try {
                 $pendingPayments = SubscriptionPayment::GetAllPendingByParentId($Parent_id);
                 if (!empty($pendingPayments->jsonSerialize())) {
@@ -370,12 +371,16 @@ namespace GHES\VLP {
                 } else {
                     return new \WP_Error('ChargePayment_Error', 'Something went wrong with your total. Please refresh the page and try again.');
                 }
+
+                // Create an instance of a customerProfile
                 $customerProfile = new customerProfile();
                 //TODO: Populate this object with customer info first, rather than passing variables directly
-                $chargeResult = $customerProfile->chargeCustomerProfile($Parent->customerProfileId, $Parent->customerPaymentProfileId, $Amount);
+
+                //Charge Customer Profile
+                $chargeResult = $customerProfile->chargeCustomerProfile($customerProfileId, $customerPaymentProfileId, $Amount);
 
                 // Create the payment record from the response.
-                $paymentResult = $this->CreatePaymentFromResponse($chargeResult);
+                $paymentResult = $this->CreatePaymentFromResponse($chargeResult, $PaymentMethod->id);
                 $paymentResultid = $paymentResult->id;
                 $chargepayment = Payment::Get($paymentResultid);
 
@@ -447,7 +452,7 @@ namespace GHES\VLP {
             return new \WP_Error('Refund_Error', 'An error occured: The transaction could not be refunded.');
         }
 
-        public function CreatePaymentFromResponse($chargeResult)
+        public function CreatePaymentFromResponse($chargeResult, $paymentMethodId)
         {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
@@ -471,6 +476,7 @@ namespace GHES\VLP {
                 }
             }
             $this->Type = 'Charge';
+            $this->PaymentMethod_id = $paymentMethodId;
             $this->User_id = get_current_user_id();
             $this->Status = $chargeStatus;
             $this->Description = 'VLL Subscription';
@@ -495,17 +501,18 @@ namespace GHES\VLP {
             VLPUtils::$db->error_handler = false; // since we're catching errors, don't need error handler
             VLPUtils::$db->throw_exception_on_error = true;
 
+            $response = $chargeResult[0];
+            $transId = $chargeResult[0]->getTransactionResponse()->getTransId();
+            $originalPayment = Payment::GetBytransId($transId);
+            $paymentMethodId = $originalPayment->PaymentMethod_id;
+
             if (!is_array($chargeResult)) {
                 $type = 'Refund';
                 $response = $chargeResult;
             } else {
                 $type = 'Void';
                 //If this is a void, we need to void the original amount, so we get the original payment, then get the amount from that.
-                $response = $chargeResult[0];
-                $transId = $chargeResult[0]->getTransactionResponse()->getTransId();
-                $originalPayment = Payment::GetBytransId($transId);
                 $voidedAmount = $originalPayment->Amount;
-
                 $refundAmount = $voidedAmount;
             }
             $tresponse = $response->getTransactionResponse();
@@ -532,6 +539,7 @@ namespace GHES\VLP {
                 $accountNumber = $tresponse->getAccountNumber();
             }
 
+            $this->PaymentMethod_id = $paymentMethodId;
             $this->Type = $type;
             $this->User_id = get_current_user_id();
             $this->Amount = $refundAmount;
@@ -562,6 +570,7 @@ namespace GHES\VLP {
             try {
 
                 VLPUtils::$db->insert('Payment', array(
+                    'PaymentMethod_id' => $this->PaymentMethod_id,
                     'Type' => $this->Type,
                     'User_id' => $this->User_id,
                     'Amount' => $this->Amount,
@@ -760,6 +769,7 @@ namespace GHES\VLP {
 
             $Payment = new Payment();
             $Payment->id = $row['id'];
+            $Payment->PaymentMethod_id = $row['PaymentMethod_id'];
             $Payment->Type = $row['Type'];
             $Payment->User_id = $row['User_id'];
             $Payment->Amount = $row['Amount'];

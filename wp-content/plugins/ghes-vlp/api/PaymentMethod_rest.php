@@ -5,14 +5,14 @@ use GHES\ghes_base;
 namespace GHES\VLP {
 
     /**
-     * Add rest api endpoint for customerPaymentProfile Definitions
+     * Add rest api endpoint for Payment Definitions
      */
 
 
     /**
-     * Class customerPaymentProfile_Rest
+     * Class PaymentMethod_Rest
      */
-    class customerPaymentProfile_Rest extends \WP_REST_Controller
+    class PaymentMethod_Rest extends \WP_REST_Controller
     {
         /**
          * The namespace.
@@ -29,13 +29,13 @@ namespace GHES\VLP {
         protected $rest_base;
 
         /**
-         * Payment_Rest constructor.
+         * PaymentMethod_Rest constructor.
          */
         public function __construct()
         {
 
             $this->namespace = 'ghes-vlp/v1';
-            $this->rest_base = 'customerpaymentprofile';
+            $this->rest_base = 'paymentmethod';
         }
 
         /**
@@ -88,24 +88,24 @@ namespace GHES\VLP {
             register_rest_route($this->namespace, '/' . $this->rest_base, array(
 
                 array(
-                    'methods'             => Payment_Rest::READABLE,
+                    'methods'             => PaymentMethod_Rest::READABLE,
                     'callback'            => array($this, 'get_item'),
                     'permission_callback' => array($this, 'get_item_permissions_check'),
                 ),
                 array(
-                    'methods'         => Payment_Rest::EDITABLE,
+                    'methods'         => PaymentMethod_Rest::EDITABLE,
                     'callback'        => array($this, 'update_item'),
                     'permission_callback' => array($this, 'update_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(false),
                 ),
                 array(
-                    'methods'         => Payment_Rest::CREATABLE,
+                    'methods'         => PaymentMethod_Rest::CREATABLE,
                     'callback'        => array($this, 'create_item'),
                     'permission_callback' => array($this, 'create_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(true),
                 ),
                 array(
-                    'methods'         => Payment_Rest::DELETABLE,
+                    'methods'         => PaymentMethod_Rest::DELETABLE,
                     'callback'        => array($this, 'delete_item'),
                     'permission_callback' => array($this, 'delete_item_permissions_check'),
                     'args'            => $this->get_endpoint_args_for_item_schema(true),
@@ -126,7 +126,7 @@ namespace GHES\VLP {
             if (is_user_logged_in() && \GHES\ghes_base::UserIsParent()) {
                 return true;
             } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot get this Payment resource.'), array('status' => $this->authorization_status_code()));
+                return new \WP_Error('rest_forbidden', esc_html__('You cannot get this Payment Method resource.'), array('status' => $this->authorization_status_code()));
         }
 
         /**
@@ -138,10 +138,10 @@ namespace GHES\VLP {
          */
         public function update_item_permissions_check($request)
         {
-            if (current_user_can('administrator')) {
+            if (is_user_logged_in() && \GHES\ghes_base::UserIsParent()) {
                 return true;
             } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot update this Payment resource.'), array('status' => $this->authorization_status_code()));
+                return new \WP_Error('rest_forbidden', esc_html__('You cannot update this Payment Method resource.'), array('status' => $this->authorization_status_code()));
         }
 
         /**
@@ -156,7 +156,7 @@ namespace GHES\VLP {
             if (is_user_logged_in() && \GHES\ghes_base::UserIsParent()) {
                 return true;
             } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot create this Payment resource.'), array('status' => $this->authorization_status_code()));
+                return new \WP_Error('rest_forbidden', esc_html__('You cannot create this Payment Method resource.'), array('status' => $this->authorization_status_code()));
         }
 
         /**
@@ -168,14 +168,11 @@ namespace GHES\VLP {
          */
         public function delete_item_permissions_check($request)
         {
-            if (current_user_can('administrator')) {
-                return true;
-            } else
-                return new \WP_Error('rest_forbidden', esc_html__('You cannot delete this Payment resource.'), array('status' => $this->authorization_status_code()));
+            return false;
         }
 
         /**
-         * Get the customerPaymentProfile Definition list.
+         * Get the Payment Definition list.
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -185,22 +182,22 @@ namespace GHES\VLP {
         {
             if ($request['id'] != '') {
                 // Call static function Get (use :: to reference static function)
-                $customerPaymentProfile = customerPaymentProfile::Get($request['id']);
+                $paymentmethod = PaymentMethod::Get($request['id']);
             } else {
                 // Call static function Get (use :: to reference static function)
-                $customerPaymentProfile = customerPaymentProfile::GetAll();
+                $paymentmethod = PaymentMethod::GetAll();
             }
 
-            if (!is_wp_error($customerPaymentProfile)) {
-                return rest_ensure_response($customerPaymentProfile);
-            } else {
-                $error_string = $customerPaymentProfile->get_error_message();
-                return new \WP_Error('customerPaymentProfile_Get_Error', 'An error occured: ' . $error_string, array('status' => 400));
+            if (!is_wp_error($paymentmethod))
+                return rest_ensure_response($paymentmethod);
+            else {
+                $error_string = $paymentmethod->get_error_message();
+                return new \WP_Error('PaymentMethod_Get_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
         /**
-         * Update customerPaymentProfile Definition
+         * Update Payment Definition
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -208,41 +205,43 @@ namespace GHES\VLP {
          */
         public function update_item($request)
         {
-            $customerPaymentProfile = customerPaymentProfile::populatefromRow($request);
-            $success = $customerPaymentProfile->Update();
+            $paymentmethod = PaymentMethod::populatefromRow($request);
+            $success = $paymentmethod->Update();
 
-            $customerPaymentProfile = customerPaymentProfile::Get($customerPaymentProfile->id);
+            $paymentmethod = PaymentMethod::Get($paymentmethod->id);
 
             if (!is_wp_error($success))
-                return rest_ensure_response($customerPaymentProfile);
+                return rest_ensure_response($paymentmethod);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('customerPaymentProfile_Update_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('PaymentMethod_Update_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
 
         /**
-         * Delete customerPaymentProfile Definition
+         * Delete Payment Definition
          *
          * @param WP_REST_Request $request get data from request.
          *
          * @return mixed|WP_Error|WP_REST_Response
          */
+        /*
         public function delete_item($request)
         {
-            $customerPaymentProfile = customerPaymentProfile::Get($request['id']);
-            $success = $customerPaymentProfile->Delete();
+            $paymentmethod = PaymentMethod::Get($request['id']);
+            $success = $paymentmethod->Delete();
 
             if (!is_wp_error($success))
-                return rest_ensure_response($customerPaymentProfile);
+                return rest_ensure_response($paymentmethod);
             else {
                 $error_string = $success->get_error_message();
-                return new \WP_Error('customerPaymentProfile_Delete_Error', 'An error occured: ' . $error_string, array('status' => 400));
+                return new \WP_Error('PaymentMethod_Delete_Error', 'An error occured: ' . $error_string, array('status' => 400));
             }
         }
+        */
 
         /**
-         * Create customerPaymentProfile Definition
+         * Create Payment Definition
          *
          * @param WP_REST_Request $request get data from request.
          *
@@ -250,19 +249,18 @@ namespace GHES\VLP {
          */
         public function create_item($request)
         {
+            $paymentmethod = PaymentMethod::populatefromRow($request);
+            $paymentmethodsuccess = $paymentmethod->Create($request);
+            $paymentmethod = PaymentMethod::Get($paymentmethodsuccess->id);
 
-            $customerPaymentProfile = customerPaymentProfile::populatefromRow($request);
-            $success = $customerPaymentProfile->Create();
-            $customerPaymentProfile = customerPaymentProfile::Get($customerPaymentProfile->id);
-
-            if (!is_wp_error($success))
-                return rest_ensure_response($customerPaymentProfile);
-            else {
-                $error_string = $success->get_error_message();
-                return new \WP_Error('customerPaymentProfile_Create_Error', 'An error occured: ' . $error_string, array('status' => 400));
+            if (!is_wp_error($paymentmethodsuccess)) {
+                return rest_ensure_response($paymentmethod);
+            } else {
+                $error_string = $paymentmethodsuccess->get_error_codes();
+                $errorMessage = $paymentmethodsuccess->get_error_message();
+                return new \WP_Error('PaymentMethod_Create_Error', 'An error occured: ' . $errorMessage, array('status' => 400));
             }
         }
-
 
 
         /**

@@ -60,6 +60,10 @@ include_once(plugin_dir_path(__FILE__) . '/../classes/customerProfile.php');
 include_once(plugin_dir_path(__FILE__) . '/../classes/payment.php');
 include_once(plugin_dir_path(__FILE__) . '/payment_rest.php');    // SubscriptionPayment REST controller
 
+// Include SubscriptionPayment class
+include_once(plugin_dir_path(__FILE__) . '/../classes/PaymentMethod.php');
+include_once(plugin_dir_path(__FILE__) . '/PaymentMethod_rest.php');    // SubscriptionPayment REST controller
+
 // Include Email class
 include_once(plugin_dir_path(__FILE__) . '/../classes/email.php');
 
@@ -124,7 +128,11 @@ function register_vlp_controllers()
     $controller->register_routes();
 
     // Resource Controller
-    $controller = new GHES\VLP\customerPaymentProfile_rest();
+    //$controller = new GHES\VLP\customerPaymentProfile_rest();
+   // $controller->register_routes();
+
+    // Resource Controller
+    $controller = new GHES\VLP\PaymentMethod_rest();
     $controller->register_routes();
 }
 

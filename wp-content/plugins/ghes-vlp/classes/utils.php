@@ -69,10 +69,27 @@ namespace GHES\VLP {
             $parentid = \GHES\Parents::GetByUserID(get_current_user_id())->id;
             $currentSubscriptions = Subscription::GetAllCurrentByParentId($parentid);
 
+            $user = wp_get_current_user();
+
             if ($currentSubscriptions->jsonSerialize()) {
                 Utils::AddVLPRole($userid);
+            } else if (Utils::isUserStaff()){
+                Utils::AddVLPRole($user->id);
             } else {
                 Utils::RemoveVLPRole($userid);
+            }
+
+        }
+
+        public static function isUserStaff()
+        {
+            $user = wp_get_current_user();
+            $email = $user->user_email;
+
+            if (strpos($email, '@georgetownhill.com')) {
+                return true;
+            } else {
+                return false;
             }
         }
     }

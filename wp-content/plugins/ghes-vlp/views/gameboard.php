@@ -44,7 +44,7 @@ function vlp_gameboard($atts, $content = null)
 
     $output = '';
 
-    if (isset($_COOKIE['VLPSelectedChild'])) {
+    if (isset($_COOKIE['VLPSelectedChild']) && $_COOKIE['VLPSelectedChild'] != '') {
         $childid = $_COOKIE['VLPSelectedChild'];
         $child = Children::Get($childid);
         $todaysdate = new DateTime(date("Y-m-d"));
@@ -255,30 +255,37 @@ function vlp_gameboard($atts, $content = null)
         // Get All Lesson Categories - Lessons_id, Categories_id
 
         //Get All Resources - id, Media_id, Lesson_id
-
-        $age  = '';
-        if ($years > 1) {
-            $age = $years;
-        } else if ($months == 1) {
-            $age = $months . ' month';
-        } else {
-            $age = $months . ' months';
+        if (!GHES\VLP\Utils::isUserStaff()) {
+            $age  = '';
+            if ($years > 1) {
+                $age = $years;
+            } else if ($months == 1) {
+                $age = $months . ' month';
+            } else {
+                $age = $months . ' months';
+            }
         }
-
         $output .= ' </div> <!-- End of Gameboard -->';
         $output .= '<div class="vll-navigation-buttons">';
         $output .= '<div class="vll-first-column">';
-        $output .= '<div class="age-name">';
-        $output .= '<span class="child-first-name">' . $child->FirstName . '</span><br/>';
-        $output .= '<span class="child-age">Age ' . $age . ' </span>';
-        $output .= '</div>';
+        if (!GHES\VLP\Utils::isUserStaff()) {
+            $output .= '<div class="age-name">';
+            $output .= '<span class="child-first-name">' . $child->FirstName . '</span><br/>';
+            $output .= '<span class="child-age">Age ' . $age . ' </span>';
+            $output .= '</div>';
+        }
+
         $output .= '<a href="' . $browsethemeslink . '" class="view-all-weeks-btn"><img class="nav-btn-img" src="' . $viewAllWeeksButton . '" /></a><br/>';
         $output .= '<a href="' . $browselessonslink . '" class="view-all-lessons-btn"><img class="nav-btn-img" src="' . $browseLessonsButton . '" /></a><br/>';
         $output .= '</div>';
+
         $output .= '<div class="vll-second-column">';
-        $output .= '<img src="' . $boyGirlClipArt . '" class="childrenicons" />';
-        $output .= '<a href="' . $changechildlink . '" class="change-child-btn"><img class="nav-btn-img" src="' . $changeChildButton . '" /></a><br/>';
+        if (!GHES\VLP\Utils::isUserStaff()) {
+            $output .= '<img src="' . $boyGirlClipArt . '" class="childrenicons" />';
+            $output .= '<a href="' . $changechildlink . '" class="change-child-btn"><img class="nav-btn-img" src="' . $changeChildButton . '" /></a><br/>';
+        }
         $output .= '</div>';
+        
         $output .= '</div>';
     } else {
         $output .= '<h2>Sorry, no theme found for that week.</h2>';

@@ -70,7 +70,9 @@ function vlp_welcome()
         $output .= '<div id="parent-is-vlp-links" class="section-links button-links">';
         $output .= '<a href="' . get_permalink(get_option("vlp-agetree")) . '?destination=Gameboard"><img src="' . $launchGameBTN . '" /></a>';
         $output .= '<a href="' . get_permalink(get_option("vlp-agetree")) . '?destination=Lessons"><img src="' . $viewAllLessonsBTN . '" /></a>';
-        $output .= '<a href="' . get_permalink(get_option("add_edit_children_url")) . '"><img src="' . $viewMyChildrenBTN . '" /></a>';
+        if (!GHES\VLP\Utils::isUserStaff()) {
+            $output .= '<a href="' . get_permalink(get_option("add_edit_children_url")) . '"><img src="' . $viewMyChildrenBTN . '" /></a>';
+        }
         $output .= '</div>';
     } else {
         /*
@@ -79,9 +81,11 @@ function vlp_welcome()
         $output .= '</ul>'; // close section links
         */
         // Re-written to be more visual
-        $output .= '<div id="parent-is-vlp-links" class="section-links button-links">';
-        $output .= '<a href="' . get_permalink(get_option("vlp-purchase")) . '">Subscribe Now</a>';
-        $output .= '</div>';
+        if (!GHES\VLP\Utils::isUserStaff()) {
+            $output .= '<div id="parent-is-vlp-links" class="section-links button-links">';
+            $output .= '<a href="' . get_permalink(get_option("vlp-purchase")) . '">Subscribe Now</a>';
+            $output .= '</div>';
+        }
     }
     $output .= '</div>'; // close section details
     $output .= '</div>'; // close vlp-section

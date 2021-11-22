@@ -33,10 +33,7 @@ function vlp_gameboard($atts, $content = null)
     $completionIcon = plugin_dir_url(dirname(__FILE__)) . 'assets/Star.png';
     $nextWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Next Week Button.png';
     $previousWeekButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/Last Week Button.png';
-    $viewAllWeeksButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/View All Themes Button.png';
-    $browseLessonsButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/View All Lessons BTN.png';
-    $changeChildButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/View My Children Button.png';
-    $boyGirlClipArt = plugin_dir_url(dirname(__FILE__)) . 'assets/boy_girl_clipart_faces.png';
+    $viewAllWeeksButton = plugin_dir_url(dirname(__FILE__)) . 'assets/Buttons/View All Weeks Button.png';
 
     $browsethemeslink = get_permalink(get_option('vlp-themes'));
     $browselessonslink = get_permalink(get_option('vlp-lessons'));
@@ -59,7 +56,7 @@ function vlp_gameboard($atts, $content = null)
     } else if (isset($_COOKIE['VLPAgeGroupId'])) {
         $agegroupid = $_COOKIE['VLPAgeGroupId'];
     } else {
-        $output .= 'No Child or Age group Selected';
+        $output .= 'No Child or Age group Selected'; 
         return $output;
     }
 
@@ -92,7 +89,7 @@ function vlp_gameboard($atts, $content = null)
         $themecompleted = $theme->Completed;
         $themepercentcompleted = $theme->PercentComplete;
         $lastweekstheme = Theme::GetbyDateandAgeGroupPrevious($themeid, $agegroupid);
-        $nextweekstheme = Theme::GetbyDateandAgeGroupNext($themeid, $agegroupid);
+        $nextweekstheme = Theme::GetbyDateandAgeGroupNext($themeid, $agegroupid );
 
         if ($themecompleted) {
             $themeprogress = "completed";
@@ -255,38 +252,11 @@ function vlp_gameboard($atts, $content = null)
         // Get All Lesson Categories - Lessons_id, Categories_id
 
         //Get All Resources - id, Media_id, Lesson_id
-        if (!GHES\VLP\Utils::isUserStaff()) {
-            $age  = '';
-            if ($years > 1) {
-                $age = $years;
-            } else if ($months == 1) {
-                $age = $months . ' month';
-            } else {
-                $age = $months . ' months';
-            }
-        }
+
         $output .= ' </div> <!-- End of Gameboard -->';
-        $output .= '<div class="vll-navigation-buttons">';
-        $output .= '<div class="vll-first-column">';
-        if (!GHES\VLP\Utils::isUserStaff()) {
-            $output .= '<div class="age-name">';
-            $output .= '<span class="child-first-name">' . $child->FirstName . '</span><br/>';
-            $output .= '<span class="child-age">Age ' . $age . ' </span>';
-            $output .= '</div>';
-        }
-
         $output .= '<a href="' . $browsethemeslink . '" class="view-all-weeks-btn"><img class="nav-btn-img" src="' . $viewAllWeeksButton . '" /></a><br/>';
-        $output .= '<a href="' . $browselessonslink . '" class="view-all-lessons-btn"><img class="nav-btn-img" src="' . $browseLessonsButton . '" /></a><br/>';
-        $output .= '</div>';
-
-        $output .= '<div class="vll-second-column">';
-        if (!GHES\VLP\Utils::isUserStaff()) {
-            $output .= '<img src="' . $boyGirlClipArt . '" class="childrenicons" />';
-            $output .= '<a href="' . $changechildlink . '" class="change-child-btn"><img class="nav-btn-img" src="' . $changeChildButton . '" /></a><br/>';
-        }
-        $output .= '</div>';
-        
-        $output .= '</div>';
+        $output .= '<a href="' . $browselessonslink . '" class="view-all-lessons-btn">View All Lessons</a><br/>';
+        $output .= '<a href="' . $changechildlink . '" class="change-child-btn">Change Child</a><br/>';
     } else {
         $output .= '<h2>Sorry, no theme found for that week.</h2>';
     }

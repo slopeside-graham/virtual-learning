@@ -125,8 +125,6 @@ function purchaseSubscription() {
         timeout: 0,
         data: {
             Amount: calculateTotal(),
-            PaymentMethodId: "1", // TODO: need the grid to add update and select payment methods
-            /*
             CardNumber: $("#vlp-bill-CardNumber").val().replace(/\s/g, ''),
             ExpirationDate: $("#vlp-bill-ExpirationYear").val() + "-" + $("#vlp-bill-ExpirationMonth").val(),
             CardCode: $("#vlp-bill-CardCode").val(),
@@ -146,7 +144,6 @@ function purchaseSubscription() {
             Zip: $("#vlp-bill-Zip").val(),
             PhoneNumber: $("#vlp-bill-PhoneNumber").val(),
             Email: $("#vlp-bill-Email").val(),
-            */
             SubscriptionPayments: selectedPayments
         },
         success: function (result) {

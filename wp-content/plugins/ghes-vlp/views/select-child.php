@@ -63,11 +63,6 @@ function vlp_select_child($atts, $content = null)
         $output .= '<li><a href="' . $destinationURL . '">Continue to Virtual Learning</a></li>';
         $output .= '<li><a href="' . get_permalink(get_option('add_edit_children_url')) . '">Add/Edit Children</a></li>';
         return $output;
-    } else if (GHES\VLP\Utils::isUserStaff()) {
-        setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
-        unset($_COOKIE['VLPSelectedChild']);
-        header('Location: ' . $destinationURL);
-        exit;
     } else if ($children->count() > 1) {
         setcookie('VLPAgeGroupId', $agegroupid, 0, '/');
 

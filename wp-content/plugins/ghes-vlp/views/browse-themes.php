@@ -27,7 +27,7 @@ function vlp_browse_themes($atts, $content = null)
 
     $output = '';
 
-    if (isset($_COOKIE['VLPSelectedChild'])) {
+    if (isset($_COOKIE['VLPSelectedChild']) && $_COOKIE['VLPSelectedChild'] != '') {
         $childid = $_COOKIE['VLPSelectedChild'];
         $child = Children::Get($childid);
         $childFirstName = $child->FirstName;

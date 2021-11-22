@@ -5,7 +5,7 @@
 use GHES\Utils;
 use GHES\VLP\Utils as VLPUtils;
 
-const vlpscriptver = '1.0.1-6-2021-1';  // Use this in register script calls to bypass cache.
+const vlpscriptver = '1.0.7-7-2020-1';  // Use this in register script calls to bypass cache.
 /**
  * Plugin Name: GHES Virtual Learning Platform
  * Version: 0.1
@@ -94,9 +94,6 @@ function register_vlp_script_style_frontend()
   wp_register_script('wp-api-gameboard-archive', plugins_url('ghes-vlp/js/gameboard-archive.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-gameboard-archive', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
-  wp_register_style('vll-style', plugins_url('/ghes-vlp/css/reg-style.css'), array(), scriptver);
-  wp_enqueue_style('vll-style');
-
   wp_register_style('browse-themes-style', plugins_url('/ghes-vlp/css/browse-themes.css'), array(), scriptver);
   wp_enqueue_style('browse-themes-style');
 
@@ -137,9 +134,6 @@ function register_vlp_script_style_frontend()
 
   wp_register_script('wp-api-vlp-payment-history', plugins_url('ghes-vlp/js/payment-history.js', dirname(__FILE__)), 'wp-api-frontend-utils', scriptver, true);
   wp_localize_script('wp-api-vlp-payment-history', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
-
-  wp_register_script('wp-api-manage-payment-methods', plugins_url('ghes-vlp/js/manage-payment-methods.js', dirname(__FILE__)), 'wp-api-frontend-utils', scriptver, true);
-  wp_localize_script('wp-api-manage-payment-methods', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
 
   wp_register_script('wp-api-frontend-utils', plugins_url('ghes-vlp/js/utils.js', dirname(__FILE__)), ['jquery'], scriptver, true);
   wp_localize_script('wp-api-frontend-utils', 'wpApiSettings', array('root' => esc_url_raw(rest_url()), 'nonce' => wp_create_nonce('wp_rest')));
@@ -258,8 +252,20 @@ add_action( 'init', 'add_vlp_admin_role', 11 );
 
 // The following script is used to add arole
 /*
-$u = new \WP_User( 482 );
+$u = new \WP_User( 2808 );
 
 // Add role
 $u->add_role( 'VLP Parent' );
+*/
+
+// Use the following code to create a free subscription.
+/*
+$freeSubscription = new GHES\VLP\Subscription();
+
+    $freeSubscription->ParentID = 2285; // Should be the Parent ID of the Parent getting the free Subscription
+    $freeSubscription->StartDate = ('11/01/2021'); // Should be the date for the start of the Free Subscription
+    $freeSubscription->EndDate = ('11/30/2022'); // Should be the date for the end of the free Subscription
+    $freeSubscription->SubscriptionDefinition_id = 1; // Should be the definition of the Free Subscription. 
+
+$freeSubscription->CreateFreeSubscription();
 */

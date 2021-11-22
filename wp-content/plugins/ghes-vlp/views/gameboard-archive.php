@@ -27,7 +27,7 @@ function vlp_gameboard_archive($atts, $content = null)
 
     $output = '';
 
-    if (isset($_COOKIE['VLPSelectedChild'])) {
+    if (isset($_COOKIE['VLPSelectedChild']) && $_COOKIE['VLPSelectedChild'] != '') {
         $childid = $_COOKIE['VLPSelectedChild'];
         $child = Children::Get($childid);
         $todaysdate = new DateTime(date("Y-m-d"));

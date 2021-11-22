@@ -134,17 +134,11 @@ function vlp_manage_subscription($atts, $content = null)
             $output .= '</div>';
             $output .= '</script>';
             */
-            /*
+
             $billinginfofilepath = plugin_dir_path(__FILE__) . '/templates/purchase-billing.html';
             $billinginfo = file_get_contents($billinginfofilepath);
 
             $output .= $billinginfo;
-            */
-            $output .= '<div class="purchase-vll-billing">';
-            $output .= '<h3>Select Payment Method</h3>';
-            $paymentMethodSelect = do_shortcode('[vlp_parent_payment_method]');
-            $output .= $paymentMethodSelect;
-            $output .= '</div>';
             $output .= '<div id="cancel-subscription"></div>';
         }
     } else {

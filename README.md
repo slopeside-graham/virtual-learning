@@ -1,0 +1,1 @@
+<p>Virtual learning is a project that takes a curriculum developed by teachers and curriculum specialists and provides it to parents to use with their children. The curriculum is saved into a database, separate from WordPress, and then displayed to the end users. This project also integrates with Authorize.net to allow anyone to purchase and use Virtual Learning. </p>
